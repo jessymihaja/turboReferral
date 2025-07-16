@@ -26,7 +26,7 @@ const [validationPatterns, setValidationPatterns] = useState('');
     async function fetchUserReferrals() {
       try {
         setLoading(true);
-        const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/referrals?user=${user.username}`);
+        const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/referrals/user/${user._id}`);
         if (!res.ok) throw new Error('Erreur chargement referrals');
         const data = await res.json();
         setReferrals(data);
@@ -161,6 +161,7 @@ async function handleServiceRequestSubmit(e) {
                     disabled={deletingId === ref._id}
                     style={{
                       marginTop: '0.5rem',
+                      marginLeft: '0.4rem',
                       backgroundColor: deletingId === ref._id ? '#ccc' : '#e74c3c',
                       color: 'white',
                       border: 'none',

@@ -11,8 +11,8 @@ export default function ServiceDetail() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [newReferral, setNewReferral] = useState({
-    link: '',
-    code: '',
+    link: undefined,
+    code: undefined,
     description: '',
   });
 
@@ -27,7 +27,7 @@ export default function ServiceDetail() {
       const serviceData = await serviceRes.json();
       setService(serviceData);
 
-      const referralRes = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals?service=${id}`);
+      const referralRes = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals/service/${id}`);
       if (!referralRes.ok) throw new Error('Erreur chargement referrals');
       const referralData = await referralRes.json();
       console.log('Referrals loaded:', referralData);  // <=== ici
@@ -69,7 +69,7 @@ export default function ServiceDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           service: id,
-          user: user.username,
+          user: user._id,
           link: newReferral.link,
           code: newReferral.code,
           description: newReferral.description,

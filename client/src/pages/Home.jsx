@@ -92,7 +92,7 @@ export default function Home() {
                 padding: '0.75rem 1rem',
                 marginBottom: '0.75rem',
                 borderRadius: '6px',
-                backgroundColor: '#ecf0f1',
+                backgroundColor: '#d7ccc8',
                 cursor: 'pointer',
                 width: '25%',
                 boxSizing: 'border-box',
