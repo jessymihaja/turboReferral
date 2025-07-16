@@ -24,7 +24,10 @@ const Navbar = ({ user, logout }) => {
           <>
             <Link to="/dashboard" style={styles.link}><FaUserCog /> Dashboard</Link>
             {user.role === 'admin' && (
+              <>
               <Link to="/admin" style={styles.link}><FaTools /> Admin</Link>
+              <Link to="/categories" style={styles.link}><FaTools /> Categories</Link>
+              </>
             )}
           </>
         )}

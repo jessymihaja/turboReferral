@@ -16,6 +16,10 @@ const [serviceDescription, setServiceDescription] = useState('');
 const [serviceLogo, setServiceLogo] = useState('');
 const [serviceWebsite, setServiceWebsite] = useState('');
 const [validationPatterns, setValidationPatterns] = useState('');
+const [selectedCategory, setSelectedCategory] = useState('');
+  const [categories, setCategories] = useState([]);
+
+
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -36,9 +40,22 @@ const [validationPatterns, setValidationPatterns] = useState('');
         setLoading(false);
       }
     }
+    async function fetchCategories() {
+      try {
+        const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/categories`);
+        if (!res.ok) throw new Error('Erreur lors du chargement des catégories');
+        const data = await res.json();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
+    fetchCategories();
     fetchUserReferrals();
   }, [user, authFetch]);
+
+  
 
   function groupByService(referrals) {
     return referrals.reduce((acc, ref) => {
@@ -89,6 +106,7 @@ async function handleServiceRequestSubmit(e) {
           .split(/\n|,/)
           .map(p => p.trim())
           .filter(p => p.length > 0),
+        category: selectedCategory || null,
       }),
     });
 
@@ -103,6 +121,7 @@ async function handleServiceRequestSubmit(e) {
     setServiceLogo('');
     setServiceWebsite('');
     setValidationPatterns('');
+    setSelectedCategory('');
   } catch (err) {
     setFormError(err.message);
   } finally {
@@ -180,67 +199,133 @@ async function handleServiceRequestSubmit(e) {
       )}
 
       <section style={{ marginTop: '3rem', paddingTop: '1rem', borderTop: '1px solid #ccc' }}>
-  <h3>Demander un nouveau service</h3>
   <form
-    onSubmit={handleServiceRequestSubmit}
-    style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '500px' }}
+  onSubmit={handleServiceRequestSubmit}
+  style={{
+    maxWidth: '600px',
+    margin: '2rem auto',
+    padding: '2rem',
+    borderRadius: '10px',
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    fontFamily: 'Segoe UI, sans-serif'
+  }}
+>
+  <h2 style={{ marginBottom: '1rem', color: '#333' }}>Demander un nouveau service</h2>
+
+  <input
+    type="text"
+    placeholder="Nom du service "
+    value={serviceName}
+    onChange={e => setServiceName(e.target.value)}
+    required
+    style={{
+      padding: '0.75rem',
+      fontSize: '1rem',
+      borderRadius: '6px',
+      border: '1px solid #ccc'
+    }}
+  />
+
+  <textarea
+    placeholder="Description"
+    value={serviceDescription}
+    onChange={e => setServiceDescription(e.target.value)}
+    rows={3}
+    style={{
+      padding: '0.75rem',
+      fontSize: '1rem',
+      borderRadius: '6px',
+      border: '1px solid #ccc'
+    }}
+  />
+
+  <input
+    type="text"
+    placeholder="Logo URL"
+    value={serviceLogo}
+    onChange={e => setServiceLogo(e.target.value)}
+    style={{
+      padding: '0.75rem',
+      fontSize: '1rem',
+      borderRadius: '6px',
+      border: '1px solid #ccc'
+    }}
+  />
+
+  <input
+    type="text"
+    placeholder="Website"
+    value={serviceWebsite}
+    onChange={e => setServiceWebsite(e.target.value)}
+    style={{
+      padding: '0.75rem',
+      fontSize: '1rem',
+      borderRadius: '6px',
+      border: '1px solid #ccc'
+    }}
+  />
+
+  <textarea
+    placeholder="Pattern de validation (une regex par ligne ou séparées par des virgules)"
+    value={validationPatterns}
+    onChange={e => setValidationPatterns(e.target.value)}
+    rows={4}
+    style={{
+      padding: '0.75rem',
+      fontSize: '1rem',
+      borderRadius: '6px',
+      border: '1px solid #ccc'
+    }}
+  />
+
+  <select
+    value={selectedCategory}
+    onChange={(e) => setSelectedCategory(e.target.value)}
+    style={{
+      padding: '0.75rem',
+      fontSize: '1rem',
+      borderRadius: '6px',
+      border: '1px solid #ccc'
+    }}
   >
-    <input
-      type="text"
-      placeholder="Nom du service"
-      value={serviceName}
-      onChange={e => setServiceName(e.target.value)}
-      required
-      style={{ padding: '0.5rem', fontSize: '1rem' }}
-    />
-    <textarea
-      placeholder="Description (facultatif)"
-      value={serviceDescription}
-      onChange={e => setServiceDescription(e.target.value)}
-      rows={3}
-      style={{ padding: '0.5rem', fontSize: '1rem' }}
-    />
-    <input
-      type="text"
-      placeholder="Logo (URL)"
-      value={serviceLogo}
-      onChange={e => setServiceLogo(e.target.value)}
-      style={{ padding: '0.5rem', fontSize: '1rem' }}
-    />
-    <input
-      type="text"
-      placeholder="Site web"
-      value={serviceWebsite}
-      onChange={e => setServiceWebsite(e.target.value)}
-      style={{ padding: '0.5rem', fontSize: '1rem' }}
-    />
-    <textarea
-      placeholder="Patterns de validation (1 par ligne ou séparés par des virgules)"
-      value={validationPatterns}
-      onChange={e => setValidationPatterns(e.target.value)}
-      rows={4}
-      style={{ padding: '0.5rem', fontSize: '1rem' }}
-    />
+    <option value="">Catégorie</option>
+    {categories.map(cat => (
+      <option key={cat._id} value={cat._id}>
+        {cat.name}
+      </option>
+    ))}
+  </select>
 
-    {formError && <p style={{ color: 'red' }}>{formError}</p>}
-    {formSuccess && <p style={{ color: 'green' }}>{formSuccess}</p>}
+  {formError && (
+    <p style={{ color: 'red', fontWeight: '500' }}>{formError}</p>
+  )}
+  {formSuccess && (
+    <p style={{ color: '#27ae60', fontWeight: '500' }}>{formSuccess}</p>
+  )}
 
-    <button
-      type="submit"
-      disabled={formLoading}
-      style={{
-        padding: '0.5rem',
-        backgroundColor: '#27ae60',
-        color: 'white',
-        border: 'none',
-        fontSize: '1rem',
-        cursor: formLoading ? 'not-allowed' : 'pointer',
-        borderRadius: '4px',
-      }}
-    >
-      {formLoading ? 'Envoi...' : 'Envoyer la demande'}
-    </button>
-  </form>
+  <button
+    type="submit"
+    disabled={formLoading}
+    style={{
+      padding: '0.75rem',
+      backgroundColor: '#27ae60',
+      color: 'white',
+      border: 'none',
+      fontSize: '1rem',
+      fontWeight: '600',
+      borderRadius: '6px',
+      cursor: formLoading ? 'not-allowed' : 'pointer',
+      transition: 'background-color 0.2s ease'
+    }}
+  >
+    {formLoading ? 'envoi...' : 'soumettre'}
+  </button>
+</form>
+
 </section>
 
     </div>

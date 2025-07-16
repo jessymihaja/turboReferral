@@ -25,7 +25,7 @@ exports.getServiceById = async (req, res) => {
 // Créer un service (non validé par défaut)
 exports.createService = async (req, res) => {
   try {
-    const { name, description, logo, website, validationPatterns } = req.body;
+    const { name, description, logo, website, validationPatterns,category } = req.body;
 
     const existing = await Service.findOne({ name });
     if (existing) return res.status(400).json({ message: 'Service déjà existant' });
@@ -37,6 +37,7 @@ exports.createService = async (req, res) => {
       website,
       validationPatterns,
       isValidated: false, // par défaut non validé
+      category,
     });
     await service.save();
 

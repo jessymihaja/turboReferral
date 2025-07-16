@@ -4,25 +4,38 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [services, setServices] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL + '/api/services')
+    fetch(`${import.meta.env.VITE_API_URL}/api/services`)
       .then(res => res.json())
       .then(setServices)
       .catch(console.error);
+
+    fetch(`${import.meta.env.VITE_API_URL}/api/categories`)
+      .then(res => res.json())
+      .then(setCategories)
+      .catch(console.error);
   }, []);
 
-  const filteredServices = query.trim()
-    ? services.filter(service =>
-        service.name.toLowerCase().includes(query.toLowerCase())
-      )
-    : [];
+  const filteredServices = services.filter(service => {
+    const matchQuery = query.trim()
+      ? service.name.toLowerCase().includes(query.toLowerCase())
+      : true;
+
+    const matchCategory = selectedCategory
+      ? service.category === selectedCategory
+      : true;
+
+    return matchQuery && matchCategory;
+  });
 
   return (
     <div
       style={{
-        maxWidth: '800px',
+        maxWidth: '900px',
         margin: '2rem auto',
         padding: '1rem 1.5rem',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
@@ -47,7 +60,7 @@ export default function Home() {
           fontSize: '1rem',
           borderRadius: '6px',
           border: '1px solid #ccc',
-          marginBottom: '1.5rem',
+          marginBottom: '1rem',
           outline: 'none',
           transition: 'border-color 0.3s ease',
           width: '100%',
@@ -57,6 +70,52 @@ export default function Home() {
         onBlur={e => (e.target.style.borderColor = '#ccc')}
       />
 
+      {/* Boutons Catégories */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          marginBottom: '1.5rem',
+          justifyContent: 'center',
+        }}
+      >
+        <button
+          onClick={() => setSelectedCategory('')}
+          style={{
+            padding: '0.5rem 1rem',
+            borderRadius: '20px',
+            backgroundColor: !selectedCategory ? '#27ae60' : '#b38666ff',
+            color: !selectedCategory ? 'white' : 'white',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: '500',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          All
+        </button>
+        {categories.map(cat => (
+          <button
+            key={cat._id}
+            onClick={() => setSelectedCategory(cat._id)}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '20px',
+              backgroundColor: selectedCategory === cat._id ? '#27ae60' : '#b38666ff',
+              color: selectedCategory === cat._id ? 'white' : 'white',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '500',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Liste des services */}
       <motion.ul
         style={{
           listStyle: 'none',
@@ -65,16 +124,16 @@ export default function Home() {
           width: '100%',
           boxSizing: 'border-box',
           display: 'flex',
-          flexDirection: 'row',
-          overflowX: 'auto',
+          flexWrap: 'wrap',
           gap: '1rem',
+          justifyContent: 'flex-start',
         }}
         initial="hidden"
         animate="visible"
         variants={{
           visible: {
             transition: {
-              staggerChildren: 0.1,
+              staggerChildren: 0.05,
             },
           },
           hidden: {},
@@ -89,15 +148,15 @@ export default function Home() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
               style={{
-                padding: '0.75rem 1rem',
-                marginBottom: '0.75rem',
-                borderRadius: '6px',
-                backgroundColor: '#d7ccc8',
+                flex: '1 0 18%', // ~5 par ligne
+                minWidth: '150px',
+                maxWidth: '180px',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                backgroundColor: '#f4f4f4',
+                textAlign: 'center',
                 cursor: 'pointer',
-                width: '25%',
-                boxSizing: 'border-box',
-                display: 'flex',
-                alignItems: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
               }}
               whileHover={{ backgroundColor: '#d1e7dd' }}
               whileTap={{ scale: 0.98 }}
@@ -108,8 +167,7 @@ export default function Home() {
                   textDecoration: 'none',
                   color: '#2c3e50',
                   fontWeight: '600',
-                  fontSize: '1.1rem',
-                  flexGrow: 1,
+                  fontSize: '1rem',
                   display: 'block',
                 }}
               >
@@ -118,18 +176,18 @@ export default function Home() {
             </motion.li>
           ))}
         </AnimatePresence>
-
-        {!query.trim() && (
-          <p style={{ color: '#7f8c8d', fontStyle: 'italic', textAlign: 'center', width: '100%' }}>
-            Commencez à taper pour rechercher un service.
-          </p>
-        )}
-        {query.trim() && filteredServices.length === 0 && (
-          <p style={{ color: '#e74c3c', fontStyle: 'italic', textAlign: 'center', width: '100%' }}>
-            Aucun service trouvé pour "{query}".
-          </p>
-        )}
       </motion.ul>
+
+      {!query.trim() && filteredServices.length === 0 && (
+        <p style={{ color: '#7f8c8d', fontStyle: 'italic', textAlign: 'center', marginTop: '2rem' }}>
+          Aucune reponse dans la catégorie sélectionnée pour le moment.
+        </p>
+      )}
+      {query.trim() && filteredServices.length === 0 && (
+        <p style={{ color: '#e74c3c', fontStyle: 'italic', textAlign: 'center', marginTop: '2rem' }}>
+          Aucun service trouvé pour "{query}".
+        </p>
+      )}
     </div>
   );
 }

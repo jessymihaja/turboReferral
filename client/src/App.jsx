@@ -10,6 +10,7 @@ import { UserProvider, UserContext } from './contexts/UserContext';
 import { useContext } from 'react';
 import AdminRoute from './components/AdminRoute';
 import Navbar from './components/NavBar';
+import CategoryForm from './pages/CategoryForm';
 import './app.css';
 
 function NavbarComp() {
@@ -45,6 +46,7 @@ function App() {
       </AdminRoute>
     }
   />
+        <Route path='/categories' element={<CategoryForm />} />
       </Routes>
     </UserProvider>
   );
