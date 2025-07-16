@@ -1,6 +1,7 @@
 // controllers/serviceRequestController.js
 
 const ServiceRequest = require('../models/ServiceRequest'); // modèle mongoose à créer
+const Service = require('../models/Service'); 
 
 exports.createServiceRequest = async (req, res) => {
   try {

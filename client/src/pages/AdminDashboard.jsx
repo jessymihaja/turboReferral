@@ -14,7 +14,7 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         const [servicesRes, referralsRes] = await Promise.all([
-          authFetch(`${import.meta.env.VITE_API_URL}/api/services`),
+          authFetch(`${import.meta.env.VITE_API_URL}/api/admin/services`),
           authFetch(`${import.meta.env.VITE_API_URL}/api/referrals`)
         ]);
 
@@ -38,10 +38,11 @@ export default function AdminDashboard() {
 
   async function handleValidateService(id) {
     try {
-      const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/services/${id}/validate`, { method: 'PUT' });
+      const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/admin/services/${id}/validate`, { method: 'PUT' });
       if (!res.ok) throw new Error('Erreur validation service');
       const updated = await res.json();
       setServices(services.map(s => s._id === id ? updated.service : s));
+      alert('Service validé avec succès !');
     } catch (err) {
       alert(err.message);
     }
@@ -71,8 +72,8 @@ export default function AdminDashboard() {
           <ul>
             {services.map(service => (
               <li key={service._id} style={{ marginBottom: '1rem' }}>
-                <strong>{service.name}</strong> - {service.validated ? 'Validé ✅' : 'Non validé ❌'}
-                {!service.validated && (
+                <strong>{service.name}</strong> - {service.isValidated ? 'Validé ✅' : 'Non validé ❌'}
+                {!service.isValidated && (
                   <button
                     onClick={() => handleValidateService(service._id)}
                     style={{ marginLeft: '1rem', padding: '0.3rem 0.6rem' }}

@@ -1,3 +1,4 @@
+const Service = require('../models/Service');
 exports.listServices = async (req, res) => {
   try {
     const services = await Service.find();
@@ -26,7 +27,7 @@ exports.validateService = async (req, res) => {
     const service = await Service.findById(req.params.id);
     if (!service) return res.status(404).json({ message: 'Service non trouvé' });
 
-    service.validated = true;
+    service.isValidated = true;
     await service.save();
 
     res.json({ message: 'Service validé', service });

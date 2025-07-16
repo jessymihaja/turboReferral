@@ -11,8 +11,11 @@ export default function Dashboard() {
   const authFetch = useAuthFetch();
 
   // État formulaire création service
-  const [serviceName, setServiceName] = useState('');
-  const [serviceDescription, setServiceDescription] = useState('');
+ const [serviceName, setServiceName] = useState('');
+const [serviceDescription, setServiceDescription] = useState('');
+const [serviceLogo, setServiceLogo] = useState('');
+const [serviceWebsite, setServiceWebsite] = useState('');
+const [validationPatterns, setValidationPatterns] = useState('');
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -61,40 +64,52 @@ export default function Dashboard() {
   }
 
   // Soumission demande création service
-  async function handleServiceRequestSubmit(e) {
-    e.preventDefault();
-    setFormError('');
-    setFormSuccess('');
-    if (!serviceName.trim()) {
-      setFormError('Le nom du service est obligatoire.');
-      return;
-    }
-    setFormLoading(true);
+async function handleServiceRequestSubmit(e) {
+  e.preventDefault();
+  setFormError('');
+  setFormSuccess('');
 
-    try {
-      const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/service-requests`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: serviceName.trim(),
-          description: serviceDescription.trim(),
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Erreur lors de la demande');
-      }
-
-      setFormSuccess('Demande envoyée avec succès !');
-      setServiceName('');
-      setServiceDescription('');
-    } catch (err) {
-      setFormError(err.message);
-    } finally {
-      setFormLoading(false);
-    }
+  if (!serviceName.trim()) {
+    setFormError('Le nom du service est obligatoire.');
+    return;
   }
+
+  setFormLoading(true);
+
+  try {
+    const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/services`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: serviceName.trim(),
+        description: serviceDescription.trim(),
+        logo: serviceLogo.trim(),
+        website: serviceWebsite.trim(),
+        validationPatterns: validationPatterns
+          .split(/\n|,/)
+          .map(p => p.trim())
+          .filter(p => p.length > 0),
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.message || 'Erreur lors de la demande');
+    }
+
+    setFormSuccess('Service demandé avec succès !');
+    setServiceName('');
+    setServiceDescription('');
+    setServiceLogo('');
+    setServiceWebsite('');
+    setValidationPatterns('');
+  } catch (err) {
+    setFormError(err.message);
+  } finally {
+    setFormLoading(false);
+  }
+}
+
 
   if (!user) return <p>Vous devez être connecté pour accéder au dashboard.</p>;
   if (loading) return <p>Chargement...</p>;
@@ -164,42 +179,69 @@ export default function Dashboard() {
       )}
 
       <section style={{ marginTop: '3rem', paddingTop: '1rem', borderTop: '1px solid #ccc' }}>
-        <h3>Demander un nouveau service</h3>
-        <form onSubmit={handleServiceRequestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
-          <input
-            type="text"
-            placeholder="Nom du service"
-            value={serviceName}
-            onChange={e => setServiceName(e.target.value)}
-            required
-            style={{ padding: '0.5rem', fontSize: '1rem' }}
-          />
-          <textarea
-            placeholder="Description (facultatif)"
-            value={serviceDescription}
-            onChange={e => setServiceDescription(e.target.value)}
-            rows={3}
-            style={{ padding: '0.5rem', fontSize: '1rem' }}
-          />
-          {formError && <p style={{ color: 'red' }}>{formError}</p>}
-          {formSuccess && <p style={{ color: 'green' }}>{formSuccess}</p>}
-          <button
-            type="submit"
-            disabled={formLoading}
-            style={{
-              padding: '0.5rem',
-              backgroundColor: '#27ae60',
-              color: 'white',
-              border: 'none',
-              fontSize: '1rem',
-              cursor: formLoading ? 'not-allowed' : 'pointer',
-              borderRadius: '4px',
-            }}
-          >
-            {formLoading ? 'Envoi...' : 'Envoyer la demande'}
-          </button>
-        </form>
-      </section>
+  <h3>Demander un nouveau service</h3>
+  <form
+    onSubmit={handleServiceRequestSubmit}
+    style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '500px' }}
+  >
+    <input
+      type="text"
+      placeholder="Nom du service"
+      value={serviceName}
+      onChange={e => setServiceName(e.target.value)}
+      required
+      style={{ padding: '0.5rem', fontSize: '1rem' }}
+    />
+    <textarea
+      placeholder="Description (facultatif)"
+      value={serviceDescription}
+      onChange={e => setServiceDescription(e.target.value)}
+      rows={3}
+      style={{ padding: '0.5rem', fontSize: '1rem' }}
+    />
+    <input
+      type="text"
+      placeholder="Logo (URL)"
+      value={serviceLogo}
+      onChange={e => setServiceLogo(e.target.value)}
+      style={{ padding: '0.5rem', fontSize: '1rem' }}
+    />
+    <input
+      type="text"
+      placeholder="Site web"
+      value={serviceWebsite}
+      onChange={e => setServiceWebsite(e.target.value)}
+      style={{ padding: '0.5rem', fontSize: '1rem' }}
+    />
+    <textarea
+      placeholder="Patterns de validation (1 par ligne ou séparés par des virgules)"
+      value={validationPatterns}
+      onChange={e => setValidationPatterns(e.target.value)}
+      rows={4}
+      style={{ padding: '0.5rem', fontSize: '1rem' }}
+    />
+
+    {formError && <p style={{ color: 'red' }}>{formError}</p>}
+    {formSuccess && <p style={{ color: 'green' }}>{formSuccess}</p>}
+
+    <button
+      type="submit"
+      disabled={formLoading}
+      style={{
+        padding: '0.5rem',
+        backgroundColor: '#27ae60',
+        color: 'white',
+        border: 'none',
+        fontSize: '1rem',
+        cursor: formLoading ? 'not-allowed' : 'pointer',
+        borderRadius: '4px',
+      }}
+    >
+      {formLoading ? 'Envoi...' : 'Envoyer la demande'}
+    </button>
+  </form>
+</section>
+
     </div>
   );
 }
