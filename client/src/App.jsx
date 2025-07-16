@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -9,40 +9,21 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { UserProvider, UserContext } from './contexts/UserContext';
 import { useContext } from 'react';
 import AdminRoute from './components/AdminRoute';
+import Navbar from './components/NavBar';
+import './app.css';
 
-function Navbar() {
+function NavbarComp() {
   const { user, logout } = useContext(UserContext);
 
   return (
-    <nav style={{ padding: '1rem', background: '#f0f0f0' }}>
-      <Link to="/" style={{ marginRight: '1rem' }}>🏠 Accueil</Link>
-
-      {user ? (
-        <>
-          <span style={{ marginRight: '1rem' }}>👋 Bonjour {user.username}</span>
-          <Link to="/dashboard" style={{ marginRight: '1rem' }}>⚙️ Mon dashboard</Link>
-          
-          {/* Affiche lien Admin Dashboard seulement si rôle admin */}
-          {user.role === 'admin' && (
-            <Link to="/admin" style={{ marginRight: '1rem' }}>🛠️ Admin dashboard</Link>
-          )}
-
-          <button onClick={logout}>🚪 Déconnexion</button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" style={{ marginRight: '1rem' }}>🔐 Se connecter</Link>
-          <Link to="/register">🆕 S'inscrire</Link>
-        </>
-      )}
-    </nav>
+    <Navbar user={user} logout={logout} />
   );
 }
 
 function App() {
   return (
     <UserProvider>
-      <Navbar />
+      <NavbarComp />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
