@@ -15,6 +15,7 @@ const referralRoutes = require('./routes/referralRoute');
 const serviceRequestRoute = require('./routes/serviceRequestRoute');
 const adminRoutes = require('./routes/adminRoute');
 const categoryRoutes = require('./routes/categoryRoute');
+const referralVoteRoutes = require('./routes/ReferralVoteRoutes');
 
 // Connexion MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -31,6 +32,7 @@ app.use('/api/referrals', referralRoutes);
 app.use('/api', serviceRequestRoute);
 app.use('/api/admin', adminRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/referralVotes', referralVoteRoutes);
 // Route racine
 app.get('/', (req, res) => {
   res.send('API TurboReferral fonctionne');

@@ -66,20 +66,28 @@ exports.getReferralsbyServiceId = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ message: 'Service ID requis' });
-    const referrals = await Referral.find({ service: id }).populate('service');
+    const referrals = await Referral.find({ service: id }).populate('service').populate('user');
     res.json(referrals);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+const mongoose = require('mongoose');
+
 exports.getAllReferralsbyUserid = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ message: 'User ID requis' });
-    const referrals = await Referral.find({ user: id }).populate('user').populate('service');
+
+    // S'assurer que c'est bien un ObjectId
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    const referrals = await Referral.find({ user: objectId })
+      .populate('user')
+      .populate('service');
+
     res.json(referrals);
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };

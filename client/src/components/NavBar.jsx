@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import {
   FaHome,
-  FaUserCog,
+  FaChartBar,
   FaSignOutAlt,
   FaTools,
   FaSignInAlt,
   FaUserPlus,
-  FaUser
+  FaUser,
+  FaLightbulb
 } from 'react-icons/fa';
 
 const Navbar = ({ user, logout }) => {
@@ -22,11 +23,11 @@ const Navbar = ({ user, logout }) => {
         <Link to="/" style={styles.link}><FaHome /> Accueil</Link>
         {user && (
           <>
-            <Link to="/dashboard" style={styles.link}><FaUserCog /> Dashboard</Link>
+            <Link to="/dashboard" style={styles.link}><FaChartBar /> Dashboard</Link>
             {user.role === 'admin' && (
               <>
               <Link to="/admin" style={styles.link}><FaTools /> Admin</Link>
-              <Link to="/categories" style={styles.link}><FaTools /> Categories</Link>
+              <Link to="/categories" style={styles.link}><FaLightbulb /> Categories</Link>
               </>
             )}
           </>

@@ -1,6 +1,10 @@
 import { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import ReferralVoteForm from '../components/ReferralVoteForm';
+import { FaComment } from 'react-icons/fa';
+import TimeAgo from '../components/TimeAgo';
+//import CommentModal from '../components/CommentModal';
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -10,54 +14,41 @@ export default function ServiceDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [newReferral, setNewReferral] = useState({
-    link: undefined,
-    code: undefined,
-    description: '',
-  });
+  const [newReferral, setNewReferral] = useState({ link: undefined, code: undefined, description: '' });
+  const [selectedReferral, setSelectedReferral] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
- useEffect(() => {
-  async function fetchData() {
-    try {
-      setLoading(true);
-      setError('');
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const serviceRes = await fetch(`${import.meta.env.VITE_API_URL}/api/services/${id}`);
+        if (!serviceRes.ok) throw new Error('Service non trouv\u00e9');
+        const serviceData = await serviceRes.json();
+        setService(serviceData);
 
-      const serviceRes = await fetch(`${import.meta.env.VITE_API_URL}/api/services/${id}`);
-      if (!serviceRes.ok) throw new Error('Service non trouvé');
-      const serviceData = await serviceRes.json();
-      setService(serviceData);
-
-      const referralRes = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals/service/${id}`);
-      if (!referralRes.ok) throw new Error('Erreur chargement referrals');
-      const referralData = await referralRes.json();
-      console.log('Referrals loaded:', referralData);  // <=== ici
-
-      setReferrals(referralData);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+        const referralRes = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals/service/${id}`);
+        if (!referralRes.ok) throw new Error('Erreur chargement referrals');
+        const referralData = await referralRes.json();
+        setReferrals(referralData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
-  fetchData();
-}, [id]);
+    fetchData();
+  }, [id]);
 
-  // Vérifie si l'utilisateur a déjà ajouté un referral pour ce service
- const hasReferralForUser = user
-  ? referrals.some(ref => {
-      if (!ref.user) return false;
-      if (typeof ref.user === 'string') return ref.user === user.username && (ref.link || ref.code);
-      if (typeof ref.user === 'object') return ref.user.username === user.username && (ref.link || ref.code);
-      return false;
-    })
-  : false;
+  const hasReferralForUser = user
+    ? referrals.some(ref => ref.user?.username === user.username || ref.user === user.username)
+    : false;
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Validation simple : soit link soit code mais pas les deux ni aucun
     if ((!newReferral.link && !newReferral.code) || (newReferral.link && newReferral.code)) {
       setError('Veuillez renseigner soit un lien, soit un code (pas les deux).');
       return;
@@ -76,10 +67,10 @@ export default function ServiceDetail() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erreur lors de l’ajout du referral');
+      if (!res.ok) throw new Error(data.message || 'Erreur lors de l\u2019ajout du referral');
 
-      setReferrals((prev) => [...prev, data]);
-      setSuccess('Referral ajouté avec succès !');
+      setReferrals(prev => [...prev, data]);
+      setSuccess('Referral ajout\u00e9 avec succ\u00e8s !');
       setNewReferral({ link: '', code: '', description: '' });
     } catch (err) {
       setError(err.message);
@@ -91,102 +82,76 @@ export default function ServiceDetail() {
   if (!service) return <p>Service introuvable</p>;
 
   return (
-    <div style={{ maxWidth: '700px', margin: '2rem auto', padding: '1rem' }}>
-      <h2>{service.name}</h2>
-      {service.logo && (
-        <img
-          src={service.logo}
-          alt={service.name}
-          style={{ maxWidth: '150px', marginBottom: '1rem' }}
-        />
-      )}
-      {service.website && (
-        <p>
-          Site :{' '}
-          <a href={service.website} target="_blank" rel="noreferrer">
-            {service.website}
-          </a>
-        </p>
-      )}
-      {service.description && <p>{service.description}</p>}
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', padding: '2rem' }}>
+      <div style={{ borderTop: '2px solid #27ae60', borderRadius: '8px', padding: '1rem', backgroundColor: '#f9f9f9' ,maxHeight:'50%'}}>
+        <h2 style={{ color: '#2c3e50' }}>{service.name}</h2>
+        {service.logo && <img src={service.logo} alt={service.name} style={{ maxWidth: '100%' }} />}
+        {service.website && <p><a href={service.website} target="_blank" rel="noreferrer" style={{ color: '#27ae60', textDecoration: 'none' }}>{service.website}</a></p>}
+        {service.description && <p style={{ color: '#555' }}>{service.description}</p>}
 
-      <hr style={{ margin: '2rem 0' }} />
-
-      <h3>Liens et codes de parrainage</h3>
-      {referrals.length === 0 && <p>Aucun referral pour ce service.</p>}
-      <ul>
-        {referrals.map((ref) => (
-          <li key={ref._id} style={{ marginBottom: '1rem' }}>
-            {ref.link && (
-              <a href={ref.link} target="_blank" rel="noreferrer">
-                {ref.link}
-              </a>
-            )}
-            {ref.code && <span>Code : {ref.code}</span>}
-            {ref.description && (
-              <p style={{ fontStyle: 'italic', marginTop: '0.3rem' }}>{ref.description}</p>
-            )}
-          </li>
-        ))}
-      </ul>
-
-      {user ? (
-        !hasReferralForUser ? (
-          <>
-            <hr style={{ margin: '2rem 0' }} />
-            <h3>Ajouter un lien ou code de parrainage</h3>
-            <form
-              onSubmit={handleSubmit}
-              style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}
-            >
-              <input
-                type="url"
-                placeholder="Lien de parrainage (https://...)"
-                value={newReferral.link}
-                onChange={(e) => setNewReferral({ ...newReferral, link: e.target.value })}
-                disabled={!!newReferral.code}
-                style={{ padding: '0.5rem' }}
-              />
-              <input
-                type="text"
-                placeholder="Code de parrainage"
-                value={newReferral.code}
-                onChange={(e) => setNewReferral({ ...newReferral, code: e.target.value })}
-                disabled={!!newReferral.link}
-                style={{ padding: '0.5rem' }}
-              />
-              <input
-                type="text"
-                placeholder="Description (max 100 caractères)"
-                value={newReferral.description}
-                onChange={(e) =>
-                  setNewReferral({ ...newReferral, description: e.target.value.slice(0, 100) })
-                }
-                maxLength={100}
-                style={{ padding: '0.5rem' }}
-              />
-              <button
-                type="submit"
-                style={{
-                  padding: '0.5rem',
-                  backgroundColor: '#27ae60',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                Ajouter
-              </button>
-            </form>
+        <h2 style={{ color: '#2c3e50' }}>Enregistrer un nouveau referral</h2>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.5rem' }}>
+            <input type="url" placeholder="Lien de parrainage (https://...)" value={newReferral.link} onChange={(e) => setNewReferral({ ...newReferral, link: e.target.value })} disabled={!!newReferral.code} style={{ padding: '0.5rem' }} />
+            <input type="text" placeholder="Code de parrainage" value={newReferral.code} onChange={(e) => setNewReferral({ ...newReferral, code: e.target.value })} disabled={!!newReferral.link} style={{ padding: '0.5rem' }} />
+            <input type="text" placeholder="Description" value={newReferral.description} onChange={(e) => setNewReferral({ ...newReferral, description: e.target.value })} maxLength={100} style={{ padding: '0.5rem' }} />
+            <button type="submit" style={{ backgroundColor: '#27ae60', color: 'white', padding: '0.5rem', border: 'none', borderRadius: '4px' }}>Ajouter</button>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {success && <p style={{ color: 'green' }}>{success}</p>}
-          </>
-        ) : (
-          <p>Vous avez déjà ajouté un lien ou un code pour ce service.</p>
-        )
-      ) : (
-        <p>Connectez-vous pour ajouter un referral.</p>
+          </form>
+          {user && hasReferralForUser && (<p>vous avez un ou plusieurs referrals sur ce service</p>)}
+        
+      </div>
+
+      <div>
+        <h3 style={{ marginBottom: '1rem' }}>Referrals disponibles</h3>
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {referrals.map(ref => (
+            <div key={ref._id} style={{ border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9',maxWidth: '60%' }}>
+              <div style={{ border: '1px solid lightgrey',borderTopLeftRadius:'8px',borderTopRightRadius:'8px', padding: '0.4rem', backgroundColor: 'lightgrey',maxWidth: '100%' }}>
+                {ref.link && <span style={{
+                  display: 'flex',          
+                  justifyContent: 'center',
+                  alignItems: 'center',     
+                  width: '95%',            
+                  color: '#b38666ff',
+                  backgroundColor: 'white',
+                  borderRadius: '28px',
+                  padding: '0.6rem'
+                }}>
+                  <a href={ref.link} target="_blank" rel="noreferrer" style={{ color: '#b38666ff' }}>
+                    {ref.link}
+                  </a>
+                </span>}
+                {ref.code && <span style={{
+                  display: 'flex',          
+                  justifyContent: 'center',
+                  alignItems: 'center',     
+                  width: '95%',            
+                  color: '#b38666ff',
+                  backgroundColor: 'white',
+                  borderRadius: '28px',
+                  padding: '0.6rem'
+                }}>{ref.code}</span>}
+                <p style={{ fontStyle: 'italic' }}>{ref.description}</p>
+                <p style={{ color: '#2c3e50' }}>Ajouté par : {ref.user?.username || ref.user} <TimeAgo isoDateString= {ref.createdAt}></TimeAgo></p>
+                <div style={{ marginLeft: '0.5rem', fontWeight: 'bold'}}>avg {ref.voteAverage || 0}
+                  <button onClick={() => { setSelectedReferral(ref); setShowModal(true); }} style={{ padding:'1rem' ,background: 'transparent', border: 'none', cursor: 'pointer', color: '#2c3e50' }}><FaComment/>commentaires</button>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
+                
+              <ReferralVoteForm referralId={ref._id} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {showModal && selectedReferral && (
+        <CommentModal
+          referral={selectedReferral}
+          onClose={() => setShowModal(false)}
+        />
       )}
     </div>
   );

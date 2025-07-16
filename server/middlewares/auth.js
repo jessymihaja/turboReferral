@@ -8,11 +8,21 @@ function authenticateToken(req, res, next) {
 
   if (!token) return res.status(401).json({ message: 'Token manquant' });
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Token invalide' });
-    req.user = user; // ajoute l'user décodé à la requête
+  const User = require('../models/User'); // n'oublie pas d'importer le modèle
+
+jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+  if (err) return res.status(403).json({ message: 'Token invalide' });
+
+  try {
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(401).json({ message: 'Utilisateur non trouvé' });
+
+    req.user = user; // maintenant req.user._id est dispo
     next();
-  });
+  } catch (err) {
+    return res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
 }
 
 module.exports = authenticateToken;

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const referralSchema = new mongoose.Schema({
   service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
-  user: { type: String, required: true }, // identifiant user (ex: username ou email)
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // identifiant user (ex: username ou email)
   link: {
     type: String,
     unique: true,
@@ -21,7 +21,7 @@ const referralSchema = new mongoose.Schema({
     unique: true,
     sparse: true,
   },
-  promo: { type: String, maxlength: 16 },
+  description: { type: String, maxlength: 100 },
 }, { timestamps: true });
 
 // Validation personnalisée : soit link soit code (mais pas les deux)
