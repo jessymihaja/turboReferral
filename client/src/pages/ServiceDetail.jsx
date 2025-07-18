@@ -4,7 +4,7 @@ import { UserContext } from '../contexts/UserContext';
 import ReferralVoteForm from '../components/ReferralVoteForm';
 import { FaComment } from 'react-icons/fa';
 import TimeAgo from '../components/TimeAgo';
-//import CommentModal from '../components/CommentModal';
+import CommentModal from '../components/CommentModal';
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -133,7 +133,7 @@ export default function ServiceDetail() {
                   padding: '0.6rem'
                 }}>{ref.code}</span>}
                 <p style={{ fontStyle: 'italic' }}>{ref.description}</p>
-                <p style={{ color: '#2c3e50' }}>Ajouté par : {ref.user?.username || ref.user} <TimeAgo isoDateString= {ref.createdAt}></TimeAgo></p>
+                <span style={{ color: '#2c3e50' }}>Ajouté par : {ref.user?.username || ref.user} <TimeAgo isoDateString= {ref.createdAt}></TimeAgo></span>
                 <div style={{ marginLeft: '0.5rem', fontWeight: 'bold'}}>avg {ref.voteAverage || 0}
                   <button onClick={() => { setSelectedReferral(ref); setShowModal(true); }} style={{ padding:'1rem' ,background: 'transparent', border: 'none', cursor: 'pointer', color: '#2c3e50' }}><FaComment/>commentaires</button>
                 </div>

@@ -27,3 +27,18 @@ exports.submitVote = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+exports.getCommentsByReferral = async (req, res) => {
+  try {
+    const { referralId } = req.params;
+    const comments = await ReferralVote.find({ referral: referralId, comment: { $ne: '' } })
+      .populate('user', 'username')
+      .sort({ createdAt: -1 });
+
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
