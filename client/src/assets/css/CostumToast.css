@@ -1,0 +1,49 @@
+.custom-toast {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: white;
+    z-index: 9999;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.custom-toast.success {
+    background-color: #28a745; /* Vert pour succès */
+}
+
+.custom-toast.error {
+    background-color: #dc3545; /* Rouge pour erreur */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Progress bar animée */
+.progress-bar {
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.6);
+    margin-top: 8px;
+    animation: fillBar 2s linear forwards;
+}
+
+@keyframes fillBar {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}

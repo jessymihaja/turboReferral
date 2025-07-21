@@ -5,6 +5,7 @@ import ReferralVoteForm from '../components/ReferralVoteForm';
 import { FaComment } from 'react-icons/fa';
 import TimeAgo from '../components/TimeAgo';
 import CommentModal from '../components/CommentModal';
+import CustomToast from '../components/CustomToast';  
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -17,6 +18,7 @@ export default function ServiceDetail() {
   const [newReferral, setNewReferral] = useState({ link: undefined, code: undefined, description: '' });
   const [selectedReferral, setSelectedReferral] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: '' });
 
   useEffect(() => {
     async function fetchData() {
@@ -46,11 +48,11 @@ export default function ServiceDetail() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setToast({ message: '...', type: 'error' });
+    setToast({ message: 'Referral ajouté avec succès !', type: 'success' });
 
     if ((!newReferral.link && !newReferral.code) || (newReferral.link && newReferral.code)) {
-      setError('Veuillez renseigner soit un lien, soit un code (pas les deux).');
+      setToast({ message: 'Veuillez renseigner soit un lien, soit un code', type: 'error' });
       return;
     }
 
@@ -73,7 +75,7 @@ export default function ServiceDetail() {
       setSuccess('Referral ajout\u00e9 avec succ\u00e8s !');
       setNewReferral({ link: '', code: '', description: '' });
     } catch (err) {
-      setError(err.message);
+      setToast({ message: err.message, type: 'error' });
     }
   }
 
@@ -82,7 +84,15 @@ export default function ServiceDetail() {
   if (!service) return <p>Service introuvable</p>;
 
   return (
+    
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', padding: '2rem' }}>
+      {toast.message && (
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: '', type: '' })}
+      />
+)}
       <div style={{ borderTop: '2px solid #27ae60', borderRadius: '8px', padding: '1rem', backgroundColor: '#f9f9f9' ,maxHeight:'50%'}}>
         <h2 style={{ color: '#2c3e50' }}>{service.name}</h2>
         {service.logo && <img src={service.logo} alt={service.name} style={{ maxWidth: '100%' }} />}

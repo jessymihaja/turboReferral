@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
+import CustomToast from './CustomToast';
+
 function ReferralVoteForm({ referralId }) {
     const { token} = useContext(UserContext);
   const [vote, setVote] = useState('');
   const [comment, setComment] = useState('');
-  const [message, setMessage] = useState('');
+  const [toast, setToast] = useState({ message: '', type: '' });
+
 
   async function handleSubmit(e) {
   e.preventDefault();
@@ -19,8 +22,8 @@ function ReferralVoteForm({ referralId }) {
   });
 
   const data = await res.json();
-  if (!res.ok) return setMessage(data.message);
-  setMessage('Merci pour votre vote !');
+  if (!res.ok) return setToast({ message: data.message, type: 'error' });;
+  setToast({ message: 'Merci pour votre vote', type: 'success' });
   setVote('');
   setComment('');
 }
@@ -112,12 +115,13 @@ function ReferralVoteForm({ referralId }) {
     Envoyer
   </button>
   </div>
-
-  {message && (
-    <p style={{ marginTop: '0.75rem', color: '#2c3e50', fontStyle: 'italic', textAlign: 'center' }}>
-      {message}
-    </p>
-  )}
+{toast.message && (
+      <CustomToast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: '', type: '' })}
+      />
+)}
 </form>
 
   );

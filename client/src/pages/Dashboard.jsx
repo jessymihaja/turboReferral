@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { useAuthFetch } from '../utils/authFetch';
+import CustomToast from '../components/CustomToast';
 
 export default function Dashboard() {
   const { user } = useContext(UserContext);
@@ -9,6 +10,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const authFetch = useAuthFetch();
+  const [toast, setToast] = useState({ message: '', type: '' });
 
   // État formulaire création service
  const [serviceName, setServiceName] = useState('');
@@ -87,7 +89,7 @@ async function handleServiceRequestSubmit(e) {
   setFormSuccess('');
 
   if (!serviceName.trim()) {
-    setFormError('Le nom du service est obligatoire.');
+    setToast({ message: 'le nom du service est obligatoire ', type: 'error' });
     return;
   }
 
@@ -115,7 +117,7 @@ async function handleServiceRequestSubmit(e) {
       throw new Error(errData.message || 'Erreur lors de la demande');
     }
 
-    setFormSuccess('Service demandé avec succès !');
+    setToast({ message: 'service demandé avec succès', type: 'success' });
     setServiceName('');
     setServiceDescription('');
     setServiceLogo('');
@@ -123,7 +125,7 @@ async function handleServiceRequestSubmit(e) {
     setValidationPatterns('');
     setSelectedCategory('');
   } catch (err) {
-    setFormError(err.message);
+    setToast({ message: err.message, type: 'error' });
   } finally {
     setFormLoading(false);
   }
@@ -138,6 +140,13 @@ async function handleServiceRequestSubmit(e) {
 
   return (
     <div style={{ maxWidth: '700px', margin: '2rem auto', padding: '1rem', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+      {toast.message && (
+            <CustomToast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast({ message: '', type: '' })}
+            />
+      )}
       <h2 style={{ marginBottom: '1rem' }}>Dashboard de {user.username}</h2>
       <p style={{ marginBottom: '1.5rem' }}>Vous avez {referrals.length} lien(s) ou code(s) de parrainage.</p>
 
