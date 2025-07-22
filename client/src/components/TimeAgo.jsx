@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale'; // Pour avoir le résultat en français
+import { FaClock } from 'react-icons/fa';
 
 function TimeAgo({ isoDateString }) {
   // Convertir la chaîne ISO en objet Date
@@ -33,9 +34,9 @@ function TimeAgo({ isoDateString }) {
   }, [dateObj]); // Dépendance à dateObj pour recalculer si la date change
 
   return (
-    <p>
-      Publié : **{timeAgo}**
-    </p>
+    <span style={{ alignItems: 'center', color: 'rgb(4 120 87 )',fontSize: '0.9rem', display: 'flex', gap: '0.2rem'}}>
+      <FaClock/> {timeAgo}
+    </span>
   );
 }
 export default TimeAgo;

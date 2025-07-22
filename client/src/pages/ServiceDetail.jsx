@@ -6,6 +6,7 @@ import { FaComment } from 'react-icons/fa';
 import TimeAgo from '../components/TimeAgo';
 import CommentModal from '../components/CommentModal';
 import CustomToast from '../components/CustomToast';  
+import ReportReferral from '../components/ReportReferral';
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -87,12 +88,12 @@ export default function ServiceDetail() {
     
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', padding: '2rem' }}>
       {toast.message && (
-      <CustomToast
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ message: '', type: '' })}
-      />
-)}
+        <CustomToast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ message: '', type: '' })}
+        />
+      )}
       <div style={{ borderTop: '2px solid #27ae60', borderRadius: '8px', padding: '1rem', backgroundColor: '#f9f9f9' ,maxHeight:'50%'}}>
         <h2 style={{ color: '#2c3e50' }}>{service.name}</h2>
         {service.logo && <img src={service.logo} alt={service.name} style={{ maxWidth: '100%' }} />}
@@ -143,14 +144,16 @@ export default function ServiceDetail() {
                   padding: '0.6rem'
                 }}>{ref.code}</span>}
                 <p style={{ fontStyle: 'italic' }}>{ref.description}</p>
-                <span style={{ color: '#2c3e50' }}>Ajouté par : {ref.user?.username || ref.user} <TimeAgo isoDateString= {ref.createdAt}></TimeAgo></span>
-                <div style={{ marginLeft: '0.5rem', fontWeight: 'bold'}}>avg {ref.voteAverage || 0}
+                <span style={{ color: '#2c3e50' }}><span className="avatar-circle" style={{float:'left'}}>{(ref.user?.username?.charAt(0).toUpperCase() || '?')}</span>{ ref.user?.username && (ref.user.username.charAt(0).toUpperCase() + ref.user.username.slice(1).toLowerCase()) || ref.user} <TimeAgo isoDateString= {ref.createdAt}></TimeAgo></span>
+                <div style={{ marginLeft: '0.5rem', fontWeight: 'bold',marginBottom:'-1rem'}}>{ref.voteAverage || 0}
                   <button onClick={() => { setSelectedReferral(ref); setShowModal(true); }} style={{ padding:'1rem' ,background: 'transparent', border: 'none', cursor: 'pointer', color: '#2c3e50' }}><FaComment/>commentaires</button>
                 </div>
+                
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
-                
+              
               <ReferralVoteForm referralId={ref._id} />
+               <ReportReferral referralId={ref._id}/> 
               </div>
             </div>
           ))}
