@@ -16,6 +16,10 @@ const reportSchema = new mongoose.Schema({
     enum: ['Brisé', 'Trompeur', 'Abusif', 'Autre'],
     required: true
   },
+  status: {
+    type: Number,
+    default: 1, // 1 = à vérifier, 0 = traité
+  },
   reportedAt: {
     type: Date,
     default: Date.now

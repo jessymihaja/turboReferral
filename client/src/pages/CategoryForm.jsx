@@ -59,7 +59,7 @@ export default function CategoryForm() {
 
   return (
     <div style={{ maxWidth: '500px', margin: '2rem auto', fontFamily: 'Segoe UI, sans-serif' }}>
-      <h2>Créer une nouvelle categorie</h2>
+      <h2 style={{color:'#5D4037'}}>Créer une nouvelle categorie</h2>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <input
           type="text"

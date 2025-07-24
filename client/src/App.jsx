@@ -11,6 +11,7 @@ import { useContext } from 'react';
 import AdminRoute from './components/AdminRoute';
 import Navbar from './components/NavBar';
 import CategoryForm from './pages/CategoryForm';
+import PendingReports from './pages/PendingReports';
 import './app.css';
 
 function NavbarComp() {
@@ -47,6 +48,7 @@ function App() {
     }
   />
         <Route path='/categories' element={<CategoryForm />} />
+        <Route path='/pending-reports' element={<PendingReports />} />
       </Routes>
     </UserProvider>
   );

@@ -147,8 +147,8 @@ async function handleServiceRequestSubmit(e) {
               onClose={() => setToast({ message: '', type: '' })}
             />
       )}
-      <h2 style={{ marginBottom: '1rem' }}>Dashboard de {user.username}</h2>
-      <p style={{ marginBottom: '1.5rem' }}>Vous avez {referrals.length} lien(s) ou code(s) de parrainage.</p>
+      <h2 style={{ marginBottom: '1rem' ,color:'#5D4037'}}>Bienvenue sur votre tableau de bord  {user.username}</h2>
+      <p style={{ marginBottom: '1.5rem' ,color:'#4E342E'}}>Vous avez {referrals.length} lien(s) ou code(s) de parrainage.</p>
 
       {referrals.length === 0 ? (
         <p>Aucun referral posté pour l'instant.</p>

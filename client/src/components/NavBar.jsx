@@ -7,7 +7,8 @@ import {
   FaSignInAlt,
   FaUserPlus,
   FaUser,
-  FaLightbulb
+  FaLightbulb,
+  FaExclamationTriangle
 } from 'react-icons/fa';
 
 const Navbar = ({ user, logout }) => {
@@ -28,6 +29,7 @@ const Navbar = ({ user, logout }) => {
               <>
               <Link to="/admin" style={styles.link}><FaTools /> Admin</Link>
               <Link to="/categories" style={styles.link}><FaLightbulb /> Categories</Link>
+              <Link to="/pending-reports" style={styles.link}><FaExclamationTriangle/> Signalements</Link>
               </>
             )}
           </>

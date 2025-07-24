@@ -32,3 +32,41 @@ exports.getAllReports = async (req, res) => {
     res.status(500).json({ message: 'Erreur de recuperation des signalements' });
   }
 };
+
+exports.getPendingReports = async (req, res) => {
+  try {
+    const reports = await Report.aggregate([
+      { $match: { status: 1 } }, // ne garder que ceux à vérifier
+      { $sort: { createdAt: 1 } }, // plus ancien d’abord
+      {
+        $group: {
+          _id: '$referralId',
+          report: { $first: '$$ROOT' } // on garde le premier pour chaque referralId
+        }
+      },
+      {
+        $replaceRoot: { newRoot: '$report' }
+      }
+    ]);
+
+    // On peuple referralId et reporterId, puis on peuple referralId.user
+    const populatedReports = await Report.populate(reports, [
+      {
+        path: 'referralId',
+        populate: {
+          path: 'user',
+          select: 'username'
+        }
+      },
+      {
+        path: 'reporterId',
+        select: 'username'
+      }
+    ]);
+
+    res.status(200).json(populatedReports);
+  } catch (error) {
+    console.error('Error fetching pending reports:', error);
+    res.status(500).json({ message: 'Error retrieving pending reports' });
+  }
+};

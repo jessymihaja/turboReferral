@@ -64,7 +64,7 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ maxWidth: 900, margin: '2rem auto', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
-      <h2>Admin Dashboard</h2>
+      <h2 style={{color:'#5D4037'}}>Admin Dashboard</h2>
 
       <section style={{ marginBottom: '2rem' }}>
         <h3>Services</h3>
