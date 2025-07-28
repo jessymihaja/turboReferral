@@ -22,9 +22,23 @@ const PendingReports = () => {
     setToast({ message: 'Suppression avec succès', type: 'error' });
   };
 
-  const handleIgnore = (id) => {
-    // TODO: ajouter action "ignorer"
+  const handleIgnore = async (id) => {
+    try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reports/${id}/ignore`, {
+      method: 'PUT',
+    });
+
+    //if (!response.ok) throw new Error('Échec de l’ignorance du report');
+
+    const data = await response.json();
+    setToast({ message: 'Report ignoré avec succès', type: 'success' });
+
+    fetchReports();
     setToast({ message: 'Signalement ignoré', type: 'success' });
+
+  } catch (error) {
+    setToast({ message: error.message, type: 'error' });
+  }
   };
 
   const handleWarn = (id) => {

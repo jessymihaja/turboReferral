@@ -10,5 +10,7 @@ router.post('/', authMiddleware,reportController.createReport);
 // Get all reports
 router.get('/', reportController.getAllReports);
 router.get('/pending', reportController.getPendingReports);
+router.put('/:id/ignore', reportController.ignoreReport);
+
 
 module.exports = router;

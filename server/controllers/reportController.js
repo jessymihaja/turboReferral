@@ -70,3 +70,30 @@ exports.getPendingReports = async (req, res) => {
     res.status(500).json({ message: 'Error retrieving pending reports' });
   }
 };
+exports.ignoreReport = async (req, res) => {
+  try {
+    const reportId = req.params.id;
+
+    // D'abord, on récupère le report pour trouver le referralId associé
+    const report = await Report.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
+    const referralId = report.referralId;
+
+    // Ensuite, on met à jour tous les reports liés à ce referralId
+    const result = await Report.updateMany(
+      { referralId: referralId },
+      { $set: { status: 0 } }
+    );
+
+    res.json({
+      message: 'All reports related to the referral were ignored successfully',
+      modifiedCount: result.modifiedCount
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
