@@ -41,10 +41,20 @@ const PendingReports = () => {
   }
   };
 
-  const handleWarn = (id) => {
-    // TODO: ajouter envoi d’avertissement
-    setToast({ message: 'Proprietaire avertit', type: 'success' });
-  };
+ const handleWarn = async (id) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/warn/${id}`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de l’envoi');
+
+    setToast({ message: 'Propriétaire averti', type: 'success' });
+  } catch (err) {
+    console.error(err);
+    setToast({ message: 'Erreur lors de l’envoi de l’avertissement', type: 'error' });
+  }
+};
 
   return (
     <div style={{ padding: '20px',textAlign: 'center' }}>

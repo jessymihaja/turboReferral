@@ -17,6 +17,7 @@ const adminRoutes = require('./routes/adminRoute');
 const categoryRoutes = require('./routes/categoryRoute');
 const referralVoteRoutes = require('./routes/ReferralVoteRoutes');
 const reportRoutes = require('./routes/reportRoute');
+const notificationRoutes = require('./routes/notificationRoute');
 
 // Connexion MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -35,6 +36,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/referralVotes', referralVoteRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/notifications', notificationRoutes);
 // Route racine
 app.get('/', (req, res) => {
   res.send('API TurboReferral fonctionne');

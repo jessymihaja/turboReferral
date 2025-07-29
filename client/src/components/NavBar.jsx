@@ -10,6 +10,7 @@ import {
   FaLightbulb,
   FaExclamationTriangle
 } from 'react-icons/fa';
+import NotificationIcon from './NotificationIcon';
 
 const Navbar = ({ user, logout }) => {
   return (
@@ -41,7 +42,8 @@ const Navbar = ({ user, logout }) => {
         {user ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             <button onClick={logout} style={styles.button}><FaSignOutAlt /> Déconnexion</button>
-            <div style={styles.username}><FaUser style={{ marginRight: '5px' }} />{user.email}</div>
+            <div style={styles.username}><NotificationIcon />{user.email}</div>
+            
           </div>
         ) : (
           <>
@@ -112,6 +114,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     fontWeight: 500,
+    gap: '0.8rem',
   }
 };
 
