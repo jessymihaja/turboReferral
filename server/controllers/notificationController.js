@@ -39,7 +39,7 @@ exports.warnUser = async (req, res) => {
     const lien = referral.link || referral.code || 'lien inconnu';
     const raison = report.reason || 'Aucune raison spécifiée';
 
-    const title = `Avertissement sur le lien "${lien}" pour contenue "${raison}"`;
+    const title = `Avertissement sur le lien "${lien}" pour contenu "${raison}"`;
     const content = `Veuillez modifier votre lien "${lien}" afin de respecter les termes et conditions de notre site.`;
 
     const newNotif = await Notification.create({ userId, title, content });

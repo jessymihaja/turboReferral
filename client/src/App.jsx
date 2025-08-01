@@ -12,6 +12,7 @@ import AdminRoute from './components/AdminRoute';
 import Navbar from './components/NavBar';
 import CategoryForm from './pages/CategoryForm';
 import PendingReports from './pages/PendingReports';
+import Notifications from './pages/Notifications';
 import './app.css';
 
 function NavbarComp() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/services/:id" element={<ServiceDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route
           path="/dashboard"
           element={
