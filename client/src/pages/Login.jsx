@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 
 export default function Login() {
@@ -11,7 +11,6 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      // Redirection selon rôle
       if (user.role === 'admin') {
         navigate('/admin', { replace: true });
       } else {
@@ -20,61 +19,122 @@ export default function Login() {
     }
   }, [user, navigate]);
 
- async function handleSubmit(e) {
-  e.preventDefault();
-  setError('');
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
 
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
 
-    console.log('Login - données utilisateur reçues:', data.user);
+      if (!res.ok) {
+        setError(data.message || 'Erreur lors de la connexion');
+        return;
+      }
 
-    if (!res.ok) {
-      setError(data.message || 'Erreur lors de la connexion');
-      return;
+      login(data.user, data.token);
+      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
+    } catch (err) {
+      setError('Erreur réseau');
     }
-
-    login(data.user, data.token);
-    navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
-  } catch (err) {
-    setError('Erreur réseau');
   }
-}
 
   return (
-    <div style={{ maxWidth: '400px', margin: '3rem auto', padding: '1rem', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Se connecter</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <input
-          type="text"
-          placeholder="Nom d'utilisateur"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          style={{ padding: '0.5rem', fontSize: '1rem' }}
-          autoFocus
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ padding: '0.5rem', fontSize: '1rem' }}
-        />
-        <button
-          type="submit"
-          style={{ padding: '0.5rem', backgroundColor: '#27ae60', color: 'white', border: 'none', fontSize: '1rem', cursor: 'pointer', borderRadius: '4px' }}
-        >
-          Connexion
-        </button>
-        {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-      </form>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      background: '#fdf6fc',
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    }}>
+      <div style={{
+        width: '800px',
+        height: '500px',
+        display: 'flex',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+        background: '#fff'
+      }}>
+        <div style={{
+          backgroundColor: '#5D4037',
+          color: '#fff',
+          width: '50%',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <h2>Bienvenue</h2>
+          <p style={{ textAlign: 'center', margin: '1rem 0' }}>Rejoin notre plateforme, explore de nouvelles expériences</p>
+          <Link to="/register">
+            <button style={{
+              padding: '0.7rem 1.5rem',
+              border: 'none',
+              backgroundColor: '#fff',
+              color: '#5D4037',
+              borderRadius: '20px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}>Inscription</button>
+          </Link>
+        </div>
+        <div style={{
+          width: '50%',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
+          <h2 style={{ color: '#5D4037', marginBottom: '1rem' }}>Se connecter</h2>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <input
+              type="text"
+              placeholder="Nom d'utilisateur"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              style={{
+                padding: '0.8rem',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                fontSize: '1rem'
+              }}
+            />
+            <input
+              type="password"
+              placeholder="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                padding: '0.8rem',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                fontSize: '1rem'
+              }}
+            />
+            <button type="submit" style={{
+              padding: '0.8rem',
+              backgroundColor: '#5D4037',
+              color: 'white',
+              border: 'none',
+              fontSize: '1rem',
+              borderRadius: '20px',
+              cursor: 'pointer'
+            }}>
+              Connexion
+            </button>
+            {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
