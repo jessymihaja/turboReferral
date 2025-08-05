@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const UserContext = createContext(null);
 
@@ -26,11 +27,14 @@ export function UserProvider({ children }) {
   };
 
   // Fonction pour logout
+  const navigate = useNavigate();
+
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    navigate('/');
   };
 
   return (
