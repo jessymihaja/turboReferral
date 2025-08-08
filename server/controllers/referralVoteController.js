@@ -42,3 +42,34 @@ exports.getCommentsByReferral = async (req, res) => {
   }
 };
 
+exports.getAllAverageRatings = async (req, res) => {
+  try {
+    const result = await ReferralVote.aggregate([
+      {
+        $group: {
+          _id: '$referral',
+          average: {
+            $avg: {
+              $cond: [{ $eq: ['$vote', 'good'] }, 1, 0]
+            }
+          },
+          totalVotes: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Transformer le tableau en objet { referralId: { average, totalVotes } }
+    const averagesMap = {};
+    result.forEach(r => {
+      averagesMap[r._id.toString()] = {
+        average: r.average,
+        totalVotes: r.totalVotes
+      };
+    });
+
+    res.json(averagesMap);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
