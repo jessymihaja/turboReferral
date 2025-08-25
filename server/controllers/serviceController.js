@@ -25,7 +25,13 @@ exports.getServiceById = async (req, res) => {
 // Créer un service (non validé par défaut)
 exports.createService = async (req, res) => {
   try {
-    const { name, description, logo, website, validationPatterns,category } = req.body;
+    const { name, description, website, validationPatterns, category } = req.body;
+
+    // Vérifier si fichier uploadé
+    let logo = '';
+    if (req.file) {
+      logo = `/uploads/logos/${req.file.filename}`; // chemin relatif
+    }
 
     const existing = await Service.findOne({ name });
     if (existing) return res.status(400).json({ message: 'Service déjà existant' });
@@ -39,8 +45,8 @@ exports.createService = async (req, res) => {
       isValidated: false, // par défaut non validé
       category,
     });
-    await service.save();
 
+    await service.save();
     res.status(201).json(service);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -69,6 +75,10 @@ exports.updateService = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+
+    if (req.file) {
+      updates.logo = `/uploads/logos/${req.file.filename}`;
+    }
 
     const service = await Service.findByIdAndUpdate(id, updates, { new: true });
     if (!service) return res.status(404).json({ message: 'Service non trouvé' });

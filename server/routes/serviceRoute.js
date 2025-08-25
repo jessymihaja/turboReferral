@@ -9,11 +9,12 @@ const {
   updateService,
   setServiceValidation,
 } = require('../controllers/serviceController');
+const upload = require('../middlewares/uploadLogo');
 
 router.get('/', getAllServices);
 router.get('/:id', getServiceById);
-router.post('/', createService);
-router.put('/:id', adminAuthMiddleware, updateService);  // Ici updateService
+router.post('/',upload.single('logo'), createService);
+router.put('/:id', adminAuthMiddleware,upload.single('logo'), updateService);  
 router.put('/:id/validate', adminAuthMiddleware, setServiceValidation);
 
 module.exports = router;

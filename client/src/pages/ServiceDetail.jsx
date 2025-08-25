@@ -129,7 +129,7 @@ export default function ServiceDetail() {
       {/* Colonne de gauche - Infos service */}
       <div style={{ borderTop: '2px solid #27ae60', borderRadius: '8px', padding: '1rem', backgroundColor: '#f9f9f9' }}>
         <h2 style={{ color: '#2c3e50' }}>{service.name}</h2>
-        {service.logo && <img src={service.logo} alt={service.name} style={{ maxWidth: '100%' }} />}
+        {service.logo && <img src={`${import.meta.env.VITE_API_URL}${service.logo}`} alt={service.name} style={{ maxWidth: '10%' }} />}
         {service.website && (
           <p>
             <a href={service.website} target="_blank" rel="noreferrer" style={{ color: '#27ae60', textDecoration: 'none' }}>
