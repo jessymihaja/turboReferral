@@ -3,7 +3,7 @@ const Service = require('../models/Service');
 
 exports.getAllReferrals = async (req, res) => {
   try {
-    const referrals = await Referral.find().populate('service');
+    const referrals = await Referral.find().populate('service').populate('user');
     res.json(referrals);
   } catch (error) {
     res.status(500).json({ message: error.message });

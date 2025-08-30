@@ -150,8 +150,8 @@ export default function Home() {
               style={{
                 flex: '1 0 18%', // ~5 par ligne
                 minWidth: '150px',
-                maxWidth: '180px',
-                padding: '0.75rem',
+                maxWidth: '150px',
+                padding: '0.25rem',
                 borderRadius: '8px',
                 backgroundColor: '#f4f4f4',
                 textAlign: 'center',
@@ -171,7 +171,15 @@ export default function Home() {
                   display: 'block',
                 }}
               >
+                {service.logo && (
+                  <img
+                    src={`${import.meta.env.VITE_API_URL}${service.logo}`}
+                    alt={service.name}
+                    style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '0.5rem' ,objectFit: 'contain', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                  />
+                )}
                 {service.name}
+
               </Link>
             </motion.li>
           ))}
