@@ -7,5 +7,6 @@ router.get('/', authMiddleware, notificationController.getUserNotifications);
 router.put('/:id/read', authMiddleware, notificationController.markAsRead);
 router.post('/warn/:reportId', notificationController.warnUser);
 router.get('/unread-count',authMiddleware, notificationController.getUnreadCount);
+router.post('/warnDeletedReferral/:reportId', notificationController.warnUserDeletedReferral); // Nouvelle route pour avertir d'un lien supprimé
 
 module.exports = router;

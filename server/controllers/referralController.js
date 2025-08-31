@@ -51,13 +51,26 @@ exports.createReferral = async (req, res) => {
   }
 };
 
+const Notification = require('../models/Notification');
+const ReferralVote = require('../models/ReferralVote');
+const Report = require('../models/Report');
+
 exports.deleteReferral = async (req, res) => {
   try {
     const referral = await Referral.findById(req.params.id);
-    if (!referral) return res.status(404).json({ message: 'Referral non trouvé' });
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral non trouvé' });
+    }
 
-    await Referral.deleteOne({ _id: req.params.id });
-    res.json({ message: 'Referral supprimé' });
+    // Supprimer d'abord les entités liées
+    await Notification.deleteMany({ referral: referral._id });
+    await ReferralVote.deleteMany({ referral: referral._id });
+    await Report.deleteMany({ referralId: referral._id });
+
+    // Supprimer le referral
+    await Referral.deleteOne({ _id: referral._id });
+
+    res.json({ message: 'Referral et ses dépendances supprimés' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

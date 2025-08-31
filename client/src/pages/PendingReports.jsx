@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import CustomToast from '../components/CustomToast';
 import { FaCheck, FaExclamationTriangle, FaTrash,FaEye} from 'react-icons/fa';
+import { useAuthFetch } from '../utils/authFetch';
 
 const PendingReports = () => {
   const [reports, setReports] = useState([]);
   const [toast, setToast] = useState({ message: '', type: '' });
-
+  const authFetch = useAuthFetch();
   useEffect(() => {
     fetchReports();
   }, []);
@@ -17,10 +18,24 @@ const PendingReports = () => {
       .catch(console.error);
   };
 
-  const handleDelete = (id) => {
-    // TODO: ajouter suppression via API
-    setToast({ message: 'Suppression avec succès', type: 'error' });
+  const handleDelete = async (id,referralId) => {
+    try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/warnDeletedReferral/${id}`, {
+      method: 'POST',
+    });
+    const responseDelete = await authFetch(`${import.meta.env.VITE_API_URL}/api/referrals/${referralId}`, {
+      method: 'DELETE',
+    });
+    if(!responseDelete.ok) throw new Error('Erreur lors de la suppression du referral');
+
+
+    if (!response.ok) throw new Error('Erreur lors de l’envoi');
+    setToast({ message: 'Suppression avec succès', type: 'success' });
+  } catch (err) {
+    console.error(err);
+    setToast({ message: 'Erreur lors de la suppression', type: 'error' });
   };
+}
 
   const handleIgnore = async (id) => {
     try {
@@ -112,7 +127,7 @@ const PendingReports = () => {
                   <td style={cellStyle}>
                     <button onClick={() => handleIgnore(report._id)} style={{ ...actionBtn, backgroundColor: '#4ef07fff' }}><FaCheck/></button>
                     <button onClick={() => handleWarn(report._id)} style={actionBtn}><FaExclamationTriangle/></button>
-                    <button onClick={() => handleDelete(report._id)} style={{ ...actionBtn, backgroundColor: '#d9534f' }}><FaTrash/></button>
+                    <button onClick={() => handleDelete(report._id,report.referralId._id)} style={{ ...actionBtn, backgroundColor: '#d9534f' }}><FaTrash/></button>
                   </td>
                 </tr>
               ))
