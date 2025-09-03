@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import ReferralInfo from '../components/ReferralInfo';
 
 export default function Home() {
   const [services, setServices] = useState([]);
@@ -196,6 +197,7 @@ export default function Home() {
           Aucun service trouvé pour "{query}".
         </p>
       )}
+      <ReferralInfo></ReferralInfo>
     </div>
   );
 }
