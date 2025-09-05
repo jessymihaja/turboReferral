@@ -13,6 +13,7 @@ import Navbar from './components/NavBar';
 import CategoryForm from './pages/CategoryForm';
 import PendingReports from './pages/PendingReports';
 import Notifications from './pages/Notifications';
+import Footer from './components/Footer';
 import './app.css';
 
 function NavbarComp() {
@@ -42,16 +43,17 @@ function App() {
           }
         />
         <Route
-    path="/admin"
-    element={
-      <AdminRoute>
-        <AdminDashboard />
-      </AdminRoute>
-    }
-  />
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
         <Route path='/categories' element={<CategoryForm />} />
         <Route path='/pending-reports' element={<PendingReports />} />
       </Routes>
+      <Footer />
     </UserProvider>
   );
 }
