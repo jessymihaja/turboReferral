@@ -46,6 +46,9 @@ const Navbar = ({ user, logout }) => {
                     <Link to="/admin" style={styles.dropdownItem} onClick={() => setAdminMenuOpen(false)}>
                       <FaTools /> Admin
                     </Link>
+                    <Link to="/admin/referrals" style={styles.dropdownItem} onClick={() => setAdminMenuOpen(false)}>
+                      <FaChartBar /> Referrals
+                    </Link>
                     <Link to="/categories" style={styles.dropdownItem} onClick={() => setAdminMenuOpen(false)}>
                       <FaLightbulb /> Catégories
                     </Link>

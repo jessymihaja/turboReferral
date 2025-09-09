@@ -14,6 +14,7 @@ import CategoryForm from './pages/CategoryForm';
 import PendingReports from './pages/PendingReports';
 import Notifications from './pages/Notifications';
 import Footer from './components/Footer';
+import AdminReferralsPage from './components/AdminReferralsPage';
 import './app.css';
 
 function NavbarComp() {
@@ -52,6 +53,7 @@ function App() {
         />
         <Route path='/categories' element={<CategoryForm />} />
         <Route path='/pending-reports' element={<PendingReports />} />
+        <Route path='/admin/referrals' element={<AdminReferralsPage />} />
       </Routes>
       <Footer />
     </UserProvider>
