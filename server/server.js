@@ -19,6 +19,7 @@ const referralVoteRoutes = require('./routes/ReferralVoteRoutes');
 const reportRoutes = require('./routes/reportRoute');
 const notificationRoutes = require('./routes/notificationRoute');
 const path = require('path');
+const promReferralRoutes = require('./routes/promReferralRoute');
 
 // Connexion MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -39,6 +40,8 @@ app.use('/api/referralVotes', referralVoteRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/promotions', promReferralRoutes);
+
 
 // Route racine
 app.get('/', (req, res) => {

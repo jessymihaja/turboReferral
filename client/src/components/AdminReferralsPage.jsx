@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaCrown } from "react-icons/fa";
+import PromoteReferralModal from "./PromoteReferralModal";
 export default function AdminReferralsPage() {
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredReferrals, setFilteredReferrals] = useState([]); // liste filtrée
   const [search, setSearch] = useState("");
+  const [selectedReferral, setSelectedReferral] = useState(null); // referral sélectionné pour promotion
 
   // Fetch des referrals
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function AdminReferralsPage() {
             alignItems: "center",
             gap: "6px",
         }}
-        onClick={() => alert(`Promouvoir referral : ${row._id}`)}
+        onClick={() => setSelectedReferral(row)}
         >
         <FaCrown size={16} />
         Promouvoir
@@ -144,6 +146,14 @@ export default function AdminReferralsPage() {
             }}
           />
         }
+      />
+      <PromoteReferralModal
+        referral={selectedReferral}
+        isOpen={!!selectedReferral}
+        onClose={() => setSelectedReferral(null)}
+        onCreated={(newPromo) => {
+          console.log("Promo créée :", newPromo);
+        }}
       />
     </div>
   );
