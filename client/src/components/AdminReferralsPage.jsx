@@ -14,7 +14,7 @@ export default function AdminReferralsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals/with-status`);
         const data = await res.json();
         setReferrals(data);
         setFilteredReferrals(data);
@@ -56,6 +56,25 @@ export default function AdminReferralsPage() {
       sortable: true,
     },
     {
+      name: "Statut Prom",
+      cell: (row) => (
+        <span
+          style={{
+            padding: "4px 10px",
+            borderRadius: "12px",
+            fontSize: "13px",
+            fontWeight: "600",
+            color: row.isPromoted ? "#155724" : "#721c24",
+            backgroundColor: row.isPromoted ? "#d4edda" : "#f8d7da",
+            border: `1px solid ${row.isPromoted ? "#c3e6cb" : "#f5c6cb"}`,
+          }}
+        >
+          {row.isPromoted ? "Active" : "Inactive"}
+        </span>
+      ),
+      sortable: true,
+    },
+    {
       name: "Créé le",
       selector: (row) => new Date(row.createdAt).toLocaleDateString(),
       sortable: true,
@@ -82,6 +101,7 @@ export default function AdminReferralsPage() {
         </button>
     ),
     }
+
   ];
 
   // Style personnalisé

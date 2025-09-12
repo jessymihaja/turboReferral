@@ -104,3 +104,32 @@ exports.getAllReferralsbyUserid = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const PromoReferral = require('../models/PromReferral');
+exports.getReferralsWithPromoStatus = async (req, res) => {
+  try {
+    const referrals = await Referral.find().populate("user service");
+
+    // Cherche les promotions actives
+    const now = new Date();
+    const promos = await PromoReferral.find({
+      dateDebut: { $lte: now },
+      dateFin: { $gte: now },
+    });
+
+    // Mets en map pour chercher vite
+    const activePromoMap = new Map(
+      promos.map((p) => [p.referral.toString(), true])
+    );
+
+    const referralsWithStatus = referrals.map((ref) => ({
+      ...ref.toObject(),
+      isPromoted: activePromoMap.has(ref._id.toString()),
+    }));
+
+    res.json(referralsWithStatus);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};

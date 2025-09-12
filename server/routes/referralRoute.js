@@ -8,6 +8,7 @@ const {
   deleteReferral,
   getReferralsbyServiceId,
   getAllReferralsbyUserid,
+  getReferralsWithPromoStatus
 } = require('../controllers/referralController');
 
 const { updateReferral } = require('../controllers/adminController'); // importer ici
@@ -16,6 +17,7 @@ router.get('/service/:id', getReferralsbyServiceId); // route pour récupérer l
 router.get('/', getAllReferrals);
 router.post('/', createReferral);
 router.delete('/:id', adminAuthMiddleware, deleteReferral);
-router.put('/:id', adminAuthMiddleware, updateReferral);  // utiliser la fonction importée
+router.put('/:id', adminAuthMiddleware, updateReferral);  
+router.get('/with-status', getReferralsWithPromoStatus); // nouvelle route pour obtenir les referrals avec leur statut de promotion
 
 module.exports = router;
