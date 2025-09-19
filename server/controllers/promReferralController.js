@@ -38,3 +38,31 @@ exports.getActivePromReferrals = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getActivePromReferralsbyServiceId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: 'Service ID requis' });
+    const today = new Date();
+
+    const activePromotions = await PromReferral.find({
+      dateDebut: { $lte: today },
+      dateFin: { $gte: today },
+    }).populate({
+    path: "referral",
+    populate: {
+      path: "user", // on ajoute le user lié au referral
+      select: "username", 
+    },
+  }); 
+
+    // Filtrer les promotions pour ne garder que celles du service demandé
+    const filteredPromotions = activePromotions.filter(
+      (promo) => promo.referral.service.toString() === id
+    );
+    res.json(filteredPromotions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

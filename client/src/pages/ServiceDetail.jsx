@@ -2,11 +2,12 @@ import { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import ReferralVoteForm from '../components/ReferralVoteForm';
-import { FaComment, FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
+import { FaComment, FaStar, FaRegStar, FaStarHalfAlt ,FaCrown} from 'react-icons/fa';
 import TimeAgo from '../components/TimeAgo';
 import CommentModal from '../components/CommentModal';
 import CustomToast from '../components/CustomToast';
 import ReportReferral from '../components/ReportReferral';
+import PreniumReferralCard from '../components/PreniumReferralCard';
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -20,26 +21,30 @@ export default function ServiceDetail() {
   const [selectedReferral, setSelectedReferral] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState({ message: '', type: '' });
+  const [promotions, setPromotions] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
 
-        const [serviceRes, referralRes, avgRes] = await Promise.all([
+        const [serviceRes, referralRes, avgRes,promotionsRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/services/${id}`),
           fetch(`${import.meta.env.VITE_API_URL}/api/referrals/service/${id}`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/referralVotes/averages/all`)
+          fetch(`${import.meta.env.VITE_API_URL}/api/referralVotes/averages/all`),
+          fetch(`${import.meta.env.VITE_API_URL}/api/promotions/active/service/${id}`),
         ]);
 
         if (!serviceRes.ok) throw new Error('Service non trouvé');
         if (!referralRes.ok) throw new Error('Erreur chargement referrals');
         if (!avgRes.ok) throw new Error('Erreur chargement moyennes');
+        if (!promotionsRes.ok) throw new Error('Erreur chargement promotions');
 
-        const [serviceData, referralData, avgData] = await Promise.all([
+        const [serviceData, referralData, avgData,promotions] = await Promise.all([
           serviceRes.json(),
           referralRes.json(),
-          avgRes.json()
+          avgRes.json(),
+          promotionsRes.json()
         ]);
 
         setService(serviceData);
@@ -51,6 +56,7 @@ export default function ServiceDetail() {
         }));
 
         setReferrals(referralsWithAverages);
+        setPromotions(promotions);
 
       } catch (err) {
         setError(err.message);
@@ -111,6 +117,10 @@ export default function ServiceDetail() {
     }
     return stars;
   }
+  function onComment(referral) {
+    setSelectedReferral(referral);
+    setShowModal(true);
+  }
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
@@ -155,6 +165,14 @@ export default function ServiceDetail() {
       <div>
         <h3 style={{ marginBottom: '1rem' }}>Referrals disponibles</h3>
         <div style={{ display: 'grid', gap: '1rem' }}>
+          {promotions.length > 0 && (
+            <div>
+              <h4 style={{ color: '#e67e22' }}><FaCrown></FaCrown> Promotions Actives !</h4>
+              {promotions.map(promo => (
+                <PreniumReferralCard key={promo._id} ref={promo.referral} promo={promo} onComment={onComment} />
+              ))}
+            </div>
+          )}
           {referrals.map(ref => (
             <div key={ref._id} style={{ border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#e3e2e2ff', padding: '0.5rem' ,width: '80%'}}>
               {ref.link && (

@@ -72,4 +72,33 @@ exports.getAllAverageRatings = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const mongoose = require('mongoose');
+
+exports.getAverageRatingByReferral = async (req, res) => {
+  try {
+    const { referralId } = req.params;
+    const result = await ReferralVote.aggregate([
+      { $match: { referral: new mongoose.Types.ObjectId(referralId) } }, // ✅
+      {
+        $group: {
+          _id: '$referral',
+          average: {
+            $avg: {
+              $cond: [{ $eq: ['$vote', 'good'] }, 1, 0],
+            },
+          },
+          totalVotes: { $sum: 1 },
+        },
+      },
+    ]);
+
+    if (result.length === 0) {
+      return res.json({ average: 0, totalVotes: 0 });
+    }
+    res.json({ average: result[0].average, totalVotes: result[0].totalVotes });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
