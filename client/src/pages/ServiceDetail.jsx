@@ -174,39 +174,148 @@ export default function ServiceDetail() {
             </div>
           )}
           {referrals.map(ref => (
-            <div key={ref._id} style={{ border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#e3e2e2ff', padding: '0.5rem' ,width: '80%'}}>
-              {ref.link && (
-                <div style={{ color: '#b38666ff', backgroundColor: 'white', borderRadius: '28px', padding: '0.6rem', textAlign: 'center' }}>
-                  <a href={ref.link} target="_blank" rel="noreferrer" style={{ color: '#b38666ff' }}>
-                    {ref.link}
-                  </a>
+            <div
+              key={ref._id}
+              style={{
+                borderRadius: "12px",
+                background: "#fff",
+                padding: "1rem",
+                width: "78%",
+                boxShadow: "0px 2px 6px rgba(0,0,0,0.1)",
+                marginBottom: "1rem",
+                transition: "transform 0.2s ease",
+              }}
+            >
+              {/* Header utilisateur + date */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: "0.8rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span
+                    style={{
+                      backgroundColor: "#27ae60",
+                      color: "white",
+                      borderRadius: "50%",
+                      width: "36px",
+                      height: "36px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {(ref.user?.username?.charAt(0).toUpperCase() || "?")}
+                  </span>
+                  <span style={{ fontWeight: "600", color: "#2c3e50" }}>
+                    {ref.user?.username
+                      ? ref.user.username.charAt(0).toUpperCase() +
+                        ref.user.username.slice(1).toLowerCase()
+                      : ref.user}
+                  </span>
                 </div>
-              )}
-              {ref.code && (
-                <div style={{ color: '#b38666ff', backgroundColor: 'white', borderRadius: '28px', padding: '0.6rem', textAlign: 'center' }}>
-                  {ref.code}
-                </div>
-              )}
-              <p style={{ fontStyle: 'italic' }}>{ref.description}</p>
-              <span style={{ color: '#2c3e50' }}>
-                <span className="avatar-circle" style={{ float: 'left' }}>
-                  {(ref.user?.username?.charAt(0).toUpperCase() || '?')}
+                <span style={{ fontSize: "13px", color: "#777" }}>
+                  <TimeAgo isoDateString={ref.createdAt} />
                 </span>
-                {ref.user?.username && (ref.user.username.charAt(0).toUpperCase() + ref.user.username.slice(1).toLowerCase()) || ref.user}
-                <TimeAgo isoDateString={ref.createdAt} />
-              </span>
-              <div style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>
-                {renderStars(ref.voteAverage*5)}
-                <button onClick={() => { setSelectedReferral(ref); setShowModal(true); }} style={{ padding: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#2c3e50' }}>
-                  <FaComment /> commentaires
-                </button>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem', backgroundColor: 'white', padding: '0.5rem', borderRadius: '8px' }}>
+
+              {/* Lien ou code type "Reveal code" */}
+              {(ref.link || ref.code) && (
+                <div
+                  style={{
+                    marginBottom: "0.8rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor: "#f7f9fc",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    padding: "0.6rem 0.8rem",
+                  }}
+                >
+                  <span style={{ color: "#2c3e50", fontWeight: "500" }}>
+                    {ref.link ? ref.link : ref.code}
+                  </span>
+                  {ref.link && (
+                  <button
+                    style={{
+                      backgroundColor: "#2980b9",
+                      color: "white",
+                      border: "none",
+                      padding: "0.4rem 0.8rem",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                    }}
+                    onClick={() => {
+                      if (ref.link) window.open(ref.link, "_blank");
+                    }}
+                  >
+                    Ouvrir le lien
+                  </button>
+                  )}
+                </div>
+              )}
+
+              {/* Description */}
+              <p style={{ marginBottom: "0.5rem", color: "#444", lineHeight: "1.4" }}>
+                {ref.description}
+              </p>
+
+              {/* Votes + Commentaires */}
+              <div
+                style={{
+                  marginTop: "0.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  {renderStars(ref.voteAverage * 5)}
+                  <button
+                    onClick={() => onComment(ref)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      color: "#2980b9",
+                      fontWeight: "500",
+                    }}
+                  >
+                    <FaComment /> Commentaires
+                  </button>
+                </div>
+              </div>
+
+              {/* Vote + Report */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginTop: "0.8rem",
+                  backgroundColor: "#f9f9f9",
+                  padding: "0.6rem",
+                  borderRadius: "8px",
+                  border: "1px solid #eee",
+                }}
+              >
                 <ReferralVoteForm referralId={ref._id} />
                 <ReportReferral referralId={ref._id} />
               </div>
             </div>
+
           ))}
+
         </div>
       </div>
 
