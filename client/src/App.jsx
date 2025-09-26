@@ -15,6 +15,7 @@ import PendingReports from './pages/PendingReports';
 import Notifications from './pages/Notifications';
 import Footer from './components/Footer';
 import AdminReferralsPage from './components/AdminReferralsPage';
+import PolitiqueConfidentialité from './pages/PolitiqueConfidentialité';
 import './app.css';
 
 function NavbarComp() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/politique-confidentialite" element={<PolitiqueConfidentialité />} />
         <Route
           path="/dashboard"
           element={

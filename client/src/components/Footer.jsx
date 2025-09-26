@@ -37,6 +37,7 @@ export default function Footer() {
           <ul style={{ listStyle: "none", padding: 0, lineHeight: "1.8" }}>
             <li><a href="/" style={{ color: "#bdc3c7", textDecoration: "none" }}>Accueil</a></li>
             <li><a href="#" style={{ color: "#bdc3c7", textDecoration: "none" }}>Contact</a></li>
+            <li><a href="/politique-confidentialite" style={{ color: "#bdc3c7", textDecoration: "none" }}>Politique de Confidentialité</a></li>
           </ul>
         </div>
 
