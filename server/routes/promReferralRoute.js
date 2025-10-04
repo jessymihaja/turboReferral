@@ -1,14 +1,16 @@
-
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const promReferralController = require("../controllers/promReferralController");
+const adminAuthMiddleware = require('../middlewares/adminAuth');
+const { idValidator } = require('../utils/validators');
 
-// Créer une promotion
-router.post("/", promReferralController.createPromReferral);
+const {
+  createPromReferral,
+  getActivePromReferrals,
+  getActivePromReferralsByServiceId,
+} = require('../controllers/promReferralController');
 
-// Liste des promotions actives
-router.get("/active", promReferralController.getActivePromReferrals);
-// Liste des promotions actives par service ID
-router.get("/active/service/:id", promReferralController.getActivePromReferralsbyServiceId);
+router.post('/', adminAuthMiddleware, createPromReferral);
+router.get('/active', getActivePromReferrals);
+router.get('/active/service/:id', idValidator, getActivePromReferralsByServiceId);
 
 module.exports = router;

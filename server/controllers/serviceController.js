@@ -1,90 +1,81 @@
 const Service = require('../models/Service');
+const asyncHandler = require('../utils/asyncHandler');
+const ResponseHandler = require('../utils/responseHandler');
+const { AppError } = require('../utils/errorHandler');
 
-// Récupérer tous les services validés uniquement
-exports.getAllServices = async (req, res) => {
-  try {
-    // On renvoie uniquement les services validés
-    const services = await Service.find({ isValidated: true });
-    res.json(services);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+exports.getAllServices = asyncHandler(async (req, res) => {
+  const services = await Service.find({ isValidated: true }).populate('category');
+  ResponseHandler.success(res, services);
+});
+
+exports.getServiceById = asyncHandler(async (req, res) => {
+  const service = await Service.findById(req.params.id).populate('category');
+  if (!service) {
+    throw new AppError('Service not found', 404);
   }
-};
+  ResponseHandler.success(res, service);
+});
 
-// Récupérer un service par ID (valide ou non ? ici on renvoie toujours)
-exports.getServiceById = async (req, res) => {
-  try {
-    const service = await Service.findById(req.params.id);
-    if (!service) return res.status(404).json({ message: 'Service non trouvé' });
-    res.json(service);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+exports.createService = asyncHandler(async (req, res) => {
+  const { name, description, website, validationPatterns, category } = req.body;
+
+  let logo = '';
+  if (req.file) {
+    logo = `/uploads/logos/${req.file.filename}`;
   }
-};
 
-// Créer un service (non validé par défaut)
-exports.createService = async (req, res) => {
-  try {
-    const { name, description, website, validationPatterns, category } = req.body;
-
-    // Vérifier si fichier uploadé
-    let logo = '';
-    if (req.file) {
-      logo = `/uploads/logos/${req.file.filename}`; // chemin relatif
-    }
-
-    const existing = await Service.findOne({ name });
-    if (existing) return res.status(400).json({ message: 'Service déjà existant' });
-
-    const service = new Service({
-      name,
-      description,
-      logo,
-      website,
-      validationPatterns,
-      isValidated: false, // par défaut non validé
-      category,
-    });
-
-    await service.save();
-    res.status(201).json(service);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const existing = await Service.findOne({ name });
+  if (existing) {
+    throw new AppError('Service already exists', 400);
   }
-};
 
-// Mettre à jour la validation d'un service (ex: admin valide ou invalide)
-exports.setServiceValidation = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { isValidated } = req.body; // true ou false
+  const service = new Service({
+    name,
+    description,
+    logo,
+    website,
+    validationPatterns,
+    isValidated: false,
+    category,
+  });
 
-    const service = await Service.findById(id);
-    if (!service) return res.status(404).json({ message: 'Service non trouvé' });
+  await service.save();
+  ResponseHandler.created(res, service, 'Service created successfully');
+});
 
-    service.isValidated = isValidated;
-    await service.save();
+exports.setServiceValidation = asyncHandler(async (req, res) => {
+  const { isValidated } = req.body;
 
-    res.json({ message: `Service ${isValidated ? 'validé' : 'invalidé'} avec succès`, service });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const service = await Service.findById(req.params.id);
+  if (!service) {
+    throw new AppError('Service not found', 404);
   }
-};
 
-exports.updateService = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
+  service.isValidated = isValidated;
+  await service.save();
 
-    if (req.file) {
-      updates.logo = `/uploads/logos/${req.file.filename}`;
-    }
+  ResponseHandler.success(
+    res,
+    service,
+    `Service ${isValidated ? 'validated' : 'invalidated'} successfully`
+  );
+});
 
-    const service = await Service.findByIdAndUpdate(id, updates, { new: true });
-    if (!service) return res.status(404).json({ message: 'Service non trouvé' });
+exports.updateService = asyncHandler(async (req, res) => {
+  const updates = req.body;
 
-    res.json(service);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (req.file) {
+    updates.logo = `/uploads/logos/${req.file.filename}`;
   }
-};
+
+  const service = await Service.findByIdAndUpdate(req.params.id, updates, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!service) {
+    throw new AppError('Service not found', 404);
+  }
+
+  ResponseHandler.success(res, service, 'Service updated successfully');
+});

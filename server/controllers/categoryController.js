@@ -1,27 +1,23 @@
 const Category = require('../models/Category');
+const asyncHandler = require('../utils/asyncHandler');
+const ResponseHandler = require('../utils/responseHandler');
+const { AppError } = require('../utils/errorHandler');
 
-exports.createCategory = async (req, res) => {
-  try {
-    const { name, description } = req.body;
+exports.createCategory = asyncHandler(async (req, res) => {
+  const { name, description } = req.body;
 
-    const existing = await Category.findOne({ name });
-    if (existing) {
-      return res.status(400).json({ message: 'Cette catégorie existe déjà.' });
-    }
-
-    const category = new Category({ name, description });
-    await category.save();
-    res.status(201).json(category);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  const existing = await Category.findOne({ name });
+  if (existing) {
+    throw new AppError('Category already exists', 400);
   }
-};
 
-exports.getAllCategories = async (req, res) => {
-  try {
-    const categories = await Category.find().sort({ createdAt: -1 });
-    res.json(categories);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+  const category = new Category({ name, description });
+  await category.save();
+
+  ResponseHandler.created(res, category, 'Category created successfully');
+});
+
+exports.getAllCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.find().sort({ createdAt: -1 });
+  ResponseHandler.success(res, categories);
+});

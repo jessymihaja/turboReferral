@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
+import { notificationService } from '../services';
 
 const NotificationIcon = () => {
   const [unreadCount, setUnreadCount] = useState(0);
 
- useEffect(() => {
-    const token = localStorage.getItem('token'); // ou sessionStorage, selon ton projet
-
-    fetch(`${import.meta.env.VITE_API_URL}/api/notifications/unread-count`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        setUnreadCount(data.count);
-      })
-      .catch(err => {
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const data = await notificationService.getUnreadCount();
+        setUnreadCount(data.data?.count || data.count || 0);
+      } catch (err) {
         console.error('Erreur lors de la récupération des notifications :', err);
-      });
+      }
+    };
+
+    fetchUnreadCount();
   }, []);
 
 

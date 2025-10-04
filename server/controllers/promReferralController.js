@@ -1,68 +1,53 @@
+const PromReferral = require('../models/PromReferral');
+const asyncHandler = require('../utils/asyncHandler');
+const ResponseHandler = require('../utils/responseHandler');
+const { AppError } = require('../utils/errorHandler');
 
-const PromReferral = require("../models/PromReferral");
+exports.createPromReferral = asyncHandler(async (req, res) => {
+  const { referralId, dateDebut, dateFin } = req.body;
 
-
-exports.createPromReferral = async (req, res) => {
-  try {
-    const { referralId, dateDebut, dateFin } = req.body;
-
-    if (!referralId || !dateDebut || !dateFin) {
-      return res.status(400).json({ message: "Champs manquants" });
-    }
-
-    const promReferral = new PromReferral({
-      referral: referralId,
-      dateDebut,
-      dateFin,
-    });
-
-    await promReferral.save();
-    res.status(201).json(promReferral);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (!referralId || !dateDebut || !dateFin) {
+    throw new AppError('Missing required fields', 400);
   }
-};
 
-// ➡️ Liste des promotions actives (dateDebut <= aujourd’hui <= dateFin)
-exports.getActivePromReferrals = async (req, res) => {
-  try {
-    const today = new Date();
+  const promReferral = new PromReferral({
+    referral: referralId,
+    dateDebut,
+    dateFin,
+  });
 
-    const activePromotions = await PromReferral.find({
-      dateDebut: { $lte: today },
-      dateFin: { $gte: today },
-    }).populate("referral"); 
+  await promReferral.save();
+  ResponseHandler.created(res, promReferral, 'Promotion created successfully');
+});
 
-    res.json(activePromotions);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+exports.getActivePromReferrals = asyncHandler(async (req, res) => {
+  const today = new Date();
 
-exports.getActivePromReferralsbyServiceId = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!id) return res.status(400).json({ message: 'Service ID requis' });
-    const today = new Date();
+  const activePromotions = await PromReferral.find({
+    dateDebut: { $lte: today },
+    dateFin: { $gte: today },
+  }).populate('referral');
 
-    const activePromotions = await PromReferral.find({
-      dateDebut: { $lte: today },
-      dateFin: { $gte: today },
-    }).populate({
-    path: "referral",
+  ResponseHandler.success(res, activePromotions);
+});
+
+exports.getActivePromReferralsByServiceId = asyncHandler(async (req, res) => {
+  const today = new Date();
+
+  const activePromotions = await PromReferral.find({
+    dateDebut: { $lte: today },
+    dateFin: { $gte: today },
+  }).populate({
+    path: 'referral',
     populate: {
-      path: "user", // on ajoute le user lié au referral
-      select: "username", 
+      path: 'user',
+      select: 'username',
     },
-  }); 
+  });
 
-    // Filtrer les promotions pour ne garder que celles du service demandé
-    const filteredPromotions = activePromotions.filter(
-      (promo) => promo.referral.service.toString() === id
-    );
-    res.json(filteredPromotions);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  const filteredPromotions = activePromotions.filter(
+    promo => promo.referral.service.toString() === req.params.id
+  );
 
+  ResponseHandler.success(res, filteredPromotions);
+});

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authenticateToken = require('../middlewares/auth'); // middleware JWT
+const { authenticateToken } = require('../middlewares/auth');
 const { createServiceRequest } = require('../controllers/serviceRequestController');
 
 router.post('/service-requests', authenticateToken, createServiceRequest);

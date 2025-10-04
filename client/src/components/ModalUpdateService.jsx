@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuthFetch } from "../utils/authFetch";
 import CustomToast from "./CustomToast";
+import { serviceService } from '../services';
 
 export default function ModalUpdateService({ service, onClose, onUpdated }) {
   const authFetch = useAuthFetch();
@@ -9,41 +10,32 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
   const [logo, setLogo] = useState(null);
   const [toast, setToast] = useState({ message: '', type: '' });
 
-async function handleUpdate(e) {
-  e.preventDefault();
+  async function handleUpdate(e) {
+    e.preventDefault();
 
-  if (!service || !service._id) {
-    alert("Aucun service sélectionné");
-    return;
-  }
+    if (!service || !service._id) {
+      alert("Aucun service sélectionné");
+      return;
+    }
 
-  try {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    if (logo) formData.append("logo", logo);
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      if (logo) formData.append("logo", logo);
 
-    const res = await authFetch(
-      `${import.meta.env.VITE_API_URL}/api/services/${service._id}`,
-      {
-        method: "PUT",
-        body: formData,
-      }
-    );
-
-    if (!res.ok) throw new Error("Erreur mise à jour service");
-
-    const updated = await res.json();
-    onUpdated(updated); // le backend retourne directement le service, pas "updated.service"
-    setToast({ message: 'Service mis à jour avec succès !', type: 'success' });
-    setTimeout(() => {
+      const data = await serviceService.update(service._id, formData);
+      const updated = data.data || data;
+      onUpdated(updated);
+      setToast({ message: 'Service mis à jour avec succès !', type: 'success' });
+      setTimeout(() => {
         onClose();
-    }, 1500);
-  } catch (err) {
-    setToast({ message: err.message, type: 'error' });
-    alert(err.message);
+      }, 1500);
+    } catch (err) {
+      setToast({ message: err.message || 'Erreur mise à jour service', type: 'error' });
+      alert(err.message);
+    }
   }
-}
 
 
   return (

@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 const categorySchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    unique: true, // chaque nom doit être unique
-    trim: true
+    required: [true, 'Category name is required'],
+    unique: true,
+    trim: true,
   },
   description: {
     type: String,
-    trim: true
-  }
+    trim: true,
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Category', categorySchema);

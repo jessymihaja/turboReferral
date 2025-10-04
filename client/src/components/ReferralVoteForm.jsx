@@ -2,31 +2,25 @@ import React, { useState } from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import CustomToast from './CustomToast';
+import { voteService } from '../services';
 
 function ReferralVoteForm({ referralId }) {
-    const { token} = useContext(UserContext);
+  const { token} = useContext(UserContext);
   const [vote, setVote] = useState('');
   const [comment, setComment] = useState('');
   const [toast, setToast] = useState({ message: '', type: '' });
 
-
   async function handleSubmit(e) {
-  e.preventDefault();
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/referralVotes/${referralId}/vote`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`, // si tu protèges avec JWT (à adapter selon ton app)
-    },
-    body: JSON.stringify({ vote, comment }),
-  });
-
-  const data = await res.json();
-  if (!res.ok) return setToast({ message: data.message, type: 'error' });;
-  setToast({ message: 'Merci pour votre vote', type: 'success' });
-  setVote('');
-  setComment('');
-}
+    e.preventDefault();
+    try {
+      await voteService.vote(referralId, { vote, comment });
+      setToast({ message: 'Merci pour votre vote', type: 'success' });
+      setVote('');
+      setComment('');
+    } catch (err) {
+      setToast({ message: err.message || 'Erreur lors du vote', type: 'error' });
+    }
+  }
 
   return (
     <form

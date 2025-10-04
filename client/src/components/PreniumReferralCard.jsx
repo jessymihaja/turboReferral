@@ -3,6 +3,7 @@ import TimeAgo from "./TimeAgo";
 import ReferralVoteForm from "./ReferralVoteForm";
 import ReportReferral from "./ReportReferral";
 import { useEffect, useState } from "react";
+import { voteService } from '../services';
 
 export default function PremiumReferralCard({ ref, onComment }) {
   const [averageRating, setAverageRating] = useState(null);
@@ -10,11 +11,8 @@ export default function PremiumReferralCard({ ref, onComment }) {
   useEffect(() => {
     async function fetchAverageRating() {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/referralVotes/averages/${ref._id}`
-        );
-        const data = await response.json();
-        setAverageRating(data.average);
+        const data = await voteService.getAverage(ref._id);
+        setAverageRating((data.data || data).average);
       } catch (error) {
         console.error("Erreur lors de la récupération de la note moyenne :", error);
       }

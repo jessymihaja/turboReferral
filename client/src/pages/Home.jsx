@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ReferralInfo from '../components/ReferralInfo';
+import { serviceService, categoryService } from '../services';
 
 export default function Home() {
   const [services, setServices] = useState([]);
@@ -10,15 +11,19 @@ export default function Home() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/services`)
-      .then(res => res.json())
-      .then(setServices)
-      .catch(console.error);
+    const fetchData = async () => {
+      try {
+        const servicesData = await serviceService.getAll();
+        const categoriesData = await categoryService.getAll();
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/categories`)
-      .then(res => res.json())
-      .then(setCategories)
-      .catch(console.error);
+        setServices(servicesData.data || servicesData);
+        setCategories(categoriesData.data || categoriesData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const filteredServices = services.filter(service => {

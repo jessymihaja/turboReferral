@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { useAuthFetch } from '../utils/authFetch';
 import CustomToast from '../components/CustomToast';
+import { referralService, categoryService, serviceService } from '../services';
 
 export default function Dashboard() {
   const { user } = useContext(UserContext);
@@ -31,10 +32,8 @@ export default function Dashboard() {
     async function fetchUserReferrals() {
       try {
         setLoading(true);
-        const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/referrals/user/${user._id}`);
-        if (!res.ok) throw new Error('Erreur chargement referrals');
-        const data = await res.json();
-        setReferrals(data);
+        const data = await referralService.getByUser(user._id);
+        setReferrals(data.data || data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -44,10 +43,8 @@ export default function Dashboard() {
 
     async function fetchCategories() {
       try {
-        const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/categories`);
-        if (!res.ok) throw new Error('Erreur lors du chargement des catégories');
-        const data = await res.json();
-        setCategories(data);
+        const data = await categoryService.getAll();
+        setCategories(data.data || data);
       } catch (err) {
         console.error(err);
       }
@@ -55,7 +52,7 @@ export default function Dashboard() {
 
     fetchCategories();
     fetchUserReferrals();
-  }, [user, authFetch]);
+  }, [user]);
 
   function groupByService(referrals) {
     return referrals.reduce((acc, ref) => {
@@ -70,8 +67,7 @@ export default function Dashboard() {
     if (!confirm('Confirmer la suppression ?')) return;
     try {
       setDeletingId(id);
-      const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/referrals/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Erreur suppression');
+      await referralService.delete(id);
       setReferrals(referrals.filter(ref => ref._id !== id));
     } catch (err) {
       alert(err.message);
@@ -80,7 +76,6 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ Soumission avec upload image
   async function handleServiceRequestSubmit(e) {
     e.preventDefault();
     setFormError('');
@@ -110,18 +105,10 @@ export default function Dashboard() {
       );
 
       if (serviceLogoFile) {
-        formData.append('logo', serviceLogoFile); // image uploadée
+        formData.append('logo', serviceLogoFile);
       }
 
-      const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/services`, {
-        method: 'POST',
-        body: formData, // pas besoin de headers ici
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Erreur lors de la demande');
-      }
+      await serviceService.create(formData);
 
       setToast({ message: 'Service demandé avec succès', type: 'success' });
       setServiceName('');
@@ -131,7 +118,7 @@ export default function Dashboard() {
       setValidationPatterns('');
       setSelectedCategory('');
     } catch (err) {
-      setToast({ message: err.message, type: 'error' });
+      setToast({ message: err.message || 'Erreur lors de la demande', type: 'error' });
     } finally {
       setFormLoading(false);
     }

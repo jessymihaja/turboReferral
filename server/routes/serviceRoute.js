@@ -1,20 +1,37 @@
 const express = require('express');
-const adminAuthMiddleware = require('../middlewares/adminAuth');
 const router = express.Router();
+const upload = require('../middlewares/uploadLogo');
+const adminAuthMiddleware = require('../middlewares/adminAuth');
+const { serviceValidators, idValidator } = require('../utils/validators');
 
 const {
   getAllServices,
   getServiceById,
   createService,
-  updateService,
   setServiceValidation,
+  updateService,
 } = require('../controllers/serviceController');
-const upload = require('../middlewares/uploadLogo');
 
 router.get('/', getAllServices);
-router.get('/:id', getServiceById);
-router.post('/',upload.single('logo'), createService);
-router.put('/:id', adminAuthMiddleware,upload.single('logo'), updateService);  
-router.put('/:id/validate', adminAuthMiddleware, setServiceValidation);
+router.get('/:id', idValidator, getServiceById);
+router.post(
+  '/',
+  upload.single('logo'),
+  serviceValidators.create,
+  createService
+);
+router.patch(
+  '/:id/validate',
+  adminAuthMiddleware,
+  idValidator,
+  setServiceValidation
+);
+router.put(
+  '/:id',
+  adminAuthMiddleware,
+  upload.single('logo'),
+  idValidator,
+  updateService
+);
 
 module.exports = router;

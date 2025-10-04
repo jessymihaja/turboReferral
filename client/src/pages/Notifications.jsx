@@ -1,39 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import '../assets/css/notifications.css';
 import { useNavigate } from 'react-router-dom';
+import { notificationService } from '../services';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/notifications/`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setNotifications(data);
-      })
-      .catch(err => {
+    const fetchNotifications = async () => {
+      try {
+        const data = await notificationService.getAll();
+        setNotifications(data.data || data);
+      } catch (err) {
         console.error('Erreur lors de la récupération des notifications :', err);
-      });
+      }
+    };
+
+    fetchNotifications();
   }, []);
 
-  const markAsRead = (id) => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then(() => {
-        setNotifications(notifications.map(n =>
-          n._id === id ? { ...n, isRead: true } : n
-        ));
-      })
-      .catch(err => console.error('Erreur marquage comme lu', err));
+  const markAsRead = async (id) => {
+    try {
+      await notificationService.markAsRead(id);
+      setNotifications(notifications.map(n =>
+        n._id === id ? { ...n, isRead: true } : n
+      ));
+    } catch (err) {
+      console.error('Erreur marquage comme lu', err);
+    }
   };
 
   return (

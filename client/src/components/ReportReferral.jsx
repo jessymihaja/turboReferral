@@ -3,6 +3,7 @@ import CustomToast from '../components/CustomToast';
 import { BsExclamationTriangleFill } from 'react-icons/bs';
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
+import api from '../services/api';
 
 const reasons = ['Brisé', 'Trompeur', 'Abusif', 'Autre'];
 
@@ -13,24 +14,7 @@ const ReportReferral = ({ referralId}) => {
 
   const handleReport = async (reason) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reports`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          referralId,
-          reason,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to submit report');
-      }
-
+      await api.post('/api/reports', { referralId, reason });
       setToast({ message: 'Signalement envoyé avec succès', type: 'success' });
     } catch (error) {
       let errorMessage = error.message;
@@ -39,9 +23,9 @@ const ReportReferral = ({ referralId}) => {
         errorMessage = 'Veuillez vous connecter pour signaler ce lien';
       }
 
-      setToast({ message: errorMessage, type: 'error' });
+      setToast({ message: errorMessage || 'Erreur lors du signalement', type: 'error' });
     } finally {
-      setShowReasons(false); // Cacher le menu après envoi
+      setShowReasons(false);
     }
   };
 

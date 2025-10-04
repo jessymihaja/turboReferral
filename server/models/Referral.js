@@ -1,35 +1,48 @@
 const mongoose = require('mongoose');
+const { VALIDATION } = require('../config/constants');
 
 const referralSchema = new mongoose.Schema({
-  service: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // identifiant user (ex: username ou email)
+  service: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Service',
+    required: [true, 'Service is required'],
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'User is required'],
+  },
   link: {
     type: String,
     unique: true,
     sparse: true,
-    // Validation simple optionnelle, vérifie que si link est présent, c’est une URL basique
+    trim: true,
     validate: {
       validator: function(v) {
-        if (!v) return true; // lien vide ok (car code peut être présent)
-        return /^https?:\/\/.+$/.test(v.trim());
+        if (!v) return true;
+        return VALIDATION.URL_REGEX.test(v);
       },
-      message: props => `${props.value} n'est pas un lien valide`
-    }
+      message: 'Invalid link format',
+    },
   },
   code: {
     type: String,
     unique: true,
     sparse: true,
+    trim: true,
   },
-  description: { type: String, maxlength: 100 },
+  description: {
+    type: String,
+    maxlength: [VALIDATION.MAX_DESCRIPTION_LENGTH, `Description cannot exceed ${VALIDATION.MAX_DESCRIPTION_LENGTH} characters`],
+    trim: true,
+  },
 }, { timestamps: true });
 
-// Validation personnalisée : soit link soit code (mais pas les deux)
 referralSchema.pre('validate', function(next) {
   if (!this.link && !this.code) {
-    next(new Error('Un referral doit avoir soit un lien, soit un code.'));
+    next(new Error('Referral must have either a link or a code'));
   } else if (this.link && this.code) {
-    next(new Error('Un referral ne peut pas avoir à la fois un lien et un code.'));
+    next(new Error('Referral cannot have both a link and a code'));
   } else {
     next();
   }

@@ -1,12 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const notificationController = require('../controllers/notificationController');
-const authMiddleware = require('../middlewares/auth');
+const { authenticateToken } = require('../middlewares/auth');
+const adminAuthMiddleware = require('../middlewares/adminAuth');
+const { idValidator } = require('../utils/validators');
 
-router.get('/', authMiddleware, notificationController.getUserNotifications);
-router.put('/:id/read', authMiddleware, notificationController.markAsRead);
-router.post('/warn/:reportId', notificationController.warnUser);
-router.get('/unread-count',authMiddleware, notificationController.getUnreadCount);
-router.post('/warnDeletedReferral/:reportId', notificationController.warnUserDeletedReferral); // Nouvelle route pour avertir d'un lien supprimé
+const {
+  getUserNotifications,
+  markAsRead,
+  getUnreadCount,
+  warnUser,
+  warnUserDeletedReferral,
+} = require('../controllers/notificationController');
+
+router.get('/', authenticateToken, getUserNotifications);
+router.get('/unread-count', authenticateToken, getUnreadCount);
+router.put('/:id/read', authenticateToken, idValidator, markAsRead);
+router.post('/warn/:reportId', adminAuthMiddleware, idValidator, warnUser);
+router.post(
+  '/warnDeletedReferral/:reportId',
+  adminAuthMiddleware,
+  idValidator,
+  warnUserDeletedReferral
+);
 
 module.exports = router;

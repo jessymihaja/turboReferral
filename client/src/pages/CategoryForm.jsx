@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthFetch } from '../utils/authFetch';
 import CategoryList from '../components/CategoryList';
+import { categoryService } from '../services';
 
 export default function CategoryForm() {
   const [name, setName] = useState('');
@@ -16,12 +17,10 @@ export default function CategoryForm() {
 
   const fetchCategories = async () => {
     try {
-      const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/categories`);
-      if (!res.ok) throw new Error('Error loading categories');
-      const data = await res.json();
-      setCategories(data);
+      const data = await categoryService.getAll();
+      setCategories(data.data || data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error loading categories');
     }
   };
 
@@ -36,24 +35,18 @@ export default function CategoryForm() {
     }
 
     try {
-      const res = await authFetch(`${import.meta.env.VITE_API_URL}/api/categories`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), description: description.trim() })
+      const data = await categoryService.create({
+        name: name.trim(),
+        description: description.trim()
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Error while creating category');
-      }
-
-      const newCategory = await res.json();
+      const newCategory = data.data || data;
       setSuccess('Category added successfully!');
       setName('');
       setDescription('');
       setCategories(prev => [newCategory, ...prev]);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error while creating category');
     }
   };
 

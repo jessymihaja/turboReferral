@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuthFetch } from "../utils/authFetch";
 import ModalUpdateService from "../components/ModalUpdateService";
+import { referralService } from '../services';
+import api from '../services/api';
 
 export default function AdminDashboard() {
   const authFetch = useAuthFetch();
@@ -15,55 +17,41 @@ export default function AdminDashboard() {
     async function fetchData() {
       try {
         setLoading(true);
-        const [servicesRes, referralsRes] = await Promise.all([
-          authFetch(`${import.meta.env.VITE_API_URL}/api/admin/services`),
-          authFetch(`${import.meta.env.VITE_API_URL}/api/referrals`),
+        const [servicesData, referralsData] = await Promise.all([
+          api.get('/api/admin/services'),
+          referralService.getAll(),
         ]);
 
-        if (!servicesRes.ok) throw new Error("Erreur chargement services");
-        if (!referralsRes.ok) throw new Error("Erreur chargement referrals");
-
-        const servicesData = await servicesRes.json();
-        const referralsData = await referralsRes.json();
-
-        setServices(servicesData);
-        setReferrals(referralsData);
+        setServices(servicesData.data || servicesData);
+        setReferrals(referralsData.data || referralsData);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || 'Erreur lors du chargement des données');
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-  }, [authFetch]);
+  }, []);
 
   async function handleValidateService(id) {
     try {
-      const res = await authFetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/services/${id}/validate`,
-        { method: "PUT" }
-      );
-      if (!res.ok) throw new Error("Erreur validation service");
-      const updated = await res.json();
-      setServices(services.map((s) => (s._id === id ? updated.service : s)));
+      const data = await api.put(`/api/admin/services/${id}/validate`);
+      const updated = data.data?.service || data.service || data;
+      setServices(services.map((s) => (s._id === id ? updated : s)));
       alert("Service validé avec succès !");
     } catch (err) {
-      alert(err.message);
+      alert(err.message || "Erreur validation service");
     }
   }
 
   async function handleDeleteReferral(id) {
     if (!confirm("Supprimer ce referral ?")) return;
     try {
-      const res = await authFetch(
-        `${import.meta.env.VITE_API_URL}/api/referrals/${id}`,
-        { method: "DELETE" }
-      );
-      if (!res.ok) throw new Error("Erreur suppression referral");
+      await referralService.delete(id);
       setReferrals(referrals.filter((r) => r._id !== id));
     } catch (err) {
-      alert(err.message);
+      alert(err.message || "Erreur suppression referral");
     }
   }
 

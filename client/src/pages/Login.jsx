@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import { authService } from '../services';
 
 export default function Login() {
   const { user, login } = useContext(UserContext);
@@ -24,22 +25,12 @@ export default function Login() {
     setError('');
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || 'Erreur lors de la connexion');
-        return;
-      }
-
-      login(data.user, data.token);
-      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
+      const response = await authService.login({ username, password });
+      const { user, token } = response.data;
+      login(user, token);
+      navigate(user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
-      setError('Erreur réseau');
+      setError(err.message || 'Erreur lors de la connexion');
     }
   }
 

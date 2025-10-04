@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import { authService } from '../services';
 
 export default function Register() {
   const { user } = useContext(UserContext);
@@ -32,24 +33,12 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Erreur lors de l’inscription");
-        setLoading(false);
-        return;
-      }
-
+      await authService.register({ username, email, password });
       setSuccess('Inscription réussie ! Vous pouvez maintenant vous connecter.');
       setLoading(false);
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      setError('Erreur réseau');
+      setError(err.message || "Erreur lors de l'inscription");
       setLoading(false);
     }
   }

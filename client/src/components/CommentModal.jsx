@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../assets/css/CommentModal.css';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { voteService } from '../services';
 
 function CommentModal({ referral, onClose }) {
   const [comments, setComments] = useState([]);
@@ -9,9 +10,8 @@ function CommentModal({ referral, onClose }) {
   useEffect(() => {
     async function fetchComments() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/referralVotes/${referral._id}/comments`);
-        const data = await res.json();
-        setComments(data);
+        const data = await voteService.getComments(referral._id);
+        setComments(data.data || data);
       } catch (err) {
         console.error('Erreur lors du chargement des commentaires:', err);
       } finally {

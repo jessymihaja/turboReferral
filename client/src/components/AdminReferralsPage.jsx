@@ -3,21 +3,22 @@ import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaCrown } from "react-icons/fa";
 import PromoteReferralModal from "./PromoteReferralModal";
+import api from '../services/api';
+
 export default function AdminReferralsPage() {
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filteredReferrals, setFilteredReferrals] = useState([]); // liste filtrée
+  const [filteredReferrals, setFilteredReferrals] = useState([]);
   const [search, setSearch] = useState("");
-  const [selectedReferral, setSelectedReferral] = useState(null); // referral sélectionné pour promotion
+  const [selectedReferral, setSelectedReferral] = useState(null);
 
-  // Fetch des referrals
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals/with-status`);
-        const data = await res.json();
-        setReferrals(data);
-        setFilteredReferrals(data);
+        const data = await api.get('/api/referrals/with-status');
+        const referrals = data.data || data;
+        setReferrals(referrals);
+        setFilteredReferrals(referrals);
         setLoading(false);
       } catch (err) {
         console.error(err);

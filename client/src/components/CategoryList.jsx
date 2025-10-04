@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { categoryService } from '../services';
 
 export default function CategoryList() {
   const [categories, setCategories] = useState([]);
@@ -6,10 +7,16 @@ export default function CategoryList() {
   const itemsPerPage = 5;
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/categories`)
-      .then(res => res.json())
-      .then(setCategories)
-      .catch(console.error);
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryService.getAll();
+        setCategories(data.data || data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
   const totalPages = Math.ceil(categories.length / itemsPerPage);

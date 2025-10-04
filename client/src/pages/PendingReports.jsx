@@ -2,74 +2,58 @@ import React, { useEffect, useState } from 'react';
 import CustomToast from '../components/CustomToast';
 import { FaCheck, FaExclamationTriangle, FaTrash,FaEye} from 'react-icons/fa';
 import { useAuthFetch } from '../utils/authFetch';
+import { referralService, notificationService } from '../services';
+import api from '../services/api';
 
 const PendingReports = () => {
   const [reports, setReports] = useState([]);
   const [toast, setToast] = useState({ message: '', type: '' });
   const authFetch = useAuthFetch();
+
   useEffect(() => {
     fetchReports();
   }, []);
 
   const fetchReports = async () => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/reports/pending`)
-      .then(res => res.json())
-      .then(setReports)
-      .catch(console.error);
-  };
-
-  const handleDelete = async (id,referralId) => {
     try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/warnDeletedReferral/${id}`, {
-      method: 'POST',
-    });
-    const responseDelete = await authFetch(`${import.meta.env.VITE_API_URL}/api/referrals/${referralId}`, {
-      method: 'DELETE',
-    });
-    if(!responseDelete.ok) throw new Error('Erreur lors de la suppression du referral');
-
-
-    if (!response.ok) throw new Error('Erreur lors de l’envoi');
-    setToast({ message: 'Suppression avec succès', type: 'success' });
-  } catch (err) {
-    console.error(err);
-    setToast({ message: 'Erreur lors de la suppression', type: 'error' });
+      const data = await api.get('/api/reports/pending');
+      setReports(data.data || data);
+    } catch (error) {
+      console.error('Error fetching reports:', error);
+    }
   };
-}
+
+  const handleDelete = async (id, referralId) => {
+    try {
+      await api.post(`/api/notifications/warnDeletedReferral/${id}`);
+      await referralService.delete(referralId);
+      setToast({ message: 'Suppression avec succès', type: 'success' });
+      fetchReports();
+    } catch (err) {
+      console.error(err);
+      setToast({ message: err.message || 'Erreur lors de la suppression', type: 'error' });
+    }
+  };
 
   const handleIgnore = async (id) => {
     try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reports/${id}/ignore`, {
-      method: 'PUT',
-    });
-
-    //if (!response.ok) throw new Error('Échec de l’ignorance du report');
-
-    const data = await response.json();
-    setToast({ message: 'Report ignoré avec succès', type: 'success' });
-
-    fetchReports();
-    setToast({ message: 'Signalement ignoré', type: 'success' });
-
-  } catch (error) {
-    setToast({ message: error.message, type: 'error' });
-  }
+      await api.put(`/api/reports/${id}/ignore`);
+      setToast({ message: 'Signalement ignoré', type: 'success' });
+      fetchReports();
+    } catch (error) {
+      setToast({ message: error.message || 'Erreur lors de l\'ignorance du report', type: 'error' });
+    }
   };
 
- const handleWarn = async (id) => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/warn/${id}`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) throw new Error('Erreur lors de l’envoi');
-
-    setToast({ message: 'Propriétaire averti', type: 'success' });
-  } catch (err) {
-    console.error(err);
-    setToast({ message: 'Erreur lors de l’envoi de l’avertissement', type: 'error' });
-  }
-};
+  const handleWarn = async (id) => {
+    try {
+      await api.post(`/api/notifications/warn/${id}`);
+      setToast({ message: 'Propriétaire averti', type: 'success' });
+    } catch (err) {
+      console.error(err);
+      setToast({ message: err.message || 'Erreur lors de l\'envoi de l\'avertissement', type: 'error' });
+    }
+  };
 
   return (
     <div style={{ padding: '20px',textAlign: 'center' }}>

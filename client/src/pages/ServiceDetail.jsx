@@ -8,6 +8,8 @@ import CommentModal from '../components/CommentModal';
 import CustomToast from '../components/CustomToast';
 import ReportReferral from '../components/ReportReferral';
 import PreniumReferralCard from '../components/PreniumReferralCard';
+import { serviceService, referralService, voteService } from '../services';
+import api from '../services/api';
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -28,38 +30,30 @@ export default function ServiceDetail() {
       try {
         setLoading(true);
 
-        const [serviceRes, referralRes, avgRes,promotionsRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/services/${id}`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/referrals/service/${id}`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/referralVotes/averages/all`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/promotions/active/service/${id}`),
+        const [serviceData, referralData, avgData, promotionsData] = await Promise.all([
+          serviceService.getById(id),
+          referralService.getByService(id),
+          voteService.getAllAverages(),
+          api.get(`/api/promotions/active/service/${id}`)
         ]);
 
-        if (!serviceRes.ok) throw new Error('Service non trouvé');
-        if (!referralRes.ok) throw new Error('Erreur chargement referrals');
-        if (!avgRes.ok) throw new Error('Erreur chargement moyennes');
-        if (!promotionsRes.ok) throw new Error('Erreur chargement promotions');
+        setService(serviceData.data || serviceData);
 
-        const [serviceData, referralData, avgData,promotions] = await Promise.all([
-          serviceRes.json(),
-          referralRes.json(),
-          avgRes.json(),
-          promotionsRes.json()
-        ]);
+        const referrals = referralData.data || referralData;
+        const averages = avgData.data || avgData;
+        const promos = promotionsData.data || promotionsData;
 
-        setService(serviceData);
-
-        const referralsWithAverages = referralData.map(ref => ({
+        const referralsWithAverages = referrals.map(ref => ({
           ...ref,
-          voteAverage: avgData[ref._id]?.average ?? 0,
-          totalVotes: avgData[ref._id]?.totalVotes ?? 0
+          voteAverage: averages[ref._id]?.average ?? 0,
+          totalVotes: averages[ref._id]?.totalVotes ?? 0
         }));
 
         setReferrals(referralsWithAverages);
-        setPromotions(promotions);
+        setPromotions(promos);
 
       } catch (err) {
-        setError(err.message);
+        setError(err.message || 'Erreur lors du chargement des données');
       } finally {
         setLoading(false);
       }
@@ -80,26 +74,21 @@ export default function ServiceDetail() {
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/referrals`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service: id,
-          user: user._id,
-          link: newReferral.link,
-          code: newReferral.code,
-          description: newReferral.description,
-        }),
+      const data = await referralService.create({
+        service: id,
+        user: user._id,
+        link: newReferral.link,
+        code: newReferral.code,
+        description: newReferral.description,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erreur lors de l’ajout du referral');
 
-      setReferrals(prev => [...prev, data]);
+      const newRef = data.data || data;
+      setReferrals(prev => [...prev, { ...newRef, voteAverage: 0, totalVotes: 0 }]);
       setSuccess('Referral ajouté avec succès !');
       setNewReferral({ link: '', code: '', description: '' });
       setToast({ message: 'Referral ajouté avec succès !', type: 'success' });
     } catch (err) {
-      setToast({ message: err.message, type: 'error' });
+      setToast({ message: err.message || 'Erreur lors de l\'ajout du referral', type: 'error' });
     }
   }
 
