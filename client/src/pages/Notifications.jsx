@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../assets/css/notifications.css';
+import '../assets/css/Notifications.css';
 import { useNavigate } from 'react-router-dom';
 import { notificationService } from '../services';
 import { useTranslation } from 'react-i18next';
