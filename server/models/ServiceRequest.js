@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const { SERVICE_REQUEST_STATUS } = require('../config/constants');
+const { t } = require('../utils/i18n');
 
 const serviceRequestSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Service name is required'],
+    required: [true, t('validation.nameRequired')],
     trim: true,
   },
   description: {
@@ -14,7 +15,7 @@ const serviceRequestSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'User is required'],
+    required: [true, t('validation.userRequired')],
   },
   status: {
     type: String,

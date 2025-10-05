@@ -21,6 +21,6 @@ router.get('/service/:id', idValidator, getReferralsByServiceId);
 router.get('/', getAllReferrals);
 router.post('/', authenticateToken, referralValidators.create, createReferral);
 router.put('/:id', adminAuthMiddleware, idValidator, updateReferral);
-router.delete('/:id', adminAuthMiddleware, idValidator, deleteReferral);
+router.delete('/:id', authenticateToken, idValidator, deleteReferral);
 
 module.exports = router;

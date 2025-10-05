@@ -3,6 +3,7 @@ const Report = require('../models/Report');
 const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
+const { t } = require('../utils/i18n');
 
 exports.getUserNotifications = asyncHandler(async (req, res) => {
   const notifications = await Notification.find({ userId: req.user._id }).sort({
@@ -13,7 +14,7 @@ exports.getUserNotifications = asyncHandler(async (req, res) => {
 
 exports.markAsRead = asyncHandler(async (req, res) => {
   await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
-  ResponseHandler.success(res, null, 'Notification marked as read');
+  ResponseHandler.success(res, null, t('notification.notificationMarkedRead'));
 });
 
 exports.getUnreadCount = asyncHandler(async (req, res) => {
@@ -28,12 +29,12 @@ exports.warnUser = asyncHandler(async (req, res) => {
   const report = await Report.findById(req.params.reportId).populate('referralId');
 
   if (!report) {
-    throw new AppError('Report not found', 404);
+    throw new AppError(t('report.reportNotFound'), 404);
   }
 
   const referral = report.referralId;
   if (!referral) {
-    throw new AppError('Referral not found', 404);
+    throw new AppError(t('referral.referralNotFound'), 404);
   }
 
   const userId = referral.user._id;
@@ -45,19 +46,19 @@ exports.warnUser = asyncHandler(async (req, res) => {
 
   const newNotif = await Notification.create({ userId, title, content });
 
-  ResponseHandler.created(res, newNotif, 'Warning notification sent');
+  ResponseHandler.created(res, newNotif, t('notification.notificationCreated'));
 });
 
 exports.warnUserDeletedReferral = asyncHandler(async (req, res) => {
   const report = await Report.findById(req.params.reportId).populate('referralId');
 
   if (!report) {
-    throw new AppError('Report not found', 404);
+    throw new AppError(t('report.reportNotFound'), 404);
   }
 
   const referral = report.referralId;
   if (!referral) {
-    throw new AppError('Referral not found', 404);
+    throw new AppError(t('referral.referralNotFound'), 404);
   }
 
   const userId = referral.user._id;
@@ -69,5 +70,5 @@ exports.warnUserDeletedReferral = asyncHandler(async (req, res) => {
 
   const newNotif = await Notification.create({ userId, title, content });
 
-  ResponseHandler.created(res, newNotif, 'Deletion warning notification sent');
+  ResponseHandler.created(res, newNotif, t('notification.notificationCreated'));
 });

@@ -1,30 +1,59 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import { UserContext } from '../contexts/UserContext';
-import { useAuthFetch } from '../utils/authFetch';
+import { FaTrash, FaPlus, FaFileUpload, FaLink, FaCode, FaInbox, FaChevronDown, FaChevronUp, FaExternalLinkAlt } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import CustomToast from '../components/CustomToast';
 import { referralService, categoryService, serviceService } from '../services';
+import './Dashboard.css';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user } = useContext(UserContext);
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
-  const authFetch = useAuthFetch();
   const [toast, setToast] = useState({ message: '', type: '' });
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const observerTarget = useRef(null);
 
-  // État formulaire création service
+  // Collapse state for each service
+  const [collapsedServices, setCollapsedServices] = useState({});
+
+  // Form state
   const [serviceName, setServiceName] = useState('');
   const [serviceDescription, setServiceDescription] = useState('');
-  const [serviceLogoFile, setServiceLogoFile] = useState(null); // FICHIER LOGO
+  const [serviceLogoFile, setServiceLogoFile] = useState(null);
   const [serviceWebsite, setServiceWebsite] = useState('');
   const [validationPatterns, setValidationPatterns] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
-
-  const [formError, setFormError] = useState('');
-  const [formSuccess, setFormSuccess] = useState('');
   const [formLoading, setFormLoading] = useState(false);
+
+  const loadMoreReferrals = useCallback(async () => {
+    if (!user || loadingMore || !hasMore) return;
+
+    try {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      const data = await referralService.getByUser(user._id, nextPage, 10);
+      
+      const newReferrals = data.data?.referrals || data.referrals || [];
+      const pagination = data.data?.pagination || data.pagination;
+      
+      setReferrals(prev => [...prev, ...newReferrals]);
+      setPage(nextPage);
+      setHasMore(pagination?.hasMore || false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [user, page, hasMore, loadingMore]);
 
   useEffect(() => {
     if (!user) return;
@@ -32,8 +61,21 @@ export default function Dashboard() {
     async function fetchUserReferrals() {
       try {
         setLoading(true);
-        const data = await referralService.getByUser(user._id);
-        setReferrals(data.data || data);
+        const data = await referralService.getByUser(user._id, 1, 10);
+        
+        const initialReferrals = data.data?.referrals || data.referrals || [];
+        const pagination = data.data?.pagination || data.pagination;
+        
+        setReferrals(initialReferrals);
+        setHasMore(pagination?.hasMore || false);
+        
+        // Initialize all services as collapsed
+        const grouped = groupByService(initialReferrals);
+        const collapsed = {};
+        Object.keys(grouped).forEach(serviceName => {
+          collapsed[serviceName] = true;
+        });
+        setCollapsedServices(collapsed);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -54,23 +96,53 @@ export default function Dashboard() {
     fetchUserReferrals();
   }, [user]);
 
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          loadMoreReferrals();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [hasMore, loadingMore, loadMoreReferrals]);
+
   function groupByService(referrals) {
     return referrals.reduce((acc, ref) => {
-      const serviceName = ref.service?.name || 'Service inconnu';
+      const serviceName = ref.service?.name || 'Unknown Service';
       if (!acc[serviceName]) acc[serviceName] = [];
       acc[serviceName].push(ref);
       return acc;
     }, {});
   }
 
+  function toggleServiceCollapse(serviceName) {
+    setCollapsedServices(prev => ({
+      ...prev,
+      [serviceName]: !prev[serviceName]
+    }));
+  }
+
   async function handleDelete(id) {
-    if (!confirm('Confirmer la suppression ?')) return;
+    if (!confirm(t('errors.deleteConfirm'))) return;
     try {
       setDeletingId(id);
       await referralService.delete(id);
       setReferrals(referrals.filter(ref => ref._id !== id));
+      setToast({ message: t('toast.referralDeleted'), type: 'success' });
     } catch (err) {
-      alert(err.message);
+      setToast({ message: err.message, type: 'error' });
     } finally {
       setDeletingId(null);
     }
@@ -78,11 +150,9 @@ export default function Dashboard() {
 
   async function handleServiceRequestSubmit(e) {
     e.preventDefault();
-    setFormError('');
-    setFormSuccess('');
 
     if (!serviceName.trim()) {
-      setToast({ message: 'Le nom du service est obligatoire', type: 'error' });
+      setToast({ message: t('dashboard.serviceNameRequired'), type: 'error' });
       return;
     }
 
@@ -110,7 +180,7 @@ export default function Dashboard() {
 
       await serviceService.create(formData);
 
-      setToast({ message: 'Service demandé avec succès', type: 'success' });
+      setToast({ message: t('dashboard.serviceRequested'), type: 'success' });
       setServiceName('');
       setServiceDescription('');
       setServiceLogoFile(null);
@@ -118,20 +188,36 @@ export default function Dashboard() {
       setValidationPatterns('');
       setSelectedCategory('');
     } catch (err) {
-      setToast({ message: err.message || 'Erreur lors de la demande', type: 'error' });
+      setToast({ message: err.message || t('dashboard.requestFailed'), type: 'error' });
     } finally {
       setFormLoading(false);
     }
   }
 
-  if (!user) return <p>Vous devez être connecté pour accéder au dashboard.</p>;
-  if (loading) return <p>Chargement...</p>;
-  if (error) return <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>;
+  if (!user) return (
+    <div className="page-container">
+      <div className="empty-state">
+        <p>{t('auth.loginRequired')}</p>
+      </div>
+    </div>
+  );
+
+  if (loading) return (
+    <div className="page-container">
+      <div className="spinner" />
+    </div>
+  );
+
+  if (error) return (
+    <div className="page-container">
+      <p style={{ color: 'var(--color-error)' }}>{error}</p>
+    </div>
+  );
 
   const grouped = groupByService(referrals);
 
   return (
-    <div style={{ maxWidth: '700px', margin: '2rem auto', padding: '1rem', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+    <div className="dashboard">
       {toast.message && (
         <CustomToast
           message={toast.message}
@@ -139,203 +225,170 @@ export default function Dashboard() {
           onClose={() => setToast({ message: '', type: '' })}
         />
       )}
-      <h2 style={{ marginBottom: '1rem', color: '#5D4037' }}>Bienvenue sur votre tableau de bord {user.username}</h2>
-      <p style={{ marginBottom: '1.5rem', color: '#4E342E' }}>Vous avez {referrals.length} lien(s) ou code(s) de parrainage.</p>
 
-      {referrals.length === 0 ? (
-        <p>Aucun referral posté pour l'instant.</p>
-      ) : (
-        Object.entries(grouped).map(([serviceName, refs]) => (
-          <section key={serviceName} style={{ marginBottom: '2rem' }}>
-            <h3 style={{ borderBottom: '2px solid #27ae60', paddingBottom: '0.3rem', marginBottom: '1rem', color: '#27ae60' }}>
-              <a href={`/services/${refs[0].service._id}`} style={{ color: '#27ae60', textDecoration: 'none' }}>
-                {serviceName}
-              </a>
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
-              {refs.map(ref => (
-                <li
-                  key={ref._id}
-                  style={{
-                    marginBottom: '1rem',
-                    padding: '1rem',
-                    borderRadius: '8px',
-                    backgroundColor: '#f8f9fa',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  }}
-                >
-                  {ref.link ? (
-                    <a href={ref.link} target="_blank" rel="noreferrer" style={{ fontWeight: '600', color: '#2c3e50' }}>
-                      {ref.link}
-                    </a>
-                  ) : (
-                    <span style={{ fontWeight: '600' }}>Code : {ref.code}</span>
-                  )}
-                  {ref.description && (
-                    <p style={{ fontStyle: 'italic', marginTop: '0.3rem', color: '#555' }}>
-                      {ref.description}
-                    </p>
-                  )}
-                  <button
-                    onClick={() => handleDelete(ref._id)}
-                    disabled={deletingId === ref._id}
-                    style={{
-                      marginTop: '0.5rem',
-                      marginLeft: '0.4rem',
-                      backgroundColor: deletingId === ref._id ? '#ccc' : '#e74c3c',
-                      color: 'white',
-                      border: 'none',
-                      padding: '0.3rem 0.6rem',
-                      borderRadius: '4px',
-                      cursor: deletingId === ref._id ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    {deletingId === ref._id ? 'Suppression...' : 'Supprimer'}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      )}
+      <div className="dash-header">
+        <h1>{user.username}</h1>
+        <div className="stats">
+          <span>{referrals.length} parrainage{referrals.length > 1 ? 's' : ''}</span>
+          <span>·</span>
+          <span>{Object.keys(grouped).length} service{Object.keys(grouped).length > 1 ? 's' : ''}</span>
+        </div>
+      </div>
 
-      <section style={{ marginTop: '3rem', paddingTop: '1rem', borderTop: '1px solid #ccc' }}>
-        <form
-          onSubmit={handleServiceRequestSubmit}
-          style={{
-            maxWidth: '600px',
-            margin: '2rem auto',
-            padding: '2rem',
-            borderRadius: '10px',
-            backgroundColor: '#f9f9f9',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            fontFamily: 'Segoe UI, sans-serif',
-          }}
-        >
-          <h2 style={{ marginBottom: '1rem', color: '#333' }}>Demander un nouveau service</h2>
+      <div className="dash-layout">
+        <aside className="sidebar">
+          <div className="new-service">
+            <h2>
+              <FaPlus />
+              {t('dashboard.requestNewService')}
+            </h2>
 
-          <input
-            type="text"
-            placeholder="Nom du service"
-            value={serviceName}
-            onChange={e => setServiceName(e.target.value)}
-            required
-            style={{
-              padding: '0.75rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-            }}
-          />
-
-          <textarea
-            placeholder="Description"
-            value={serviceDescription}
-            onChange={e => setServiceDescription(e.target.value)}
-            rows={3}
-            style={{
-              padding: '0.75rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-            }}
-          />
-
-          {/* ✅ INPUT FILE POUR LE LOGO */}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={e => setServiceLogoFile(e.target.files[0])}
-            style={{
-              padding: '0.5rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              backgroundColor: '#fff',
-            }}
-          />
-
-          {/* ✅ Prévisualisation image */}
-          {serviceLogoFile && (
-            <div style={{ marginTop: '0.5rem' }}>
-              <p style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>Aperçu du logo :</p>
-              <img
-                src={URL.createObjectURL(serviceLogoFile)}
-                alt="Prévisualisation du logo"
-                style={{ width: '100px', height: 'auto', borderRadius: '6px', border: '1px solid #ccc' }}
+            <form onSubmit={handleServiceRequestSubmit}>
+              <input
+                type="text"
+                placeholder={t('dashboard.serviceName')}
+                value={serviceName}
+                onChange={e => setServiceName(e.target.value)}
+                required
               />
+
+              <select
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value)}
+              >
+                <option value="">{t('dashboard.selectCategory')}</option>
+                {categories.map(cat => (
+                  <option key={cat._id} value={cat._id}>{cat.name}</option>
+                ))}
+              </select>
+
+              <textarea
+                placeholder={t('dashboard.description')}
+                value={serviceDescription}
+                onChange={e => setServiceDescription(e.target.value)}
+                rows={2}
+              />
+
+              <input
+                type="url"
+                placeholder={t('dashboard.website')}
+                value={serviceWebsite}
+                onChange={e => setServiceWebsite(e.target.value)}
+              />
+
+              <div className="file-wrap">
+                <label>
+                  <FaFileUpload />
+                  {serviceLogoFile ? serviceLogoFile.name : t('dashboard.logo')}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setServiceLogoFile(e.target.files[0])}
+                  />
+                </label>
+              </div>
+
+              <textarea
+                placeholder={t('dashboard.validationPatterns')}
+                value={validationPatterns}
+                onChange={e => setValidationPatterns(e.target.value)}
+                rows={2}
+                className="mono"
+              />
+
+              <button type="submit" disabled={formLoading}>
+                {formLoading ? t('dashboard.submitting') : t('dashboard.submitRequest')}
+              </button>
+            </form>
+          </div>
+        </aside>
+
+        <div className="main-content">
+          {referrals.length === 0 ? (
+            <div className="empty">
+              <FaInbox />
+              <p>{t('dashboard.noReferralsYet')}</p>
             </div>
+          ) : (
+            <>
+              <div className="refs-list">
+                {Object.entries(grouped).map(([serviceName, refs]) => {
+                  const isCollapsed = collapsedServices[serviceName];
+                  const serviceId = refs[0]?.service?._id;
+                  
+                  return (
+                    <div key={serviceName} className="service-block">
+                      <div 
+                        className="service-title"
+                        onClick={() => toggleServiceCollapse(serviceName)}
+                      >
+                        <div className="service-title-left">
+                          {serviceId && (
+                            <a 
+                              href={`/services/${serviceId}`} 
+                              onClick={(e) => e.stopPropagation()}
+                              className="service-link"
+                            >
+                              {serviceName}
+                              <FaExternalLinkAlt />
+                            </a>
+                          )}
+                          {!serviceId && <span>{serviceName}</span>}
+                          <span className="count">{refs.length}</span>
+                        </div>
+                        <button className="collapse-btn" aria-label={isCollapsed ? 'Développer' : 'Réduire'}>
+                          {isCollapsed ? <FaChevronDown /> : <FaChevronUp />}
+                        </button>
+                      </div>
+
+                      <div className={`refs-content ${isCollapsed ? 'collapsed' : 'expanded'}`}>
+                        {refs.map(ref => (
+                          <div key={ref._id} className="ref-row">
+                            <div className="ref-info">
+                              {ref.link ? (
+                                <>
+                                  <FaLink />
+                                  <a href={ref.link} target="_blank" rel="noreferrer">{ref.link}</a>
+                                </>
+                              ) : (
+                                <>
+                                  <FaCode />
+                                  <code>{ref.code}</code>
+                                </>
+                              )}
+                              {ref.description && <span className="desc">{ref.description}</span>}
+                            </div>
+                            <button
+                              onClick={() => handleDelete(ref._id)}
+                              disabled={deletingId === ref._id}
+                              className="del-btn"
+                              aria-label="Supprimer"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Infinite scroll trigger */}
+              {hasMore && (
+                <div ref={observerTarget} className="load-more-trigger">
+                  {loadingMore && (
+                    <div className="loading-more">
+                      <div className="spinner-small" />
+                      <span>Chargement...</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
-
-          <input
-            type="text"
-            placeholder="Website"
-            value={serviceWebsite}
-            onChange={e => setServiceWebsite(e.target.value)}
-            style={{
-              padding: '0.75rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-            }}
-          />
-
-          <textarea
-            placeholder="Pattern de validation (une regex par ligne ou séparées par des virgules)"
-            value={validationPatterns}
-            onChange={e => setValidationPatterns(e.target.value)}
-            rows={4}
-            style={{
-              padding: '0.75rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-            }}
-          />
-
-          <select
-            value={selectedCategory}
-            onChange={e => setSelectedCategory(e.target.value)}
-            style={{
-              padding: '0.75rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-            }}
-          >
-            <option value="">Catégorie</option>
-            {categories.map(cat => (
-              <option key={cat._id} value={cat._id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-
-          {formError && <p style={{ color: 'red', fontWeight: '500' }}>{formError}</p>}
-          {formSuccess && <p style={{ color: '#27ae60', fontWeight: '500' }}>{formSuccess}</p>}
-
-          <button
-            type="submit"
-            disabled={formLoading}
-            style={{
-              padding: '0.75rem',
-              backgroundColor: '#27ae60',
-              color: 'white',
-              border: 'none',
-              fontSize: '1rem',
-              fontWeight: '600',
-              borderRadius: '6px',
-              cursor: formLoading ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.2s ease',
-            }}
-          >
-            {formLoading ? 'Envoi...' : 'Soumettre'}
-          </button>
-        </form>
-      </section>
+        </div>
+      </div>
     </div>
   );
 }

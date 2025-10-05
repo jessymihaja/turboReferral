@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   FaHome,
   FaChartBar,
@@ -10,79 +11,180 @@ import {
   FaLightbulb,
   FaExclamationTriangle,
   FaChevronDown,
+  FaBars,
+  FaTimes,
 } from 'react-icons/fa';
 import NotificationIcon from './NotificationIcon';
+import { useTranslation } from 'react-i18next';
 
 
 const Navbar = ({ user, logout }) => {
+  const { t } = useTranslation();
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav style={styles.nav}>
+    <motion.nav
+      style={{
+        ...styles.nav,
+        boxShadow: scrolled ? '0 4px 20px rgba(214, 156, 90, 0.15)' : 'var(--shadow-md)',
+        backdropFilter: scrolled ? 'blur(10px)' : 'none',
+        backgroundColor: scrolled ? 'rgba(249, 246, 243, 0.9)' : 'var(--color-bg-elevated)',
+      }}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
       {/* Logo */}
       <Link to="/" style={styles.logoLink}>
-        <span style={styles.logo}>turbo<span style={{ fontWeight: 'normal' }}>Referral</span></span>
+        <motion.span
+          style={styles.logo}
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
+          turbo<span style={{ fontWeight: 'normal' }}>Referral</span>
+        </motion.span>
       </Link>
 
-      {/* Liens à gauche */}
-      <div style={styles.linksGroup}>
-        <Link to="/" style={styles.link}><FaHome /> Accueil</Link>
-        {user && (
-          <>
-            <Link to="/dashboard" style={styles.link}><FaChartBar /> Dashboard</Link>
-            {user.role === 'admin' && (
-              <div style={styles.dropdownContainer}>
-                <button
-                  onClick={() => setAdminMenuOpen(prev => !prev)}
-                  style={styles.adminLink}
-                >
-                  <span style={styles.iconText}>
-                    <FaTools style={{ marginRight: 8 }} />
-                    Administration
-                  </span>
-                  <FaChevronDown style={styles.chevron} />
-                </button>
-                {adminMenuOpen && (
-                  <div style={styles.dropdownMenu}>
-                    <Link to="/admin" style={styles.dropdownItem} onClick={() => setAdminMenuOpen(false)}>
-                      <FaTools /> Admin
-                    </Link>
-                    <Link to="/admin/referrals" style={styles.dropdownItem} onClick={() => setAdminMenuOpen(false)}>
-                      <FaChartBar /> Referrals
-                    </Link>
-                    <Link to="/categories" style={styles.dropdownItem} onClick={() => setAdminMenuOpen(false)}>
-                      <FaLightbulb /> Catégories
-                    </Link>
-                    <Link to="/pending-reports" style={styles.dropdownItem} onClick={() => setAdminMenuOpen(false)}>
-                      <FaExclamationTriangle /> Signalements
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      {/* Mobile menu toggle */}
+      <button
+        style={styles.mobileToggle}
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label={t('navigation.toggleMenu')}
+      >
+        {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+      </button>
 
-      {/* Liens à droite */}
-      <div style={styles.userSection}>
-        {user ? (
-          <>
-            <div style={styles.userInfo}>
+      {/* Navigation Links */}
+      <div style={{
+        ...styles.navContent,
+        ...(mobileMenuOpen ? styles.navContentMobile : {})
+      }}>
+        <div style={styles.linksGroup}>
+          <Link to="/" style={styles.link} title={t('common.home')}>
+            <FaHome />
+            <span style={styles.linkText}>{t('common.home')}</span>
+          </Link>
+
+          {user && (
+            <>
+              <Link to="/dashboard" style={styles.link} title={t('common.dashboard')}>
+                <FaChartBar />
+                <span style={styles.linkText}>{t('common.dashboard')}</span>
+              </Link>
+              
+              {user.role === 'admin' && (
+                <div style={styles.dropdownContainer}>
+                  <button
+                    onClick={() => setAdminMenuOpen(prev => !prev)}
+                    style={styles.adminLink}
+                    title={t('common.admin')}
+                  >
+                    <FaTools />
+                    <span style={styles.linkText}>{t('common.admin')}</span>
+                    <FaChevronDown style={{
+                      ...styles.chevron,
+                      transform: adminMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                    }} />
+                  </button>
+                  {adminMenuOpen && (
+                    <div style={styles.dropdownMenu}>
+                      <Link
+                        to="/admin"
+                        style={styles.dropdownItem}
+                        onClick={() => {
+                          setAdminMenuOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <FaTools />
+                        <span>{t('common.dashboard')}</span>
+                      </Link>
+                      <Link
+                        to="/admin/referrals"
+                        style={styles.dropdownItem}
+                        onClick={() => {
+                          setAdminMenuOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <FaChartBar />
+                        <span>{t('common.referrals')}</span>
+                      </Link>
+                      <Link
+                        to="/categories"
+                        style={styles.dropdownItem}
+                        onClick={() => {
+                          setAdminMenuOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <FaLightbulb />
+                        <span>{t('common.categories')}</span>
+                      </Link>
+                      <Link
+                        to="/pending-reports"
+                        style={styles.dropdownItem}
+                        onClick={() => {
+                          setAdminMenuOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <FaExclamationTriangle />
+                        <span>{t('common.reports')}</span>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* User Section */}
+        <div style={styles.userSection}>
+          {user ? (
+            <>
               <NotificationIcon />
               <span style={styles.email}>{user.email}</span>
-            </div>
-            <button onClick={logout} style={styles.logoutButton}>
-              <FaSignOutAlt /> Déconnexion
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" style={styles.link}><FaSignInAlt /> Connexion</Link>
-            <Link to="/register" style={styles.link}><FaUserPlus /> Inscription</Link>
-          </>
-        )}
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                style={styles.logoutButton}
+                title={t('common.logout')}
+              >
+                <FaSignOutAlt />
+                <span style={styles.linkText}>{t('common.logout')}</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" style={styles.link} title={t('common.login')}>
+                <FaSignInAlt />
+                <span style={styles.linkText}>{t('common.login')}</span>
+              </Link>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link to="/register" style={styles.authButton} title={t('common.register')}>
+                  <FaUserPlus />
+                  <span style={styles.linkText}>{t('common.register')}</span>
+                </Link>
+              </motion.div>
+            </>
+          )}
+        </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
@@ -91,53 +193,87 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    padding: '0 2rem',
+    backgroundColor: 'var(--color-bg-elevated)',
+    padding: '0 var(--space-xl)',
     height: '70px',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
-    fontFamily: 'Segoe UI, sans-serif',
+    boxShadow: 'var(--shadow-md)',
     position: 'sticky',
     top: 0,
     zIndex: 1000,
+    borderBottom: '1px solid var(--color-border-light)',
   },
   logoLink: {
     textDecoration: 'none',
+    zIndex: 1001,
   },
   logo: {
-    fontSize: '1.5rem',
-    color: '#2ecc71',
-    fontWeight: 700,
+    fontSize: 'var(--font-size-xl)',
+    background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    fontWeight: 'var(--font-weight-bold)',
     letterSpacing: '-0.5px',
+  },
+  mobileToggle: {
+    display: 'none',
+    background: 'none',
+    border: 'none',
+    fontSize: 'var(--font-size-xl)',
+    color: 'var(--color-text-primary)',
+    cursor: 'pointer',
+    padding: 'var(--space-sm)',
+    zIndex: 1001,
+  },
+  navContent: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
+    marginLeft: 'var(--space-2xl)',
+  },
+  navContentMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'fixed',
+    top: '70px',
+    left: 0,
+    right: 0,
+    backgroundColor: 'var(--color-bg-elevated)',
+    boxShadow: 'var(--shadow-lg)',
+    padding: 'var(--space-lg)',
+    gap: 'var(--space-lg)',
+    zIndex: 1000,
   },
   linksGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: '1.5rem',
+    gap: 'var(--space-md)',
   },
   link: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.4rem',
+    gap: 'var(--space-sm)',
     textDecoration: 'none',
-    color: '#2c3e50',
-    fontSize: '1rem',
-    fontWeight: 500,
-    transition: 'color 0.2s ease',
+    color: 'var(--color-text-secondary)',
+    fontSize: 'var(--font-size-base)',
+    fontWeight: 'var(--font-weight-medium)',
+    padding: 'var(--space-sm) var(--space-md)',
+    borderRadius: 'var(--radius-md)',
+    transition: 'all var(--transition-base)',
+  },
+  linkText: {
+    display: 'inline',
   },
   userSection: {
     display: 'flex',
     alignItems: 'center',
-    gap: '1.5rem',
-  },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.6rem',
-    fontSize: '0.95rem',
-    color: '#34495e',
+    gap: 'var(--space-md)',
   },
   email: {
-    fontWeight: 500,
+    fontWeight: 'var(--font-weight-medium)',
+    fontSize: 'var(--font-size-sm)',
+    color: 'var(--color-text-secondary)',
     maxWidth: '180px',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -146,72 +282,135 @@ const styles = {
   logoutButton: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.4rem',
+    gap: 'var(--space-sm)',
     border: 'none',
-    backgroundColor: '#e74c3c',
-    color: '#fff',
-    fontWeight: 500,
-    padding: '0.4rem 0.8rem',
-    borderRadius: '4px',
+    backgroundColor: 'var(--color-secondary)',
+    color: 'var(--color-text-inverse)',
+    fontWeight: 'var(--font-weight-medium)',
+    padding: 'var(--space-sm) var(--space-lg)',
+    borderRadius: 'var(--radius-md)',
     cursor: 'pointer',
-    transition: 'background 0.2s ease',
+    fontSize: 'var(--font-size-sm)',
+    transition: 'all var(--transition-base)',
+  },
+  authButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-sm)',
+    textDecoration: 'none',
+    background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
+    color: 'var(--color-text-inverse)',
+    fontWeight: 'var(--font-weight-medium)',
+    padding: 'var(--space-sm) var(--space-lg)',
+    borderRadius: 'var(--radius-md)',
+    fontSize: 'var(--font-size-sm)',
+    transition: 'all var(--transition-base)',
+    boxShadow: '0 2px 8px rgba(214, 156, 90, 0.2)',
   },
   dropdownContainer: {
-  position: 'relative',
-},
-
-dropdownMenu: {
-  position: 'absolute',
-  top: '100%',
-  left: 0,
-  backgroundColor: '#ffffff',
-  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-  borderRadius: '4px',
-  padding: '0.5rem 0',
-  display: 'flex',
-  flexDirection: 'column',
-  minWidth: '200px',
-  zIndex: 999,
-},
-
-dropdownItem: {
-  padding: '0.5rem 1rem',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  color: '#2c3e50',
-  textDecoration: 'none',
-  fontSize: '0.95rem',
-  fontWeight: 500,
-  transition: 'background 0.2s ease',
-  cursor: 'pointer',
-},
- adminLink: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    background: "none",
-    border: "none",
-    padding: "10px 15px",
-    width: "100%",
-    color: "#2c3e50",
-    textDecoration: "none",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontFamily: "inherit",
-    outline: "none",
-    transition: "background 0.2s ease",
-    borderRadius: "5px",
+    position: 'relative',
   },
-  iconText: {
-    display: "flex",
-    alignItems: "center",
+  dropdownMenu: {
+    position: 'absolute',
+    top: 'calc(100% + 8px)',
+    left: 0,
+    backgroundColor: 'var(--color-bg-elevated)',
+    boxShadow: 'var(--shadow-lg)',
+    borderRadius: 'var(--radius-md)',
+    padding: 'var(--space-sm)',
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: '200px',
+    zIndex: 999,
+    border: '1px solid var(--color-border-light)',
+  },
+  dropdownItem: {
+    padding: 'var(--space-sm) var(--space-md)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-sm)',
+    color: 'var(--color-text-secondary)',
+    textDecoration: 'none',
+    fontSize: 'var(--font-size-sm)',
+    fontWeight: 'var(--font-weight-medium)',
+    transition: 'all var(--transition-base)',
+    cursor: 'pointer',
+    borderRadius: 'var(--radius-sm)',
+  },
+  adminLink: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-sm)',
+    background: 'none',
+    border: 'none',
+    padding: 'var(--space-sm) var(--space-md)',
+    color: 'var(--color-text-secondary)',
+    textDecoration: 'none',
+    cursor: 'pointer',
+    fontSize: 'var(--font-size-base)',
+    fontWeight: 'var(--font-weight-medium)',
+    borderRadius: 'var(--radius-md)',
+    transition: 'all var(--transition-base)',
   },
   chevron: {
-    marginLeft: "auto",
-    fontSize: "12px",
+    fontSize: 'var(--font-size-xs)',
+    marginLeft: 'var(--space-xs)',
+    transition: 'transform var(--transition-base)',
   },
-
 };
+
+// Add media query styles
+if (typeof window !== 'undefined') {
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = `
+    @media (max-width: 768px) {
+      nav > div:not(.mobile-toggle) {
+        display: none !important;
+      }
+      
+      nav button[aria-label="Toggle menu"] {
+        display: block !important;
+      }
+      
+      .navContentMobile {
+        display: flex !important;
+      }
+      
+      nav .linksGroup,
+      nav .userSection {
+        flex-direction: column;
+        align-items: stretch !important;
+        width: 100%;
+      }
+      
+      nav .email {
+        max-width: 100%;
+      }
+    }
+    
+    nav .link:hover,
+    nav .dropdownItem:hover,
+    nav .adminLink:hover {
+      background-color: var(--color-bg-hover);
+      color: var(--color-primary);
+    }
+    
+    nav .logoutButton:hover {
+      background-color: var(--color-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    nav .authButton:hover {
+      background-color: var(--color-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+  `;
+  if (!document.getElementById('navbar-styles')) {
+    styleSheet.id = 'navbar-styles';
+    document.head.appendChild(styleSheet);
+  }
+}
 
 export default Navbar;

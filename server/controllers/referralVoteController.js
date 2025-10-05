@@ -4,13 +4,14 @@ const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
 const { VOTE_TYPES } = require('../config/constants');
+const { t } = require('../utils/i18n');
 
 exports.submitVote = asyncHandler(async (req, res) => {
   const { referralId } = req.params;
   const { vote, comment } = req.body;
 
   if (!Object.values(VOTE_TYPES).includes(vote)) {
-    throw new AppError('Invalid vote', 400);
+    throw new AppError(t('validation.voteTypeInvalid'), 400);
   }
 
   const existing = await ReferralVote.findOne({
@@ -19,7 +20,7 @@ exports.submitVote = asyncHandler(async (req, res) => {
   });
 
   if (existing) {
-    throw new AppError('You have already voted for this referral', 400);
+    throw new AppError(t('vote.alreadyVoted'), 400);
   }
 
   const newVote = new ReferralVote({
@@ -30,7 +31,7 @@ exports.submitVote = asyncHandler(async (req, res) => {
   });
 
   await newVote.save();
-  ResponseHandler.created(res, null, 'Vote submitted successfully');
+  ResponseHandler.created(res, null, t('vote.voteRecorded'));
 });
 
 exports.getCommentsByReferral = asyncHandler(async (req, res) => {
@@ -49,9 +50,14 @@ exports.getAllAverageRatings = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: '$referral',
-        average: {
-          $avg: {
+        upvotes: {
+          $sum: {
             $cond: [{ $eq: ['$vote', VOTE_TYPES.GOOD] }, 1, 0],
+          },
+        },
+        downvotes: {
+          $sum: {
+            $cond: [{ $eq: ['$vote', VOTE_TYPES.BAD] }, 1, 0],
           },
         },
         totalVotes: { $sum: 1 },
@@ -62,7 +68,8 @@ exports.getAllAverageRatings = asyncHandler(async (req, res) => {
   const averagesMap = {};
   result.forEach(r => {
     averagesMap[r._id.toString()] = {
-      average: r.average,
+      upvotes: r.upvotes,
+      downvotes: r.downvotes,
       totalVotes: r.totalVotes,
     };
   });
@@ -76,9 +83,14 @@ exports.getAverageRatingByReferral = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: '$referral',
-        average: {
-          $avg: {
+        upvotes: {
+          $sum: {
             $cond: [{ $eq: ['$vote', VOTE_TYPES.GOOD] }, 1, 0],
+          },
+        },
+        downvotes: {
+          $sum: {
+            $cond: [{ $eq: ['$vote', VOTE_TYPES.BAD] }, 1, 0],
           },
         },
         totalVotes: { $sum: 1 },
@@ -87,11 +99,44 @@ exports.getAverageRatingByReferral = asyncHandler(async (req, res) => {
   ]);
 
   if (result.length === 0) {
-    return ResponseHandler.success(res, { average: 0, totalVotes: 0 });
+    return ResponseHandler.success(res, { upvotes: 0, downvotes: 0, totalVotes: 0 });
   }
 
   ResponseHandler.success(res, {
-    average: result[0].average,
+    upvotes: result[0].upvotes,
+    downvotes: result[0].downvotes,
     totalVotes: result[0].totalVotes,
   });
+});
+
+exports.getUserVoteForReferral = asyncHandler(async (req, res) => {
+  const userVote = await ReferralVote.findOne({
+    referral: req.params.referralId,
+    user: req.user._id,
+  });
+
+  if (!userVote) {
+    return ResponseHandler.success(res, null);
+  }
+
+  ResponseHandler.success(res, {
+    vote: userVote.vote,
+    comment: userVote.comment,
+    createdAt: userVote.createdAt,
+  });
+});
+
+exports.deleteVote = asyncHandler(async (req, res) => {
+  const { referralId } = req.params;
+
+  const deletedVote = await ReferralVote.findOneAndDelete({
+    referral: referralId,
+    user: req.user._id,
+  });
+
+  if (!deletedVote) {
+    throw new AppError(t('vote.noVoteFound'), 404);
+  }
+
+  ResponseHandler.success(res, null, t('vote.voteDeleted'));
 });

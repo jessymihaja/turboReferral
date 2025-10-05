@@ -1,19 +1,20 @@
 const mongoose = require('mongoose');
+const { t } = require('../utils/i18n');
 
 const notificationSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'User is required'],
+    required: [true, t('validation.userRequired')],
   },
   title: {
     type: String,
-    required: [true, 'Title is required'],
+    required: [true, t('validation.titleRequired')],
     trim: true,
   },
   content: {
     type: String,
-    required: [true, 'Content is required'],
+    required: [true, t('validation.contentRequired')],
     trim: true,
   },
   isRead: {

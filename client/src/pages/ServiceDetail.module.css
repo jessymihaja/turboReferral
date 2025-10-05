@@ -1,0 +1,298 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: var(--space-6);
+  padding: 0;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.sidebar {
+  position: sticky;
+  top: calc(70px + var(--space-6));
+  height: fit-content;
+}
+
+.rightSidebar {
+  position: sticky;
+  top: calc(70px + var(--space-6));
+  height: fit-content;
+  z-index: 10;
+  transition: z-index 0.3s ease;
+}
+
+.rightSidebar:focus-within {
+  z-index: 100;
+}
+
+/* Blur effect when form is focused */
+.container:has(.rightSidebar:focus-within) .sidebar {
+  filter: blur(4px);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.container:has(.rightSidebar:focus-within) .mainContent {
+  filter: blur(4px);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.sidebar,
+.mainContent {
+  transition: filter 0.3s ease, opacity 0.3s ease;
+  filter: blur(0px);
+  opacity: 1;
+}
+
+.serviceCard,
+.formCard {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.serviceCard {
+  margin-bottom: var(--space-lg);
+}
+
+.formCard {
+  border: 1px solid var(--color-primary-light);
+  animation-delay: 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+
+.formCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 123, 255, 0.05) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rightSidebar:focus-within .formCard::before {
+  opacity: 1;
+}
+
+.rightSidebar:focus-within .formCard {
+  box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);
+  border-color: var(--color-primary);
+}
+
+.formCard > * {
+  position: relative;
+  z-index: 1;
+}
+
+.referralCard {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+  transition: all var(--transition-base);
+  margin-bottom: var(--space-md);
+  animation: fadeInScale 0.4s ease-out backwards;
+}
+
+.referralCard:nth-child(1) { animation-delay: 0.05s; }
+.referralCard:nth-child(2) { animation-delay: 0.1s; }
+.referralCard:nth-child(3) { animation-delay: 0.15s; }
+.referralCard:nth-child(4) { animation-delay: 0.2s; }
+.referralCard:nth-child(5) { animation-delay: 0.25s; }
+.referralCard:nth-child(n+6) { animation-delay: 0.3s; }
+
+.referralCard:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.referralHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.referralLink {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  word-break: break-all;
+  transition: color var(--transition-base);
+}
+
+.referralLink:hover {
+  color: var(--color-primary-dark);
+}
+
+.referralCode {
+  font-family: monospace;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-muted);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+.voteSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.actionsBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.actionButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.actionButton::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background-color: var(--color-primary-50);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.actionButton:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.actionButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-primary-50);
+  transform: translateY(-1px);
+}
+
+.actionButton > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1280px) {
+  .container {
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr 360px;
+    gap: var(--space-4);
+  }
+
+  .sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .sidebar,
+  .rightSidebar {
+    position: static;
+  }
+
+  .serviceCard,
+  .formCard {
+    padding: var(--space-lg);
+  }
+
+  .referralCard {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .serviceCard,
+  .formCard {
+    padding: var(--space-md);
+  }
+}

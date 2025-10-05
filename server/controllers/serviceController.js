@@ -2,6 +2,7 @@ const Service = require('../models/Service');
 const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
+const { t } = require('../utils/i18n');
 
 exports.getAllServices = asyncHandler(async (req, res) => {
   const services = await Service.find({ isValidated: true }).populate('category');
@@ -11,7 +12,7 @@ exports.getAllServices = asyncHandler(async (req, res) => {
 exports.getServiceById = asyncHandler(async (req, res) => {
   const service = await Service.findById(req.params.id).populate('category');
   if (!service) {
-    throw new AppError('Service not found', 404);
+    throw new AppError(t('service.serviceNotFound'), 404);
   }
   ResponseHandler.success(res, service);
 });
@@ -26,7 +27,7 @@ exports.createService = asyncHandler(async (req, res) => {
 
   const existing = await Service.findOne({ name });
   if (existing) {
-    throw new AppError('Service already exists', 400);
+    throw new AppError(t('service.serviceAlreadyExists'), 400);
   }
 
   const service = new Service({
@@ -40,7 +41,7 @@ exports.createService = asyncHandler(async (req, res) => {
   });
 
   await service.save();
-  ResponseHandler.created(res, service, 'Service created successfully');
+  ResponseHandler.created(res, service, t('service.serviceCreated'));
 });
 
 exports.setServiceValidation = asyncHandler(async (req, res) => {
@@ -48,7 +49,7 @@ exports.setServiceValidation = asyncHandler(async (req, res) => {
 
   const service = await Service.findById(req.params.id);
   if (!service) {
-    throw new AppError('Service not found', 404);
+    throw new AppError(t('service.serviceNotFound'), 404);
   }
 
   service.isValidated = isValidated;
@@ -57,7 +58,7 @@ exports.setServiceValidation = asyncHandler(async (req, res) => {
   ResponseHandler.success(
     res,
     service,
-    `Service ${isValidated ? 'validated' : 'invalidated'} successfully`
+    t('service.serviceValidated')
   );
 });
 
@@ -74,8 +75,8 @@ exports.updateService = asyncHandler(async (req, res) => {
   });
 
   if (!service) {
-    throw new AppError('Service not found', 404);
+    throw new AppError(t('service.serviceNotFound'), 404);
   }
 
-  ResponseHandler.success(res, service, 'Service updated successfully');
+  ResponseHandler.success(res, service, t('service.serviceUpdated'));
 });

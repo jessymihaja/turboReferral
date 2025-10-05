@@ -7,11 +7,18 @@ export const categoryService = {
     return response.data;
   },
 
-  async create(name, description) {
-    const response = await api.post(API_ENDPOINTS.CATEGORIES.BASE, {
-      name,
-      description,
-    });
+  async create(categoryData) {
+    const response = await api.post(API_ENDPOINTS.CATEGORIES.BASE, categoryData);
+    return response.data;
+  },
+
+  async update(id, categoryData) {
+    const response = await api.put(`${API_ENDPOINTS.CATEGORIES.BASE}/${id}`, categoryData);
+    return response.data;
+  },
+
+  async delete(id) {
+    const response = await api.delete(`${API_ENDPOINTS.CATEGORIES.BASE}/${id}`);
     return response.data;
   },
 };

@@ -1,0 +1,20 @@
+.category-grid-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.category-table-container {
+  min-width: 800px;
+}
+
+@media (max-width: 1024px) {
+  .category-grid-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .category-table-container {
+    min-width: auto;
+  }
+}

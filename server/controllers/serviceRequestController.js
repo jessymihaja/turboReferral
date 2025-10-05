@@ -4,6 +4,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
 const { SERVICE_REQUEST_STATUS } = require('../config/constants');
+const { t } = require('../utils/i18n');
 
 exports.createServiceRequest = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -16,12 +17,12 @@ exports.createServiceRequest = asyncHandler(async (req, res) => {
   });
 
   if (existingRequest) {
-    throw new AppError('A request with this service name is already pending', 400);
+    throw new AppError(t('errors.alreadyExists', { field: 'Demande de service' }), 400);
   }
 
   const existingService = await Service.findOne({ name: nameTrimmed });
   if (existingService) {
-    throw new AppError('This service already exists', 400);
+    throw new AppError(t('service.serviceAlreadyExists'), 400);
   }
 
   const serviceRequest = new ServiceRequest({
@@ -33,5 +34,5 @@ exports.createServiceRequest = asyncHandler(async (req, res) => {
 
   await serviceRequest.save();
 
-  ResponseHandler.created(res, serviceRequest, 'Service request created successfully');
+  ResponseHandler.created(res, serviceRequest, t('serviceRequest.serviceRequestCreated'));
 });

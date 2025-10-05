@@ -1,49 +1,69 @@
 .custom-toast {
     position: fixed;
-    top: 80px;
-    right: 20px;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
+    top: 90px;
+    right: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     color: white;
     z-index: 9999;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    width: 250px;
-    animation: fadeIn 0.3s ease-out;
+    box-shadow: var(--shadow-xl);
+    min-width: 280px;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+    backdrop-filter: blur(10px);
 }
 
 .custom-toast.success {
-    background-color: #28a745; /* Vert pour succès */
+    background-color: var(--color-success-500);
+    border-left: 4px solid var(--color-success-700);
 }
 
 .custom-toast.error {
-    background-color: #dc3545; /* Rouge pour erreur */
+    background-color: var(--color-error-500);
+    border-left: 4px solid var(--color-error-700);
 }
 
-@keyframes fadeIn {
+.custom-toast.info {
+    background-color: var(--color-info-500);
+    border-left: 4px solid var(--color-info-700);
+}
+
+@keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateX(100%);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
     }
 }
 
-/* Progress bar animée */
+/* Progress bar */
 .progress-bar {
-    height: 5px;
-    background-color: rgba(255, 255, 255, 0.6);
-    margin-top: 8px;
-    animation: fillBar 2s linear forwards;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.7);
+    margin-top: var(--space-sm);
+    border-radius: var(--radius-full);
+    animation: fillBar 3s linear forwards;
 }
 
 @keyframes fillBar {
     from {
-        width: 0%;
+        width: 100%;
     }
     to {
-        width: 100%;
+        width: 0%;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .custom-toast {
+        right: var(--space-md);
+        left: var(--space-md);
+        min-width: auto;
     }
 }

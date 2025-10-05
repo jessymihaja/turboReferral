@@ -6,6 +6,7 @@ const Category = require('../models/Category');
 const Service = require('../models/Service');
 const Referral = require('../models/Referral');
 const ReferralVote = require('../models/ReferralVote');
+const PromReferral = require('../models/PromReferral');
 
 const { mongoUri } = require('../config/env');
 
@@ -24,6 +25,7 @@ const seedData = async () => {
     await Service.deleteMany({});
     await Referral.deleteMany({});
     await ReferralVote.deleteMany({});
+    await PromReferral.deleteMany({});
 
     // Create Users
     console.log('👤 Creating users...');

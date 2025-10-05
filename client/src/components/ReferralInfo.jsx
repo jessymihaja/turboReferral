@@ -1,11 +1,13 @@
 // src/components/ReferralInfo.jsx
 import { FaUsers, FaGift, FaShareAlt } from "react-icons/fa";
+import { useTranslation } from 'react-i18next';
 
 export default function ReferralInfo() {
+  const { t } = useTranslation();
   return (
     <div style={{ padding: "2rem", fontFamily: "Segoe UI, sans-serif",marginTop:"2rem"}}>
       <h2 style={{ textAlign: "center", color: "#2c3e50", marginBottom: "1.5rem" }}>
-        Comment ça marche ? 🚀
+        {t('referralInfo.howItWorks')}
       </h2>
 
       {/* Étapes principales */}
@@ -27,10 +29,9 @@ export default function ReferralInfo() {
           }}
         >
           <FaUsers size={30} color="#27ae60" />
-          <h3 style={{ margin: "0.8rem 0" }}>1. Rejoindre des services</h3>
+          <h3 style={{ margin: "0.8rem 0" }}>{t('referralInfo.step1Title')}</h3>
           <p>
-            Inscris-toi sur des plateformes qui proposent des programmes de parrainage.
-            Découvre les meilleures offres directement sur notre site.
+            {t('referralInfo.step1Description')}
           </p>
         </div>
 
@@ -44,10 +45,9 @@ export default function ReferralInfo() {
           }}
         >
           <FaGift size={30} color="#2980b9" />
-          <h3 style={{ margin: "0.8rem 0" }}>2. Récupérer vos codes</h3>
+          <h3 style={{ margin: "0.8rem 0" }}>{t('referralInfo.step2Title')}</h3>
           <p>
-            Rassemble tous tes codes de parrainage, apprends-en plus sur les récompenses
-            et les conditions associées.
+            {t('referralInfo.step2Description')}
           </p>
         </div>
 
@@ -61,10 +61,9 @@ export default function ReferralInfo() {
           }}
         >
           <FaShareAlt size={30} color="#e67e22" />
-          <h3 style={{ margin: "0.8rem 0" }}>3. Partager vos codes</h3>
+          <h3 style={{ margin: "0.8rem 0" }}>{t('referralInfo.step3Title')}</h3>
           <p>
-            Diffuse tes codes à tes proches ou sur les réseaux sociaux et gagne des
-            récompenses pour chaque parrainage validé.
+            {t('referralInfo.step3Description')}
           </p>
         </div>
       </div>
@@ -79,26 +78,23 @@ export default function ReferralInfo() {
         }}
       >
         <div>
-          <h4 style={{ color: "#27ae60" }}>💰 Combien puis-je gagner ?</h4>
+          <h4 style={{ color: "#27ae60" }}>{t('referralInfo.faq1Question')}</h4>
           <p>
-            Les gains varient selon les services : réductions, abonnements gratuits,
-            cashbacks ou même récompenses en cryptomonnaies.
+            {t('referralInfo.faq1Answer')}
           </p>
         </div>
 
         <div>
-          <h4 style={{ color: "#2980b9" }}>🏷️ Code promo vs code de parrainage ?</h4>
+          <h4 style={{ color: "#2980b9" }}>{t('referralInfo.faq2Question')}</h4>
           <p>
-            Le code promo attire de nouveaux clients. Le code de parrainage permet à un
-            utilisateur existant d’inviter ses amis et de recevoir une récompense.
+            {t('referralInfo.faq2Answer')}
           </p>
         </div>
 
         <div>
-          <h4 style={{ color: "#e67e22" }}>📌 Comment partager ?</h4>
+          <h4 style={{ color: "#e67e22" }}>{t('referralInfo.faq3Question')}</h4>
           <p>
-            Tu peux partager tes codes via ton profil, sur les réseaux sociaux ou
-            directement avec tes amis et ta famille.
+            {t('referralInfo.faq3Answer')}
           </p>
         </div>
       </div>

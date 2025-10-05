@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import '../assets/css/notifications.css';
 import { useNavigate } from 'react-router-dom';
 import { notificationService } from '../services';
+import { useTranslation } from 'react-i18next';
 
 const Notifications = () => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
 
@@ -33,12 +35,12 @@ const Notifications = () => {
 
   return (
     <div className="notifications-container">
-  <h2 style={{color:'#5D4037'}}>Mes notifications</h2>
-  <p className="instruction-text">Cliquez sur une notification pour la marquer comme lue</p>
-  
+  <h2 style={{color:'#5D4037'}}>{t('notifications.myNotifications')}</h2>
+  <p className="instruction-text">{t('notifications.clickToMarkAsRead')}</p>
+
   <div className="notifications-list">
     {notifications.length === 0 ? (
-      <p>Aucune notification pour le moment.</p>
+      <p>{t('notifications.noNotifications')}</p>
     ) : (
       notifications.map(notification => (
         <div

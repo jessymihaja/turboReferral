@@ -2,12 +2,13 @@ const PromReferral = require('../models/PromReferral');
 const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
+const { t } = require('../utils/i18n');
 
 exports.createPromReferral = asyncHandler(async (req, res) => {
   const { referralId, dateDebut, dateFin } = req.body;
 
   if (!referralId || !dateDebut || !dateFin) {
-    throw new AppError('Missing required fields', 400);
+    throw new AppError(t('errors.badRequest'), 400);
   }
 
   const promReferral = new PromReferral({
@@ -17,7 +18,7 @@ exports.createPromReferral = asyncHandler(async (req, res) => {
   });
 
   await promReferral.save();
-  ResponseHandler.created(res, promReferral, 'Promotion created successfully');
+  ResponseHandler.created(res, promReferral, t('promReferral.promReferralCreated'));
 });
 
 exports.getActivePromReferrals = asyncHandler(async (req, res) => {
@@ -39,15 +40,33 @@ exports.getActivePromReferralsByServiceId = asyncHandler(async (req, res) => {
     dateFin: { $gte: today },
   }).populate({
     path: 'referral',
-    populate: {
-      path: 'user',
-      select: 'username',
-    },
+    populate: [
+      {
+        path: 'user',
+        select: 'username',
+      },
+      {
+        path: 'service',
+        select: 'name',
+      }
+    ],
   });
 
   const filteredPromotions = activePromotions.filter(
-    promo => promo.referral.service.toString() === req.params.id
+    promo => promo.referral && promo.referral.service && promo.referral.service._id.toString() === req.params.id
   );
 
   ResponseHandler.success(res, filteredPromotions);
+});
+
+exports.getPromReferralByReferralId = asyncHandler(async (req, res) => {
+  const promotion = await PromReferral.findOne({
+    referral: req.params.id
+  }).sort({ createdAt: -1 });
+
+  if (!promotion) {
+    throw new AppError(t('promReferral.notFound'), 404);
+  }
+
+  ResponseHandler.success(res, promotion);
 });

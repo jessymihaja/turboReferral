@@ -24,4 +24,14 @@ export const voteService = {
     const response = await api.get(API_ENDPOINTS.VOTES.AVERAGE_BY_ID(referralId));
     return response.data;
   },
+
+  async getUserVote(referralId) {
+    const response = await api.get(API_ENDPOINTS.VOTES.USER_VOTE(referralId));
+    return response.data;
+  },
+
+  async deleteVote(referralId) {
+    const response = await api.delete(API_ENDPOINTS.VOTES.DELETE(referralId));
+    return response.data;
+  },
 };

@@ -48,7 +48,9 @@ exports.getById = asyncHandler(async (req, res) => {
 });
 ```
 
-AI agent ops
-- Keep changes small and in-pattern; don’t introduce new frameworks.
-- Don’t add docs/README unless asked; minimize comments.
-- When you need library/setup docs, use Context7 MCP to resolve the library and fetch docs automatically.
+# IMPORTANT
+- Don't add unecessary code and comments
+- Always consider clean code and reusability, make it simple, focused on the task, human-like
+- Always cleanup unused/old files and codes
+- Don't add README.md or any docs unless asked specifically
+- All text should be in French, including errors

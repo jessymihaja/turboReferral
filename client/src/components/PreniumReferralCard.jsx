@@ -1,52 +1,207 @@
-import { FaComment, FaStar, FaRegStar, FaStarHalfAlt, FaCrown } from "react-icons/fa";
+import { FaComment, FaThumbsUp, FaThumbsDown, FaCrown, FaCopy, FaCheck, FaExternalLinkAlt } from "react-icons/fa";
 import TimeAgo from "./TimeAgo";
 import ReferralVoteForm from "./ReferralVoteForm";
 import ReportReferral from "./ReportReferral";
 import { useEffect, useState } from "react";
 import { voteService } from '../services';
+import { useTranslation } from 'react-i18next';
 
-export default function PremiumReferralCard({ ref, onComment }) {
-  const [averageRating, setAverageRating] = useState(null);
+export default function PremiumReferralCard({ ref, onComment, user }) {
+  const { t } = useTranslation();
+  const [voteData, setVoteData] = useState({ upvotes: 0, downvotes: 0, totalVotes: 0 });
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [openVoteForm, setOpenVoteForm] = useState(null);
 
   useEffect(() => {
-    async function fetchAverageRating() {
+    async function fetchVotes() {
       try {
         const data = await voteService.getAverage(ref._id);
-        setAverageRating((data.data || data).average);
+        const result = data.data || data;
+        setVoteData({
+          upvotes: result.upvotes || 0,
+          downvotes: result.downvotes || 0,
+          totalVotes: result.totalVotes || 0
+        });
       } catch (error) {
-        console.error("Erreur lors de la récupération de la note moyenne :", error);
+        console.error("Erreur lors de la récupération des votes :", error);
       }
     }
-    fetchAverageRating();
+    fetchVotes();
   }, [ref._id]);
 
-  function renderStars(average) {
-    const stars = [];
-    const rounded = Math.round(average * 2) / 2;
-    for (let i = 1; i <= 5; i++) {
-      if (i <= rounded) {
-        stars.push(<FaStar key={i} color="#f1c40f" />);
-      } else if (i - 0.5 === rounded) {
-        stars.push(<FaStarHalfAlt key={i} color="#f1c40f" />);
-      } else {
-        stars.push(<FaRegStar key={i} color="#f1c40f" />);
-      }
+  async function refreshVotes() {
+    try {
+      const data = await voteService.getAverage(ref._id);
+      const result = data.data || data;
+      setVoteData({
+        upvotes: result.upvotes || 0,
+        downvotes: result.downvotes || 0,
+        totalVotes: result.totalVotes || 0
+      });
+    } catch (error) {
+      console.error("Erreur lors de la récupération des votes :", error);
     }
-    return stars;
+  }
+
+  function renderVoteButtons() {
+    const handleVoteClick = (voteType) => {
+      if (!user) {
+        alert(t('auth.loginRequired'));
+        return;
+      }
+      
+      // Toggle: if clicking the same vote type, close the form
+      if (openVoteForm === voteType) {
+        setOpenVoteForm(null);
+      } else {
+        setOpenVoteForm(voteType);
+      }
+    };
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button
+          onClick={() => handleVoteClick('good')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            border: openVoteForm === 'good' ? '2px solid var(--color-success)' : '1.5px solid #e6d9a8',
+            backgroundColor: openVoteForm === 'good' ? 'rgba(39, 174, 96, 0.15)' : 'transparent',
+            color: 'var(--color-success)',
+            fontSize: '0.9rem',
+            fontWeight: openVoteForm === 'good' ? '700' : '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            transform: openVoteForm === 'good' ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onMouseEnter={e => {
+            if (openVoteForm !== 'good') {
+              e.currentTarget.style.backgroundColor = 'rgba(39, 174, 96, 0.1)';
+              e.currentTarget.style.borderColor = 'var(--color-success)';
+            }
+          }}
+          onMouseLeave={e => {
+            if (openVoteForm !== 'good') {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.borderColor = '#e6d9a8';
+            }
+          }}
+        >
+          <FaThumbsUp size={16} />
+          <span>{voteData.upvotes}</span>
+        </button>
+        <button
+          onClick={() => handleVoteClick('bad')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            border: openVoteForm === 'bad' ? '2px solid var(--color-error)' : '1.5px solid #e6d9a8',
+            backgroundColor: openVoteForm === 'bad' ? 'rgba(231, 76, 60, 0.15)' : 'transparent',
+            color: 'var(--color-error)',
+            fontSize: '0.9rem',
+            fontWeight: openVoteForm === 'bad' ? '700' : '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            transform: openVoteForm === 'bad' ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onMouseEnter={e => {
+            if (openVoteForm !== 'bad') {
+              e.currentTarget.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+              e.currentTarget.style.borderColor = 'var(--color-error)';
+            }
+          }}
+          onMouseLeave={e => {
+            if (openVoteForm !== 'bad') {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.borderColor = '#e6d9a8';
+            }
+          }}
+        >
+          <FaThumbsDown size={16} />
+          <span>{voteData.downvotes}</span>
+        </button>
+      </div>
+    );
+  }
+
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   }
 
   return (
     <div
       style={{
-        background: "linear-gradient(145deg, #fffbe6, #fff)",
-        border: "2px solid #f1c40f",
-        borderRadius: "12px",
-        padding: "1rem",
-        width: "80%",
-        boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
+        background: "linear-gradient(145deg, #fff9e6 0%, #fffef5 50%, #fff9e6 100%)",
+        border: "2px solid #d4af37",
+        borderRadius: "16px",
+        padding: "1.5rem",
+        width: "100%",
+        boxShadow: "0 8px 24px rgba(212, 175, 55, 0.2), 0 4px 8px rgba(0,0,0,0.1)",
         marginBottom: "1rem",
+        position: "relative",
+        overflow: "visible",
+        animation: "premiumPulse 0.6s ease-out",
+        transition: "all 0.3s ease"
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.boxShadow = "0 12px 32px rgba(212, 175, 55, 0.3), 0 6px 12px rgba(0,0,0,0.15)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 8px 24px rgba(212, 175, 55, 0.2), 0 4px 8px rgba(0,0,0,0.1)";
       }}
     >
+      {/* Gold shine effect */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: "4px",
+        background: "linear-gradient(90deg, transparent, #f1c40f, #d4af37, #f1c40f, transparent)",
+        borderTopLeftRadius: "14px",
+        borderTopRightRadius: "14px",
+        animation: "shimmer 2s ease-in-out infinite"
+      }}></div>
+      
+      <style>{`
+        @keyframes premiumPulse {
+          0% {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          50% {
+            transform: scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes shimmer {
+          0%, 100% {
+            opacity: 0.6;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+      `}</style>
+      
       {/* Header : avatar + user + couronne */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.8rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -79,20 +234,25 @@ export default function PremiumReferralCard({ ref, onComment }) {
           </div>
         </div>
 
-        {/* Badge Prime */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            background: "#f1c40f",
-            color: "#fff",
-            padding: "4px 8px",
-            borderRadius: "16px",
-            fontSize: "0.8rem",
-            fontWeight: "600",
-          }}
-        >
-          <FaCrown style={{ marginRight: "4px" }} /> Promo
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {/* Badge Prime - Only crown */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "linear-gradient(135deg, #d4af37 0%, #f1c40f 50%, #d4af37 100%)",
+              color: "#fff",
+              padding: "6px 10px",
+              borderRadius: "20px",
+              fontSize: "0.85rem",
+              fontWeight: "700",
+              boxShadow: "0 2px 8px rgba(212, 175, 55, 0.4)",
+              textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+            }}
+          >
+            <FaCrown style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.2))" }} />
+          </div>
+          <ReportReferral referralId={ref._id} iconOnly />
         </div>
       </div>
 
@@ -103,34 +263,73 @@ export default function PremiumReferralCard({ ref, onComment }) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            background: "#f4f6f7",
-            borderRadius: "8px",
-            padding: "0.7rem 1rem",
+            background: "linear-gradient(135deg, #fdfbf3 0%, #fff9e6 100%)",
+            border: "1px solid #e6d9a8",
+            borderRadius: "10px",
+            padding: "0.9rem 1.2rem",
             marginBottom: "0.8rem",
+            boxShadow: "0 2px 6px rgba(212, 175, 55, 0.1)"
           }}
         >
-          <span style={{ fontWeight: "600", color: "#2c3e50" }}>
+          <span style={{ fontWeight: "600", color: "#2c3e50", flex: 1, wordBreak: "break-all" }}>
             {ref.link || ref.code}
           </span>
-          {ref.link && (
-          <button
-            style={{
-              background: "#2980b9",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              padding: "6px 12px",
-              cursor: "pointer",
-              fontWeight: "500",
-            }}
-            onClick={() => {
-              if (ref.link) window.open(ref.link, "_blank");
-            }}
-          >
-            Ouvrir le lien
-          </button>
-          )}
-
+          <div style={{ display: "flex", gap: "8px", marginLeft: "8px" }}>
+            {ref.code && (
+              <button
+                style={{
+                  background: copiedCode ? "linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)" : "linear-gradient(135deg, #d4af37 0%, #f1c40f 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  transition: "all 0.3s",
+                  boxShadow: copiedCode ? "0 2px 8px rgba(39, 174, 96, 0.3)" : "0 2px 8px rgba(212, 175, 55, 0.3)",
+                }}
+                onClick={() => copyToClipboard(ref.code)}
+                title={t('service.copyCode')}
+              >
+                {copiedCode ? <FaCheck /> : <FaCopy />}
+              </button>
+            )}
+            {ref.link && (
+              <button
+                style={{
+                  background: "linear-gradient(135deg, #d4af37 0%, #f1c40f 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  boxShadow: "0 2px 8px rgba(212, 175, 55, 0.3)",
+                  transition: "all 0.3s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px"
+                }}
+                onClick={() => {
+                  if (ref.link) window.open(ref.link, "_blank");
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(212, 175, 55, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(212, 175, 55, 0.3)";
+                }}
+                title={t('service.open')}
+              >
+                <FaExternalLinkAlt />
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -139,9 +338,11 @@ export default function PremiumReferralCard({ ref, onComment }) {
         {ref.description}
       </p>
 
-      {/* Stars + Commentaires */}
+      {/* Votes + Commentaires */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div>{averageRating && renderStars(averageRating * 5)}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {renderVoteButtons()}
+        </div>
         <button
           onClick={() => onComment(ref)}
           style={{
@@ -153,26 +354,32 @@ export default function PremiumReferralCard({ ref, onComment }) {
             gap: "6px",
             color: "#2980b9",
             fontWeight: "500",
+            padding: "6px 12px",
           }}
         >
-          <FaComment /> Commentaires
+          <FaComment /> {t('service.comments')}
         </button>
       </div>
 
-      {/* Vote + Report */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: "0.8rem",
-          padding: "0.6rem",
-          borderTop: "1px solid #ecf0f1",
-        }}
-      >
-        <ReferralVoteForm referralId={ref._id} />
-        <ReportReferral referralId={ref._id} />
-      </div>
+      {/* Vote Form - Only show if open */}
+      {openVoteForm && (
+        <div
+          style={{
+            marginTop: "0.8rem",
+            width: "100%"
+          }}
+        >
+          <ReferralVoteForm 
+            referralId={ref._id} 
+            initialVoteType={openVoteForm}
+            onVoteSuccess={() => {
+              refreshVotes();
+              setOpenVoteForm(null);
+            }}
+            onClose={() => setOpenVoteForm(null)}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -23,6 +23,8 @@ export const API_ENDPOINTS = {
     COMMENTS: (referralId) => `/api/referralVotes/${referralId}/comments`,
     AVERAGES: '/api/referralVotes/averages/all',
     AVERAGE_BY_ID: (referralId) => `/api/referralVotes/averages/${referralId}`,
+    USER_VOTE: (referralId) => `/api/referralVotes/${referralId}/user-vote`,
+    DELETE: (referralId) => `/api/referralVotes/${referralId}/vote`,
   },
   REPORTS: {
     BASE: '/api/reports',

@@ -1,25 +1,26 @@
 const mongoose = require('mongoose');
 const { VOTE_TYPES, VALIDATION } = require('../config/constants');
+const { t } = require('../utils/i18n');
 
 const referralVoteSchema = new mongoose.Schema({
   referral: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Referral',
-    required: [true, 'Referral is required'],
+    required: [true, t('validation.referralRequired')],
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'User is required'],
+    required: [true, t('validation.userRequired')],
   },
   vote: {
     type: String,
     enum: Object.values(VOTE_TYPES),
-    required: [true, 'Vote is required'],
+    required: [true, t('validation.voteTypeRequired')],
   },
   comment: {
     type: String,
-    maxlength: [VALIDATION.MAX_COMMENT_LENGTH, `Comment cannot exceed ${VALIDATION.MAX_COMMENT_LENGTH} characters`],
+    maxlength: [VALIDATION.MAX_COMMENT_LENGTH, t('validation.commentMaxLength', { max: VALIDATION.MAX_COMMENT_LENGTH })],
     trim: true,
   },
   createdAt: {

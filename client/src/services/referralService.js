@@ -7,13 +7,17 @@ export const referralService = {
     return response.data;
   },
 
-  async getByService(serviceId) {
-    const response = await api.get(API_ENDPOINTS.REFERRALS.BY_SERVICE(serviceId));
+  async getByService(serviceId, page = 1, limit = 10) {
+    const response = await api.get(API_ENDPOINTS.REFERRALS.BY_SERVICE(serviceId), {
+      params: { page, limit }
+    });
     return response.data;
   },
 
-  async getByUser(userId) {
-    const response = await api.get(API_ENDPOINTS.REFERRALS.BY_USER(userId));
+  async getByUser(userId, page = 1, limit = 10) {
+    const response = await api.get(API_ENDPOINTS.REFERRALS.BY_USER(userId), {
+      params: { page, limit }
+    });
     return response.data;
   },
 

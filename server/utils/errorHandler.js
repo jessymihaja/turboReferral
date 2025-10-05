@@ -1,4 +1,5 @@
 const { nodeEnv } = require('../config/env');
+const { t } = require('./i18n');
 
 class AppError extends Error {
   constructor(message, statusCode) {
@@ -14,12 +15,12 @@ const errorHandler = (err, req, res, next) => {
   error.message = err.message;
 
   if (err.name === 'CastError') {
-    error = new AppError('Resource not found', 404);
+    error = new AppError(t('errors.resourceNotFound'), 404);
   }
 
   if (err.code === 11000) {
     const field = Object.keys(err.keyValue)[0];
-    error = new AppError(`${field} already exists`, 400);
+    error = new AppError(t('errors.alreadyExists', { field }), 400);
   }
 
   if (err.name === 'ValidationError') {
@@ -28,15 +29,15 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (err.name === 'JsonWebTokenError') {
-    error = new AppError('Invalid token', 401);
+    error = new AppError(t('errors.invalidToken'), 401);
   }
 
   if (err.name === 'TokenExpiredError') {
-    error = new AppError('Token expired', 401);
+    error = new AppError(t('errors.tokenExpired'), 401);
   }
 
   const statusCode = error.statusCode || 500;
-  const message = error.message || 'Server error';
+  const message = error.message || t('errors.serverError');
 
   res.status(statusCode).json({
     success: false,

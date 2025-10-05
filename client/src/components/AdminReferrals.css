@@ -1,0 +1,396 @@
+/* Admin Referrals Page Styling */
+
+.admin-referrals-page {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Page Header */
+.admin-referrals-page .page-header {
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+/* Stats Grid */
+.referrals-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.referrals-stat-card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-light);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: scaleIn 0.5s ease-out backwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.referrals-stat-card:nth-child(1) { animation-delay: 0.1s; }
+.referrals-stat-card:nth-child(2) { animation-delay: 0.2s; }
+.referrals-stat-card:nth-child(3) { animation-delay: 0.3s; }
+.referrals-stat-card:nth-child(4) { animation-delay: 0.4s; }
+.referrals-stat-card:nth-child(5) { animation-delay: 0.5s; }
+
+.referrals-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 168, 133, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.referrals-stat-card:hover::before {
+  left: 100%;
+}
+
+.referrals-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary-300);
+}
+
+.referrals-stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.referrals-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.referrals-stat-card:hover .referrals-stat-icon {
+  transform: rotate(10deg) scale(1.1);
+  background: var(--color-primary-200);
+}
+
+.referrals-stat-icon.promoted {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+}
+
+.referrals-stat-icon.users {
+  background: linear-gradient(135deg, #7A9B76 0%, #6A8A66 100%);
+  color: white;
+}
+
+.referrals-stat-icon.votes {
+  background: linear-gradient(135deg, #8BA9C1 0%, #7B99B1 100%);
+  color: white;
+}
+
+.referrals-stat-trend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.referrals-stat-trend.positive {
+  background: var(--color-success-light);
+  color: var(--color-success-600);
+}
+
+.referrals-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  margin-bottom: var(--space-2);
+  animation: countUp 0.6s ease-out backwards;
+}
+
+.referrals-stat-card:nth-child(1) .referrals-stat-value { animation-delay: 0.2s; }
+.referrals-stat-card:nth-child(2) .referrals-stat-value { animation-delay: 0.3s; }
+.referrals-stat-card:nth-child(3) .referrals-stat-value { animation-delay: 0.4s; }
+.referrals-stat-card:nth-child(4) .referrals-stat-value { animation-delay: 0.5s; }
+.referrals-stat-card:nth-child(5) .referrals-stat-value { animation-delay: 0.6s; }
+
+.referrals-stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.referrals-stat-sublabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+/* Table Section */
+.referrals-table-section {
+  animation: scaleIn 0.6s ease-out backwards;
+  animation-delay: 0.3s;
+}
+
+.referrals-table-wrapper {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  overflow: hidden;
+}
+
+/* Enhanced Badge */
+.badge-promoted {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Promotion Date Display */
+.promotion-dates {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  padding: var(--space-2);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  transition: all 0.3s ease;
+}
+
+.promotion-dates:hover {
+  background: var(--color-bg-muted);
+  border-color: var(--color-border);
+}
+
+.promotion-date-range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.promotion-date-arrow {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.promotion-status-badge {
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2);
+}
+
+.promotion-status-badge.active {
+  background: var(--color-success-light);
+  color: var(--color-success-600);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.promotion-status-badge.expired {
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
+}
+
+.promotion-status-badge.scheduled {
+  background: var(--color-warning-light);
+  color: var(--color-warning-600);
+}
+
+/* Promote Button Enhancement */
+.btn-promote {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-promote::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.btn-promote:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-promote:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+}
+
+/* Delete Button Enhancement */
+.btn-delete {
+  transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(193, 122, 111, 0.4);
+}
+
+/* Loading Skeleton */
+.referrals-skeleton-card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-light);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.referrals-skeleton-text {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-muted) 0%,
+    var(--color-border-light) 50%,
+    var(--color-bg-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+
+.referrals-skeleton-text.large {
+  height: 32px;
+  width: 60%;
+}
+
+.referrals-skeleton-text.medium {
+  height: 20px;
+  width: 40%;
+}
+
+.referrals-skeleton-text.small {
+  height: 14px;
+  width: 80%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .referrals-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .referrals-stat-card {
+    padding: var(--space-4);
+  }
+
+  .referrals-stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .referrals-stat-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .referrals-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

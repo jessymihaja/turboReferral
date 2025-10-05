@@ -1,0 +1,111 @@
+{
+  "errors": {
+    "resourceNotFound": "Ressource introuvable",
+    "alreadyExists": "{{field}} existe déjà",
+    "serverError": "Erreur serveur",
+    "invalidToken": "Token invalide",
+    "tokenExpired": "Token expiré",
+    "unauthorized": "Non autorisé",
+    "forbidden": "Accès interdit",
+    "badRequest": "Requête invalide"
+  },
+  "success": {
+    "success": "Succès",
+    "created": "Créé avec succès",
+    "updated": "Mis à jour avec succès",
+    "deleted": "Supprimé avec succès"
+  },
+  "validation": {
+    "usernameRequired": "Le nom d'utilisateur est requis",
+    "usernameMinLength": "Le nom d'utilisateur doit contenir au moins {{min}} caractères",
+    "usernameMaxLength": "Le nom d'utilisateur ne peut pas dépasser {{max}} caractères",
+    "usernameInvalid": "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores",
+    "emailRequired": "L'email est requis",
+    "emailInvalid": "Format d'email invalide",
+    "passwordRequired": "Le mot de passe est requis",
+    "passwordMinLength": "Le mot de passe doit contenir au moins {{min}} caractères",
+    "nameRequired": "Le nom est requis",
+    "descriptionRequired": "La description est requise",
+    "categoryRequired": "La catégorie est requise",
+    "linkOrCodeRequired": "Un lien ou un code est requis",
+    "linkInvalid": "Format de lien invalide",
+    "userRequired": "L'utilisateur est requis",
+    "serviceRequired": "Le service est requis",
+    "referralRequired": "Le parrainage est requis",
+    "voteTypeRequired": "Le type de vote est requis",
+    "voteTypeInvalid": "Type de vote invalide",
+    "reasonRequired": "La raison est requise",
+    "startDateRequired": "La date de début est requise",
+    "endDateRequired": "La date de fin est requise",
+    "endDateInvalid": "La date de fin doit être après la date de début",
+    "logoInvalid": "Type de fichier invalide. Formats acceptés: jpeg, jpg, png, gif, webp",
+    "logoTooLarge": "Le fichier est trop volumineux. Taille maximale: 5MB",
+    "descriptionMaxLength": "La description ne peut pas dépasser {{max}} caractères",
+    "commentMaxLength": "Le commentaire ne peut pas dépasser {{max}} caractères",
+    "titleRequired": "Le titre est requis",
+    "contentRequired": "Le contenu est requis"
+  },
+  "auth": {
+    "usernameOrEmailInUse": "Nom d'utilisateur ou email déjà utilisé",
+    "userCreated": "Utilisateur créé avec succès",
+    "invalidCredentials": "Identifiants invalides",
+    "loginSuccessful": "Connexion réussie"
+  },
+  "category": {
+    "categoryCreated": "Catégorie créée avec succès",
+    "categoryUpdated": "Catégorie mise à jour avec succès",
+    "categoryDeleted": "Catégorie supprimée avec succès",
+    "categoryNotFound": "Catégorie introuvable"
+  },
+  "service": {
+    "serviceCreated": "Service créé avec succès",
+    "serviceUpdated": "Service mis à jour avec succès",
+    "serviceDeleted": "Service supprimé avec succès",
+    "serviceNotFound": "Service introuvable",
+    "serviceValidated": "Service validé avec succès",
+    "serviceAlreadyExists": "Un service avec ce nom existe déjà"
+  },
+  "referral": {
+    "referralCreated": "Parrainage créé avec succès",
+    "referralUpdated": "Parrainage mis à jour avec succès",
+    "referralDeleted": "Parrainage supprimé avec succès",
+    "referralNotFound": "Parrainage introuvable",
+    "linkOrCodeNotBoth": "Vous devez fournir soit un lien soit un code, mais pas les deux",
+    "serviceNotValidated": "Le service doit être validé avant d'y ajouter des parrainages",
+    "cannotEditOthersReferral": "Vous ne pouvez pas modifier le parrainage d'un autre utilisateur",
+    "cannotDeleteOthersReferral": "Vous ne pouvez pas supprimer le parrainage d'un autre utilisateur"
+  },
+  "vote": {
+    "voteRecorded": "Vote enregistré avec succès",
+    "voteUpdated": "Vote mis à jour avec succès",
+    "voteDeleted": "Vote supprimé avec succès",
+    "alreadyVoted": "Vous avez déjà voté pour ce parrainage",
+    "noVoteFound": "Aucun vote trouvé"
+  },
+  "report": {
+    "reportCreated": "Signalement créé avec succès",
+    "reportUpdated": "Signalement mis à jour avec succès",
+    "reportDeleted": "Signalement supprimé avec succès",
+    "reportNotFound": "Signalement introuvable",
+    "alreadyReported": "Vous avez déjà signalé ce parrainage"
+  },
+  "notification": {
+    "notificationCreated": "Notification créée avec succès",
+    "notificationMarkedRead": "Notification marquée comme lue",
+    "allNotificationsMarkedRead": "Toutes les notifications ont été marquées comme lues",
+    "notificationDeleted": "Notification supprimée avec succès",
+    "notificationNotFound": "Notification introuvable"
+  },
+  "promReferral": {
+    "promReferralCreated": "Parrainage promu avec succès",
+    "promReferralUpdated": "Promotion mise à jour avec succès",
+    "promReferralDeleted": "Promotion supprimée avec succès",
+    "promReferralNotFound": "Promotion introuvable",
+    "referralAlreadyPromoted": "Ce parrainage est déjà promu pour cette période"
+  },
+  "serviceRequest": {
+    "serviceRequestCreated": "Demande de service créée avec succès",
+    "serviceRequestDeleted": "Demande de service supprimée avec succès",
+    "serviceRequestNotFound": "Demande de service introuvable"
+  }
+}

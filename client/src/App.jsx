@@ -16,7 +16,7 @@ import Notifications from './pages/Notifications';
 import Footer from './components/Footer';
 import AdminReferralsPage from './components/AdminReferralsPage';
 import PolitiqueConfidentialité from './pages/PolitiqueConfidentialité';
-import './app.css';
+import './App.css';
 
 function NavbarComp() {
   const { user, logout } = useContext(UserContext);

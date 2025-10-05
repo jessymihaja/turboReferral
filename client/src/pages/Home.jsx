@@ -1,208 +1,276 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { FaSearch, FaInbox, FaFilter, FaArrowUp } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import ServiceCard from '../components/ServiceCard';
 import ReferralInfo from '../components/ReferralInfo';
 import { serviceService, categoryService } from '../services';
 
 export default function Home() {
+  const { t } = useTranslation();
   const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const servicesData = await serviceService.getAll();
-        const categoriesData = await categoryService.getAll();
+        setLoading(true);
+        const [servicesData, categoriesData] = await Promise.all([
+          serviceService.getAll(),
+          categoryService.getAll()
+        ]);
 
         setServices(servicesData.data || servicesData);
         setCategories(categoriesData.data || categoriesData);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
+    setTimeout(() => setIsVisible(true), 100);
+
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const filteredServices = services.filter(service => {
     const matchQuery = query.trim()
-      ? service.name.toLowerCase().includes(query.toLowerCase())
+      ? service.name.toLowerCase().includes(query.toLowerCase()) ||
+        service.description?.toLowerCase().includes(query.toLowerCase())
       : true;
 
     const matchCategory = selectedCategory
       ? service.category === selectedCategory
       : true;
 
-    return matchQuery && matchCategory;
+    return matchQuery && matchCategory && service.isValidated;
   });
 
   return (
-    <div
-      style={{
-        maxWidth: '900px',
-        margin: '2rem auto',
-        padding: '1rem 1.5rem',
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        borderRadius: '8px',
-        backgroundColor: '#fff',
-        minHeight: '80vh',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <h1 style={{ textAlign: 'center', color: '#2c3e50', marginBottom: '1.5rem' }}>
-        Bienvenue sur <span style={{ color: '#27ae60' }}>TurboReferral</span> 🚀
-      </h1>
+    <div className="page-container">
+      {/* Hero Header */}
+      <motion.div
+        className="page-header"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -20 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
+        <h1 className="page-title" style={{
+          background: 'linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-primary) 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
+          {t('home.discoverTrusted')} <span style={{
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>{t('home.trustedReferrals')}</span>
+        </h1>
+        <p className="page-subtitle">
+          {t('home.findBestServices')}
+        </p>
+      </motion.div>
 
-      <input
-        type="search"
-        placeholder="Rechercher un service..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+      {/* Search Bar */}
+      <motion.div
+        className="search-container"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0.95 }}
+        transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
         style={{
-          padding: '0.75rem 1rem',
-          fontSize: '1rem',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          marginBottom: '1rem',
-          outline: 'none',
-          transition: 'border-color 0.3s ease',
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-        onFocus={e => (e.target.style.borderColor = '#27ae60')}
-        onBlur={e => (e.target.style.borderColor = '#ccc')}
-      />
-
-      {/* Boutons Catégories */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '0.75rem',
-          marginBottom: '1.5rem',
-          justifyContent: 'center',
+          background: 'linear-gradient(135deg, rgba(214, 156, 90, 0.05) 0%, rgba(212, 165, 116, 0.05) 100%)',
+          padding: 'var(--space-1)',
+          borderRadius: 'var(--radius-full)'
         }}
       >
-        <button
-          onClick={() => setSelectedCategory('')}
-          style={{
-            padding: '0.5rem 1rem',
-            borderRadius: '20px',
-            backgroundColor: !selectedCategory ? '#27ae60' : '#b38666ff',
-            color: !selectedCategory ? 'white' : 'white',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '500',
-            transition: 'all 0.2s ease',
-          }}
+        <div style={{ position: 'relative' }}>
+          <FaSearch style={{
+            position: 'absolute',
+            left: 'var(--space-4)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: 'var(--color-text-tertiary)',
+            pointerEvents: 'none'
+          }} />
+          <input
+            type="search"
+            placeholder={t('home.searchServices')}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="search-input"
+            style={{ paddingLeft: 'var(--space-10)' }}
+          />
+        </div>
+      </motion.div>
+
+      {/* Category Filter */}
+      {categories.length > 0 && (
+        <motion.div
+          style={{ marginBottom: 'var(--space-8)' }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 10 }}
+          transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
         >
-          All
-        </button>
-        {categories.map(cat => (
-          <button
-            key={cat._id}
-            onClick={() => setSelectedCategory(cat._id)}
-            style={{
-              padding: '0.5rem 1rem',
-              borderRadius: '20px',
-              backgroundColor: selectedCategory === cat._id ? '#27ae60' : '#b38666ff',
-              color: selectedCategory === cat._id ? 'white' : 'white',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'all 0.2s ease',
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            marginBottom: 'var(--space-4)',
+            color: 'var(--color-text-secondary)',
+            fontSize: 'var(--font-size-sm)',
+            fontWeight: 'var(--font-weight-medium)'
+          }}>
+            <FaFilter size={12} />
+            <span>{t('home.filterByCategory')}</span>
+          </div>
+
+          <div className="category-filter">
+            <motion.button
+              onClick={() => setSelectedCategory('')}
+              className={`category-btn ${!selectedCategory ? 'active' : ''}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {t('common.all')} ({services.filter(s => s.isValidated).length})
+            </motion.button>
+            {categories.map((cat, idx) => {
+              const count = services.filter(s => s.category === cat._id && s.isValidated).length;
+              return (
+                <motion.button
+                  key={cat._id}
+                  onClick={() => setSelectedCategory(cat._id)}
+                  className={`category-btn ${selectedCategory === cat._id ? 'active' : ''}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.4 + idx * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {cat.name} ({count})
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Services Grid */}
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
+          <div className="spinner" />
+        </div>
+      ) : (
+        <>
+          <motion.div
+            className="card-grid"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.05,
+                },
+              },
+              hidden: {},
             }}
           >
-            {cat.name}
-          </button>
-        ))}
-      </div>
+            <AnimatePresence mode="popLayout">
+              {filteredServices.map(service => (
+                <motion.div
+                  key={service._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  layout
+                >
+                  <ServiceCard service={service} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
 
-      {/* Liste des services */}
-      <motion.ul
-        style={{
-          listStyle: 'none',
-          paddingLeft: 0,
-          margin: 0,
-          width: '100%',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          justifyContent: 'flex-start',
-        }}
-        initial="hidden"
-        animate="visible"
-        variants={{
-          visible: {
-            transition: {
-              staggerChildren: 0.05,
-            },
-          },
-          hidden: {},
-        }}
-      >
-        <AnimatePresence>
-          {filteredServices.map(service => (
-            <motion.li
-              key={service._id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                flex: '1 0 18%', // ~5 par ligne
-                minWidth: '150px',
-                maxWidth: '150px',
-                padding: '0.25rem',
-                borderRadius: '8px',
-                backgroundColor: '#f4f4f4',
-                textAlign: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-              }}
-              whileHover={{ backgroundColor: '#d1e7dd' }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Link
-                to={`/services/${service._id}`}
-                style={{
-                  textDecoration: 'none',
-                  color: '#2c3e50',
-                  fontWeight: '600',
-                  fontSize: '1rem',
-                  display: 'block',
-                }}
-              >
-                {service.logo && (
-                  <img
-                    src={`${import.meta.env.VITE_API_URL}${service.logo}`}
-                    alt={service.name}
-                    style={{ maxWidth: '40px', maxHeight: '40px', marginBottom: '0.5rem' ,objectFit: 'contain', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-                  />
-                )}
-                {service.name}
-
-              </Link>
-            </motion.li>
-          ))}
-        </AnimatePresence>
-      </motion.ul>
-
-      {!query.trim() && filteredServices.length === 0 && (
-        <p style={{ color: '#7f8c8d', fontStyle: 'italic', textAlign: 'center', marginTop: '2rem' }}>
-          Aucune reponse dans la catégorie sélectionnée pour le moment.
-        </p>
+          {/* Empty State */}
+          {filteredServices.length === 0 && !loading && (
+            <div className="empty-state">
+              <div className="empty-state-icon">
+                <FaInbox />
+              </div>
+              <p style={{
+                fontSize: 'var(--font-size-xl)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: 'var(--color-text-secondary)',
+                marginBottom: 'var(--space-2)'
+              }}>
+                {query.trim() ? t('home.noServicesFound') : t('home.noServicesAvailable')}
+              </p>
+              <p style={{
+                color: 'var(--color-text-tertiary)',
+                fontSize: 'var(--font-size-sm)'
+              }}>
+                {query.trim()
+                  ? t('home.tryAdjusting')
+                  : t('home.checkBackLater')
+                }
+              </p>
+            </div>
+          )}
+        </>
       )}
-      {query.trim() && filteredServices.length === 0 && (
-        <p style={{ color: '#e74c3c', fontStyle: 'italic', textAlign: 'center', marginTop: '2rem' }}>
-          Aucun service trouvé pour "{query}".
-        </p>
-      )}
-      <ReferralInfo></ReferralInfo>
+
+      <ReferralInfo />
+
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            onClick={scrollToTop}
+            style={{
+              position: 'fixed',
+              bottom: 'var(--space-8)',
+              right: 'var(--space-8)',
+              width: '56px',
+              height: '56px',
+              borderRadius: 'var(--radius-full)',
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
+              color: 'var(--color-text-inverse)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(214, 156, 90, 0.4)',
+              zIndex: 1000,
+              transition: 'all 0.3s ease'
+            }}
+            whileHover={{ scale: 1.1, boxShadow: '0 6px 20px rgba(214, 156, 90, 0.5)' }}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Scroll to top"
+          >
+            <FaArrowUp size={20} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

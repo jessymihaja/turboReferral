@@ -4,19 +4,20 @@ const { jwtSecret, jwtExpiresIn } = require('../config/env');
 const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
+const { t } = require('../utils/i18n');
 
 exports.register = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
   const existingUser = await User.findOne({ $or: [{ username }, { email }] });
   if (existingUser) {
-    throw new AppError('Username or email already in use', 400);
+    throw new AppError(t('auth.usernameOrEmailInUse'), 400);
   }
 
   const user = new User({ username, email, password });
   await user.save();
 
-  ResponseHandler.created(res, null, 'User created successfully');
+  ResponseHandler.created(res, null, t('auth.userCreated'));
 });
 
 exports.login = asyncHandler(async (req, res) => {
@@ -28,12 +29,12 @@ exports.login = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new AppError('Invalid credentials', 400);
+    throw new AppError(t('auth.invalidCredentials'), 400);
   }
 
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
-    throw new AppError('Invalid credentials', 400);
+    throw new AppError(t('auth.invalidCredentials'), 400);
   }
 
   const payload = { id: user._id, username: user.username, role: user.role };
@@ -46,5 +47,5 @@ exports.login = asyncHandler(async (req, res) => {
     role: user.role,
   };
 
-  ResponseHandler.success(res, { user: userData, token }, 'Login successful');
+  ResponseHandler.success(res, { user: userData, token }, t('auth.loginSuccessful'));
 });
