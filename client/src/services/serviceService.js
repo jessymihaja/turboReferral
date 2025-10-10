@@ -12,6 +12,11 @@ export const serviceService = {
     return response.data;
   },
 
+  async getMyServices() {
+    const response = await api.get(`${API_ENDPOINTS.SERVICES.BASE}/user/my-services`);
+    return response.data;
+  },
+
   async create(formData) {
     const response = await api.postFormData(API_ENDPOINTS.SERVICES.BASE, formData);
     return response.data;

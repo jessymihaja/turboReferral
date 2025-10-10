@@ -55,7 +55,7 @@ export default function Home() {
       : true;
 
     const matchCategory = selectedCategory
-      ? service.category === selectedCategory
+      ? service.category?._id === selectedCategory
       : true;
 
     return matchQuery && matchCategory && service.isValidated;
@@ -151,7 +151,7 @@ export default function Home() {
               {t('common.all')} ({services.filter(s => s.isValidated).length})
             </motion.button>
             {categories.map((cat, idx) => {
-              const count = services.filter(s => s.category === cat._id && s.isValidated).length;
+              const count = services.filter(s => s.category?._id === cat._id && s.isValidated).length;
               return (
                 <motion.button
                   key={cat._id}

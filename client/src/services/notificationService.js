@@ -2,8 +2,8 @@ import api from './api';
 import { API_ENDPOINTS } from '../config/constants';
 
 export const notificationService = {
-  async getAll() {
-    const response = await api.get(API_ENDPOINTS.NOTIFICATIONS.BASE);
+  async getAll(page = 1, limit = 10) {
+    const response = await api.get(`${API_ENDPOINTS.NOTIFICATIONS.BASE}?page=${page}&limit=${limit}`);
     return response.data;
   },
 

@@ -7,6 +7,7 @@ const Service = require('../models/Service');
 const Referral = require('../models/Referral');
 const ReferralVote = require('../models/ReferralVote');
 const PromReferral = require('../models/PromReferral');
+const Notification = require('../models/Notification');
 
 const { mongoUri } = require('../config/env');
 
@@ -26,6 +27,7 @@ const seedData = async () => {
     await Referral.deleteMany({});
     await ReferralVote.deleteMany({});
     await PromReferral.deleteMany({});
+    await Notification.deleteMany({});
 
     // Create Users
     console.log('👤 Creating users...');
@@ -105,6 +107,7 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Mobilité')._id,
         isValidated: true,
         website: 'https://uber.com',
+        requestedBy: users[0]._id,
       },
       {
         name: 'Amazon',
@@ -112,6 +115,7 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Shopping')._id,
         isValidated: true,
         website: 'https://amazon.fr',
+        requestedBy: users[0]._id,
       },
       {
         name: 'Spotify',
@@ -119,6 +123,7 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Streaming')._id,
         isValidated: true,
         website: 'https://spotify.com',
+        requestedBy: users[1]._id,
       },
       {
         name: 'Airbnb',
@@ -126,6 +131,7 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Voyage')._id,
         isValidated: true,
         website: 'https://airbnb.fr',
+        requestedBy: users[1]._id,
       },
       {
         name: 'Revolut',
@@ -133,6 +139,7 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Finance')._id,
         isValidated: true,
         website: 'https://revolut.com',
+        requestedBy: users[2]._id,
       },
       {
         name: 'Steam',
@@ -140,6 +147,7 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Jeux')._id,
         isValidated: true,
         website: 'https://store.steampowered.com',
+        requestedBy: users[2]._id,
       },
       {
         name: 'Uber Eats',
@@ -147,6 +155,7 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Food')._id,
         isValidated: true,
         website: 'https://ubereats.com',
+        requestedBy: users[0]._id,
       },
       {
         name: 'Netflix',
@@ -154,6 +163,16 @@ const seedData = async () => {
         category: categories.find(c => c.name === 'Streaming')._id,
         isValidated: false,
         website: 'https://netflix.com',
+        requestedBy: users[1]._id,
+      },
+      {
+        name: 'Disney+',
+        description: 'Streaming vidéo et films',
+        category: categories.find(c => c.name === 'Streaming')._id,
+        isValidated: false,
+        website: 'https://disneyplus.com',
+        requestedBy: users[2]._id,
+        validationReason: 'Service déjà présent sous un autre nom',
       },
     ]);
 
@@ -242,6 +261,47 @@ const seedData = async () => {
     await ReferralVote.create(votes);
     console.log(`✅ Created ${votes.length} votes`);
 
+    // Create Notifications
+    console.log('🔔 Creating notifications...');
+    const notifications = await Notification.create([
+      {
+        userId: users[0]._id,
+        title: 'Service "Uber" approuvé',
+        content: 'Votre demande de service "Uber" a été approuvée et est maintenant disponible.',
+        link: `/services/${services.find(s => s.name === 'Uber')._id}`,
+        isRead: true,
+      },
+      {
+        userId: users[1]._id,
+        title: 'Service "Netflix" en attente',
+        content: 'Votre demande de service "Netflix" est en cours de validation par un administrateur.',
+        link: `/services/${services.find(s => s.name === 'Netflix')._id}`,
+        isRead: false,
+      },
+      {
+        userId: users[2]._id,
+        title: 'Service "Disney+" rejeté',
+        content: 'Votre demande de service "Disney+" a été rejetée: Service déjà présent sous un autre nom.',
+        link: `/services/${services.find(s => s.name === 'Disney+')._id}`,
+        isRead: false,
+      },
+      {
+        userId: users[0]._id,
+        title: 'Nouveau vote sur votre parrainage',
+        content: 'Quelqu\'un a voté sur votre lien de parrainage Uber.',
+        isRead: false,
+      },
+      {
+        userId: users[1]._id,
+        title: 'Service "Spotify" approuvé',
+        content: 'Votre demande de service "Spotify" a été approuvée et est maintenant disponible.',
+        link: `/services/${services.find(s => s.name === 'Spotify')._id}`,
+        isRead: true,
+      },
+    ]);
+
+    console.log(`✅ Created ${notifications.length} notifications`);
+
     console.log('\n✨ Seed data created successfully!\n');
     console.log('📋 Summary:');
     console.log(`   - Users: ${users.length + 1} (admin: admin@turboreferral.com, password: password123)`);
@@ -249,6 +309,7 @@ const seedData = async () => {
     console.log(`   - Services: ${services.length} (${services.filter(s => s.isValidated).length} validated)`);
     console.log(`   - Referrals: ${referrals.length}`);
     console.log(`   - Votes: ${votes.length}`);
+    console.log(`   - Notifications: ${notifications.length}`);
     console.log('\n🔑 Login credentials:');
     console.log('   Admin: admin@turboreferral.com / password123');
     console.log('   User 1: john@example.com / password123');

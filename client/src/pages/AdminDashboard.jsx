@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { FaCheck, FaEdit, FaBox, FaExclamationCircle, FaUsers, FaChartLine, FaStar, FaLink, FaCode, FaTrophy } from 'react-icons/fa';
+import { FaCheck, FaEdit, FaBox, FaExclamationCircle, FaUsers, FaChartLine, FaStar, FaLink, FaCode, FaTrophy, FaPlus } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Table from "../components/Table";
 import ModalUpdateService from "../components/ModalUpdateService";
+import ModalValidateService from "../components/ModalValidateService";
+import ModalAddService from "../components/ModalAddService";
 import { referralService } from '../services';
 import api from '../services/api';
 import './AdminDashboard.css';
@@ -16,6 +18,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedService, setSelectedService] = useState(null);
+  const [serviceToValidate, setServiceToValidate] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,14 +44,18 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  async function handleValidateService(id) {
-    try {
-      const data = await api.put(`/api/admin/services/${id}/validate`);
-      const updated = data.data?.service || data.service || data;
-      setServices(services.map((s) => (s._id === id ? updated : s)));
-    } catch (err) {
-      console.error(err);
-    }
+  function handleOpenValidateModal(service) {
+    setServiceToValidate(service);
+  }
+
+  function handleServiceValidated(updated) {
+    setServices(services.map((s) => (s._id === updated._id ? updated : s)));
+    setServiceToValidate(null);
+  }
+
+  function handleServiceAdded(newService) {
+    setServices([newService, ...services]);
+    setShowAddModal(false);
   }
 
   async function handleDeleteReferral(id) {
@@ -96,6 +104,12 @@ export default function AdminDashboard() {
       )
     },
     {
+      key: 'category',
+      header: t('table.category'),
+      accessor: (service) => service.category?.name || '—',
+      render: (service) => service.category?.name || '—'
+    },
+    {
       key: 'isValidated',
       header: t('table.status'),
       align: 'center',
@@ -123,7 +137,7 @@ export default function AdminDashboard() {
         <div className="table-actions" style={{ gap: 'var(--space-2)' }}>
           {!service.isValidated && (
             <button
-              onClick={() => handleValidateService(service._id)}
+              onClick={() => handleOpenValidateModal(service)}
               className="btn-sm btn-success"
               title={t('admin.validateService')}
             >
@@ -440,7 +454,16 @@ export default function AdminDashboard() {
           <div className="admin-section-icon">
             <FaBox />
           </div>
-          <h2 className="admin-section-title">{t('admin.servicesManagement')}</h2>
+          <div style={{ flex: 1 }}>
+            <h2 className="admin-section-title">{t('admin.servicesManagement')}</h2>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+          >
+            <FaPlus /> {t('admin.addService')}
+          </button>
         </div>
         <div className="admin-table-wrapper">
           <Table
@@ -464,6 +487,21 @@ export default function AdminDashboard() {
               services.map((s) => (s._id === updatedService._id ? updatedService : s))
             );
           }}
+        />
+      )}
+
+      {serviceToValidate && (
+        <ModalValidateService
+          service={serviceToValidate}
+          onClose={() => setServiceToValidate(null)}
+          onValidated={handleServiceValidated}
+        />
+      )}
+
+      {showAddModal && (
+        <ModalAddService
+          onClose={() => setShowAddModal(false)}
+          onAdded={handleServiceAdded}
         />
       )}
     </div>

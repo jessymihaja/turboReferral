@@ -1,12 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
 import { notificationService } from '../services';
+import { UserContext } from '../contexts/UserContext';
 
 const NotificationIcon = () => {
+  const { user } = useContext(UserContext);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+
     const fetchUnreadCount = async () => {
       try {
         const data = await notificationService.getUnreadCount();
@@ -17,7 +24,12 @@ const NotificationIcon = () => {
     };
 
     fetchUnreadCount();
-  }, []);
+
+    // Rafraîchir le compteur toutes les 30 secondes
+    const interval = setInterval(fetchUnreadCount, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
 
   return (

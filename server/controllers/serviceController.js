@@ -18,7 +18,7 @@ exports.getServiceById = asyncHandler(async (req, res) => {
 });
 
 exports.createService = asyncHandler(async (req, res) => {
-  const { name, description, website, validationPatterns, category } = req.body;
+  const { name, description, website, category } = req.body;
 
   let logo = '';
   if (req.file) {
@@ -35,17 +35,24 @@ exports.createService = asyncHandler(async (req, res) => {
     description,
     logo,
     website,
-    validationPatterns,
     isValidated: false,
     category,
+    requestedBy: req.user?._id || req.user?.id,
   });
 
   await service.save();
   ResponseHandler.created(res, service, t('service.serviceCreated'));
 });
 
+exports.getUserServices = asyncHandler(async (req, res) => {
+  const services = await Service.find({ requestedBy: req.user._id })
+    .populate('category')
+    .sort({ createdAt: -1 });
+  ResponseHandler.success(res, services);
+});
+
 exports.setServiceValidation = asyncHandler(async (req, res) => {
-  const { isValidated } = req.body;
+  const { isValidated, validationReason } = req.body;
 
   const service = await Service.findById(req.params.id);
   if (!service) {
@@ -53,7 +60,24 @@ exports.setServiceValidation = asyncHandler(async (req, res) => {
   }
 
   service.isValidated = isValidated;
+  if (validationReason) {
+    service.validationReason = validationReason;
+  }
   await service.save();
+
+  if (service.requestedBy) {
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      userId: service.requestedBy,
+      title: isValidated ?
+        `Service "${service.name}" approuvé` :
+        `Service "${service.name}" rejeté`,
+      content: isValidated ?
+        `Votre demande de service "${service.name}" a été approuvée et est maintenant disponible.` :
+        `Votre demande de service "${service.name}" a été rejetée${validationReason ? `: ${validationReason}` : '.'}`,
+      link: `/services/${service._id}`,
+    });
+  }
 
   ResponseHandler.success(
     res,

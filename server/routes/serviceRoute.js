@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../middlewares/uploadLogo');
 const adminAuthMiddleware = require('../middlewares/adminAuth');
+const { authenticateToken } = require('../middlewares/auth');
 const { serviceValidators, idValidator } = require('../utils/validators');
 
 const {
@@ -10,12 +11,15 @@ const {
   createService,
   setServiceValidation,
   updateService,
+  getUserServices,
 } = require('../controllers/serviceController');
 
 router.get('/', getAllServices);
+router.get('/user/my-services', authenticateToken, getUserServices);
 router.get('/:id', idValidator, getServiceById);
 router.post(
   '/',
+  authenticateToken,
   upload.single('logo'),
   serviceValidators.create,
   createService

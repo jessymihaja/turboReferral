@@ -1,17 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit, FaTimes, FaImage, FaCheck } from 'react-icons/fa';
 import CustomToast from "./CustomToast";
-import { serviceService } from '../services';
+import { serviceService, categoryService } from '../services';
 import { useTranslation } from 'react-i18next';
 
 export default function ModalUpdateService({ service, onClose, onUpdated }) {
   const { t } = useTranslation();
   const [name, setName] = useState(service.name);
   const [description, setDescription] = useState(service.description || "");
+  const [category, setCategory] = useState(service.category?._id || "");
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [toast, setToast] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const data = await categoryService.getAll();
+        setCategories(data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des catégories:", err);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   async function handleUpdate(e) {
     e.preventDefault();
@@ -27,6 +41,7 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
+      formData.append("category", category);
       if (logo) formData.append("logo", logo);
 
       const data = await serviceService.update(service._id, formData);
@@ -95,6 +110,23 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
                 rows={4}
                 placeholder={t('modal.enterDescription')}
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label form-label-required">{t('modal.categoryRequired')}</label>
+              <select
+                className="form-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              >
+                <option value="">{t('modal.selectCategory')}</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="form-group">

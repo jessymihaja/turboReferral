@@ -17,6 +17,10 @@ const notificationSchema = new mongoose.Schema({
     required: [true, t('validation.contentRequired')],
     trim: true,
   },
+  link: {
+    type: String,
+    trim: true,
+  },
   isRead: {
     type: Boolean,
     default: false,

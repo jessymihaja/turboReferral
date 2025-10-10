@@ -29,7 +29,6 @@ export default function Dashboard() {
   const [serviceDescription, setServiceDescription] = useState('');
   const [serviceLogoFile, setServiceLogoFile] = useState(null);
   const [serviceWebsite, setServiceWebsite] = useState('');
-  const [validationPatterns, setValidationPatterns] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
   const [formLoading, setFormLoading] = useState(false);
@@ -164,15 +163,6 @@ export default function Dashboard() {
       formData.append('description', serviceDescription.trim());
       formData.append('website', serviceWebsite.trim());
       formData.append('category', selectedCategory || '');
-      formData.append(
-        'validationPatterns',
-        JSON.stringify(
-          validationPatterns
-            .split(/\n|,/)
-            .map(p => p.trim())
-            .filter(p => p.length > 0)
-        )
-      );
 
       if (serviceLogoFile) {
         formData.append('logo', serviceLogoFile);
@@ -185,7 +175,6 @@ export default function Dashboard() {
       setServiceDescription('');
       setServiceLogoFile(null);
       setServiceWebsite('');
-      setValidationPatterns('');
       setSelectedCategory('');
     } catch (err) {
       setToast({ message: err.message || t('dashboard.requestFailed'), type: 'error' });
@@ -287,14 +276,6 @@ export default function Dashboard() {
                   />
                 </label>
               </div>
-
-              <textarea
-                placeholder={t('dashboard.validationPatterns')}
-                value={validationPatterns}
-                onChange={e => setValidationPatterns(e.target.value)}
-                rows={2}
-                className="mono"
-              />
 
               <button type="submit" disabled={formLoading}>
                 {formLoading ? t('dashboard.submitting') : t('dashboard.submitRequest')}
