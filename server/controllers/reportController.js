@@ -1,4 +1,7 @@
 const Report = require('../models/Report');
+const Referral = require('../models/Referral');
+const Notification = require('../models/Notification');
+const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
@@ -48,7 +51,7 @@ exports.getPendingReports = asyncHandler(async (req, res) => {
       path: 'referralId',
       populate: {
         path: 'user',
-        select: 'username',
+        select: 'username isBlocked profilePhoto',
       },
     },
     {
@@ -75,5 +78,46 @@ exports.ignoreReport = asyncHandler(async (req, res) => {
     res,
     { modifiedCount: result.modifiedCount },
     t('report.reportUpdated')
+  );
+});
+
+exports.deleteReferral = asyncHandler(async (req, res) => {
+  const report = await Report.findById(req.params.id).populate({
+    path: 'referralId',
+    populate: { path: 'user service' }
+  });
+
+  if (!report) {
+    throw new AppError(t('report.reportNotFound'), 404);
+  }
+
+  const referral = report.referralId;
+  if (!referral) {
+    throw new AppError(t('referral.referralNotFound'), 404);
+  }
+
+  const userId = referral.user._id;
+  const lien = referral.link || referral.code || 'lien inconnu';
+  const serviceName = referral.service?.name || 'service inconnu';
+  const raison = report.reason || 'Aucune raison spécifiée';
+
+  const title = `Votre parrainage "${serviceName}" a été supprimé`;
+  const content = `Votre lien "${lien}" a été supprimé pour la raison suivante : "${raison}". Veuillez respecter les conditions d'utilisation lors de vos prochaines publications.`;
+
+  await Notification.create({ userId, title, content });
+
+  await User.findByIdAndUpdate(userId, { $inc: { deletedReferralsCount: 1 } });
+
+  await Referral.findByIdAndDelete(referral._id);
+
+  const result = await Report.updateMany(
+    { referralId: report.referralId },
+    { $set: { status: REPORT_STATUS.RESOLVED } }
+  );
+
+  ResponseHandler.success(
+    res,
+    { modifiedCount: result.modifiedCount },
+    t('report.referralDeletedAndNotificationSent')
   );
 });

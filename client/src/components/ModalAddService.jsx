@@ -3,6 +3,7 @@ import { FaPlus, FaTimes, FaImage, FaCheck } from 'react-icons/fa';
 import CustomToast from "./CustomToast";
 import { serviceService, categoryService } from '../services';
 import { useTranslation } from 'react-i18next';
+import { compressServiceLogo } from '../utils/imageCompressor';
 
 export default function ModalAddService({ onClose, onAdded }) {
   const { t } = useTranslation();
@@ -51,7 +52,7 @@ export default function ModalAddService({ onClose, onAdded }) {
       formData.append("category", category);
 
       if (logo) {
-        formData.append("logo", logo);
+        formData.append("logo", logo, logo.name || 'logo.webp');
       }
 
       const data = await serviceService.create(formData);
@@ -70,11 +71,18 @@ export default function ModalAddService({ onClose, onAdded }) {
     }
   }
 
-  function handleLogoChange(e) {
+  async function handleLogoChange(e) {
     const file = e.target.files[0];
     if (file) {
-      setLogo(file);
-      setLogoPreview(URL.createObjectURL(file));
+      try {
+        const compressed = await compressServiceLogo(file);
+        setLogo(compressed);
+        setLogoPreview(URL.createObjectURL(compressed));
+      } catch (error) {
+        console.error('Erreur compression:', error);
+        setLogo(file);
+        setLogoPreview(URL.createObjectURL(file));
+      }
     }
   }
 

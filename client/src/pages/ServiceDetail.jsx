@@ -469,9 +469,23 @@ export default function ServiceDetail() {
                 {/* User Header */}
                 <div className={styles.referralHeader}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                    <div className="avatar">
-                      {(ref.user?.username?.charAt(0).toUpperCase() || "?")}
-                    </div>
+                    {ref.user?.profilePhoto ? (
+                      <img
+                        src={`${import.meta.env.VITE_API_URL}${ref.user.profilePhoto}`}
+                        alt={ref.user.username}
+                        className="avatar"
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <div className="avatar">
+                        {(ref.user?.username?.charAt(0).toUpperCase() || "?")}
+                      </div>
+                    )}
                     <div>
                       <div style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
                         {ref.user?.username

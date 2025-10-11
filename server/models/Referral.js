@@ -37,6 +37,10 @@ const referralSchema = new mongoose.Schema({
     maxlength: [VALIDATION.MAX_DESCRIPTION_LENGTH, t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH })],
     trim: true,
   },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
 }, { timestamps: true });
 
 referralSchema.pre('validate', function(next) {

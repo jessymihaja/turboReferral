@@ -26,6 +26,12 @@ export function UserProvider({ children }) {
     localStorage.setItem('token', token);
   };
 
+  // Fonction pour mettre à jour l'utilisateur
+  const updateUser = (userData) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
   // Fonction pour logout
   const navigate = useNavigate();
 
@@ -38,7 +44,7 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, token, login, logout }}>
+    <UserContext.Provider value={{ user, token, login, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,9 +1,10 @@
 import { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import { UserContext } from '../contexts/UserContext';
-import { FaTrash, FaPlus, FaFileUpload, FaLink, FaCode, FaInbox, FaChevronDown, FaChevronUp, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaFileUpload, FaLink, FaCode, FaInbox, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaExclamationTriangle } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import CustomToast from '../components/CustomToast';
 import { referralService, categoryService, serviceService } from '../services';
+import { compressServiceLogo } from '../utils/imageCompressor';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -165,7 +166,7 @@ export default function Dashboard() {
       formData.append('category', selectedCategory || '');
 
       if (serviceLogoFile) {
-        formData.append('logo', serviceLogoFile);
+        formData.append('logo', serviceLogoFile, serviceLogoFile.name || 'logo.webp');
       }
 
       await serviceService.create(formData);
@@ -216,11 +217,52 @@ export default function Dashboard() {
       )}
 
       <div className="dash-header">
-        <h1>{user.username}</h1>
+        <div className="dash-header-user">
+          {user.profilePhoto ? (
+            <img
+              src={`${import.meta.env.VITE_API_URL}${user.profilePhoto}`}
+              alt={user.username}
+              className="dash-user-photo"
+            />
+          ) : (
+            <div className="dash-user-placeholder">
+              {user.username.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <h1>{user.username}</h1>
+        </div>
         <div className="stats">
           <span>{referrals.length} parrainage{referrals.length > 1 ? 's' : ''}</span>
           <span>·</span>
           <span>{Object.keys(grouped).length} service{Object.keys(grouped).length > 1 ? 's' : ''}</span>
+          {user.deletedReferralsCount > 0 && (
+            <>
+              <span>·</span>
+              <span
+                className="warning-badge"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  padding: 'var(--space-2) var(--space-3)',
+                  backgroundColor: 'var(--color-error-50)',
+                  color: 'var(--color-error-600)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: '600',
+                  border: '1.5px solid var(--color-error-500)',
+                  boxShadow: '0 2px 4px rgba(193, 122, 111, 0.15)',
+                  animation: 'pulse-warning 2s ease-in-out infinite',
+                  cursor: 'help',
+                  transition: 'all var(--transition-base)'
+                }}
+                title="⚠️ Parrainages supprimés par les administrateurs pour non-respect des conditions"
+              >
+                <FaExclamationTriangle size={13} style={{ animation: 'shake 3s ease-in-out infinite' }} />
+                {user.deletedReferralsCount} supprimé{user.deletedReferralsCount > 1 ? 's' : ''}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -272,7 +314,18 @@ export default function Dashboard() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={e => setServiceLogoFile(e.target.files[0])}
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        try {
+                          const compressed = await compressServiceLogo(file);
+                          setServiceLogoFile(compressed);
+                        } catch (error) {
+                          console.error('Erreur compression:', error);
+                          setServiceLogoFile(file);
+                        }
+                      }
+                    }}
                   />
                 </label>
               </div>

@@ -9,9 +9,14 @@ const { t } = require('../utils/i18n');
 exports.register = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
-  const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-  if (existingUser) {
-    throw new AppError(t('auth.usernameOrEmailInUse'), 400);
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
+    throw new AppError('Ce nom d\'utilisateur est déjà utilisé', 400);
+  }
+
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) {
+    throw new AppError('Cet email est déjà utilisé', 400);
   }
 
   const user = new User({ username, email, password });
@@ -37,6 +42,10 @@ exports.login = asyncHandler(async (req, res) => {
     throw new AppError(t('auth.invalidCredentials'), 400);
   }
 
+  if (user.isBlocked) {
+    throw new AppError(t('auth.accountBlocked'), 403);
+  }
+
   const payload = { id: user._id, username: user.username, role: user.role };
   const token = jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
 
@@ -45,6 +54,7 @@ exports.login = asyncHandler(async (req, res) => {
     username: user.username,
     email: user.email,
     role: user.role,
+    deletedReferralsCount: user.deletedReferralsCount || 0,
   };
 
   ResponseHandler.success(res, { user: userData, token }, t('auth.loginSuccessful'));

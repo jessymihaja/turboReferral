@@ -2,9 +2,12 @@ const Service = require('../models/Service');
 const Referral = require('../models/Referral');
 const User = require('../models/User');
 const PromReferral = require('../models/PromReferral');
+const ReferralVote = require('../models/ReferralVote');
+const Report = require('../models/Report');
 const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
+const { VOTE_TYPES } = require('../config/constants');
 const { t } = require('../utils/i18n');
 
 exports.listServices = asyncHandler(async (req, res) => {
@@ -231,4 +234,189 @@ exports.getAnalytics = asyncHandler(async (req, res) => {
   };
 
   ResponseHandler.success(res, analytics);
+});
+
+exports.listUsers = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 20, search = '', role = '', isBlocked = '' } = req.query;
+
+  const query = {};
+  if (search) {
+    query.$or = [
+      { username: { $regex: search, $options: 'i' } },
+      { email: { $regex: search, $options: 'i' } }
+    ];
+  }
+  if (role) query.role = role;
+  if (isBlocked !== '') query.isBlocked = isBlocked === 'true';
+
+  const users = await User.find(query)
+    .select('-password')
+    .sort({ createdAt: -1 })
+    .limit(parseInt(limit))
+    .skip((parseInt(page) - 1) * parseInt(limit));
+
+  const total = await User.countDocuments(query);
+
+  ResponseHandler.success(res, {
+    users,
+    pagination: {
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      pages: Math.ceil(total / parseInt(limit))
+    }
+  });
+});
+
+exports.getUserDetails = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+
+  const user = await User.findById(userId).select('-password');
+  if (!user) {
+    throw new AppError(t('user.userNotFound'), 404);
+  }
+
+  const userReferrals = await Referral.find({ user: userId }).populate('service').sort({ createdAt: -1 });
+  const referralIds = userReferrals.map(r => r._id);
+
+  const [
+    totalReferrals,
+    votesGiven,
+    votesReceived,
+    reports
+  ] = await Promise.all([
+    Referral.countDocuments({ user: userId }),
+    ReferralVote.find({ user: userId }).populate('referral'),
+    ReferralVote.find({
+      referral: { $in: referralIds }
+    }),
+    Report.find({ referralId: { $in: referralIds } })
+      .populate({
+        path: 'referralId',
+        populate: [
+          { path: 'service', select: 'name' },
+          { path: 'user', select: 'username profilePhoto' }
+        ]
+      })
+      .populate('reporterId', 'username')
+  ]);
+
+  const positiveVotes = votesReceived.filter(v => v.vote === VOTE_TYPES.GOOD).length;
+  const negativeVotes = votesReceived.filter(v => v.vote === VOTE_TYPES.BAD).length;
+  const totalVotesReceived = votesReceived.length;
+  const avgVote = totalVotesReceived > 0
+    ? (positiveVotes / totalVotesReceived) * 100
+    : 0;
+
+  const positiveVotesGiven = votesGiven.filter(v => v.vote === VOTE_TYPES.GOOD).length;
+  const negativeVotesGiven = votesGiven.filter(v => v.vote === VOTE_TYPES.BAD).length;
+
+  const userDetails = {
+    user: {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      profilePhoto: user.profilePhoto,
+      isBlocked: user.isBlocked,
+      deletedReferralsCount: user.deletedReferralsCount,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    },
+    stats: {
+      referrals: {
+        total: totalReferrals,
+        list: userReferrals
+      },
+      votesReceived: {
+        total: totalVotesReceived,
+        positive: positiveVotes,
+        negative: negativeVotes,
+        average: avgVote.toFixed(2)
+      },
+      votesGiven: {
+        total: votesGiven.length,
+        positive: positiveVotesGiven,
+        negative: negativeVotesGiven
+      },
+      reports: {
+        total: reports.length,
+        list: reports
+      }
+    }
+  };
+
+  ResponseHandler.success(res, userDetails);
+});
+
+exports.blockUser = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+  const { isBlocked, reason } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(t('user.userNotFound'), 404);
+  }
+
+  user.isBlocked = isBlocked;
+  if (isBlocked) {
+    await Referral.updateMany({ user: userId }, { $set: { isActive: false } });
+    await Report.deleteMany({ reporterId: userId });
+  } else {
+    await Referral.updateMany({ user: userId }, { $set: { isActive: true } });
+  }
+
+  await user.save();
+
+  const message = isBlocked
+    ? t('user.userBlocked')
+    : t('user.userUnblocked');
+
+  ResponseHandler.success(res, user, message);
+});
+
+exports.deleteUser = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(t('user.userNotFound'), 404);
+  }
+
+  await Promise.all([
+    Referral.deleteMany({ user: userId }),
+    ReferralVote.deleteMany({ user: userId }),
+    Report.deleteMany({ reporterId: userId }),
+    User.findByIdAndDelete(userId)
+  ]);
+
+  ResponseHandler.success(res, null, t('user.userDeleted'));
+});
+
+exports.updateUserRole = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+  const { role } = req.body;
+
+  if (!role || !['user', 'admin'].includes(role)) {
+    throw new AppError('Rôle invalide. Doit être "user" ou "admin"', 400);
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(t('user.userNotFound'), 404);
+  }
+
+  // Prevent changing own role
+  if (userId === req.user.id) {
+    throw new AppError('Vous ne pouvez pas modifier votre propre rôle', 403);
+  }
+
+  user.role = role;
+  await user.save();
+
+  const message = role === 'admin'
+    ? 'Utilisateur promu administrateur avec succès'
+    : 'Utilisateur rétrogradé en utilisateur standard';
+
+  ResponseHandler.success(res, { _id: user._id, username: user.username, email: user.email, role: user.role }, message);
 });

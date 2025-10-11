@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { FaCheck, FaExclamationTriangle, FaTrash, FaEye, FaFlag, FaLink, FaCode } from 'react-icons/fa';
+import { FaCheck, FaTrash, FaEye, FaFlag, FaLink, FaCode, FaBan } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import Table from '../components/Table';
 import CustomToast from '../components/CustomToast';
-import { referralService } from '../services';
 import api from '../services/api';
 
 export default function PendingReports() {
@@ -11,6 +10,10 @@ export default function PendingReports() {
   const [reports, setReports] = useState([]);
   const [toast, setToast] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(true);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [blockReason, setBlockReason] = useState('');
+  const [isBlocking, setIsBlocking] = useState(false);
 
   useEffect(() => {
     fetchReports();
@@ -29,12 +32,11 @@ export default function PendingReports() {
     }
   };
 
-  const handleDelete = async (id, referralId) => {
+  const handleDelete = async (id) => {
     if (!confirm(t('reports.deleteReferralConfirm'))) return;
 
     try {
-      await api.post(`/api/notifications/warnDeletedReferral/${id}`);
-      await referralService.delete(referralId);
+      await api.delete(`/api/reports/${id}/delete-referral`);
       setToast({ message: t('reports.referralDeleted'), type: 'success' });
       fetchReports();
     } catch (err) {
@@ -53,15 +55,50 @@ export default function PendingReports() {
     }
   };
 
-  const handleWarn = async (id) => {
+  const handleBlockUser = async () => {
+    if (!selectedUser) return;
+
     try {
-      await api.post(`/api/notifications/warn/${id}`);
-      setToast({ message: t('reports.ownerNotified'), type: 'success' });
+      setIsBlocking(true);
+      const isBlocked = !selectedUser.isBlocked;
+
+      await api.put(`/api/admin/users/${selectedUser._id}/block`, {
+        isBlocked,
+        reason: blockReason
+      });
+
+      setToast({
+        message: isBlocked ? 'Utilisateur bloqué avec succès' : 'Utilisateur débloqué avec succès',
+        type: 'success'
+      });
+
+      // Update reports with new blocked status
+      setReports(reports.map(report => {
+        if (report.referralId?.user?._id === selectedUser._id) {
+          return {
+            ...report,
+            referralId: {
+              ...report.referralId,
+              user: {
+                ...report.referralId.user,
+                isBlocked
+              }
+            }
+          };
+        }
+        return report;
+      }));
+
+      setShowBlockModal(false);
+      setBlockReason('');
+      setSelectedUser(null);
     } catch (err) {
-      console.error(err);
-      setToast({ message: err.message || t('reports.errorSending'), type: 'error' });
+      setToast({ message: err.message || 'Erreur lors du blocage', type: 'error' });
+    } finally {
+      setIsBlocking(false);
     }
   };
+
 
   const columns = [
     {
@@ -70,10 +107,31 @@ export default function PendingReports() {
       accessor: (report) => report.referralId?.user?.username || t('errors.unknown'),
       render: (report) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          <div className="avatar avatar-sm">
-            {(report.referralId?.user?.username || 'U')[0].toUpperCase()}
+          {report.referralId?.user?.profilePhoto ? (
+            <img
+              src={`${import.meta.env.VITE_API_URL}${report.referralId.user.profilePhoto}`}
+              alt={report.referralId.user.username}
+              className="avatar avatar-sm"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                objectFit: 'cover'
+              }}
+            />
+          ) : (
+            <div className="avatar avatar-sm">
+              {(report.referralId?.user?.username || 'U')[0].toUpperCase()}
+            </div>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+            <span>{report.referralId?.user?.username || t('errors.unknown')}</span>
+            {report.referralId?.user?.isBlocked && (
+              <span className="badge badge-error" style={{ fontSize: 'var(--font-size-xs)', padding: 'var(--space-1) var(--space-2)' }}>
+                <FaBan size={8} /> Bloqué
+              </span>
+            )}
           </div>
-          <span>{report.referralId?.user?.username || t('errors.unknown')}</span>
         </div>
       )
     },
@@ -148,9 +206,20 @@ export default function PendingReports() {
       header: t('reports.actions'),
       sortable: false,
       align: 'center',
-      width: '180px',
+      width: '150px',
       render: (report) => (
         <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center' }}>
+          <button
+            onClick={() => {
+              setSelectedUser(report.referralId?.user);
+              setShowBlockModal(true);
+            }}
+            className={`btn-sm ${report.referralId?.user?.isBlocked ? 'btn-success' : 'btn-warning'}`}
+            title={report.referralId?.user?.isBlocked ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur'}
+            disabled={!report.referralId?.user}
+          >
+            <FaBan size={12} />
+          </button>
           <button
             onClick={() => handleIgnore(report._id)}
             className="btn-sm btn-success"
@@ -159,18 +228,7 @@ export default function PendingReports() {
             <FaCheck size={12} />
           </button>
           <button
-            onClick={() => handleWarn(report._id)}
-            className="btn-sm"
-            style={{
-              backgroundColor: 'var(--color-warning-500)',
-              color: 'white'
-            }}
-            title={t('reports.warnOwner')}
-          >
-            <FaExclamationTriangle size={12} />
-          </button>
-          <button
-            onClick={() => handleDelete(report._id, report.referralId._id)}
+            onClick={() => handleDelete(report._id)}
             className="btn-sm btn-danger"
             title={t('common.delete')}
           >
@@ -222,6 +280,69 @@ export default function PendingReports() {
           pageSize={10}
           emptyMessage={t('reports.noPendingReports')}
         />
+      )}
+
+      {/* Block User Modal */}
+      {showBlockModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowBlockModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                {selectedUser.isBlocked ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur'}
+              </h2>
+            </div>
+            <div className="modal-body">
+              <p style={{ marginBottom: 'var(--space-4)' }}>
+                {selectedUser.isBlocked
+                  ? `Êtes-vous sûr de vouloir débloquer "${selectedUser.username}" ? Il pourra à nouveau accéder à son compte.`
+                  : `Êtes-vous sûr de vouloir bloquer "${selectedUser.username}" ? Toutes ses actions seront désactivées.`}
+              </p>
+              {!selectedUser.isBlocked && (
+                <div className="form-group">
+                  <label htmlFor="blockReason">Raison (optionnel)</label>
+                  <textarea
+                    id="blockReason"
+                    value={blockReason}
+                    onChange={(e) => setBlockReason(e.target.value)}
+                    placeholder="Raison du blocage..."
+                    rows="4"
+                    className="form-input"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button
+                onClick={() => {
+                  setShowBlockModal(false);
+                  setBlockReason('');
+                  setSelectedUser(null);
+                }}
+                className="btn-secondary"
+                disabled={isBlocking}
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleBlockUser}
+                className={selectedUser.isBlocked ? 'btn-success' : 'btn-warning'}
+                disabled={isBlocking}
+              >
+                {isBlocking ? (
+                  'Traitement...'
+                ) : selectedUser.isBlocked ? (
+                  <>
+                    <FaCheck /> Débloquer
+                  </>
+                ) : (
+                  <>
+                    <FaBan /> Bloquer
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

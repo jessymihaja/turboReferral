@@ -9,11 +9,13 @@ const {
   getAllReports,
   getPendingReports,
   ignoreReport,
+  deleteReferral,
 } = require('../controllers/reportController');
 
 router.post('/', authenticateToken, reportValidators.create, createReport);
 router.get('/', adminAuthMiddleware, getAllReports);
 router.get('/pending', adminAuthMiddleware, getPendingReports);
 router.put('/:id/ignore', adminAuthMiddleware, idValidator, ignoreReport);
+router.delete('/:id/delete-referral', adminAuthMiddleware, idValidator, deleteReferral);
 
 module.exports = router;

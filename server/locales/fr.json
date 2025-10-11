@@ -49,7 +49,8 @@
     "usernameOrEmailInUse": "Nom d'utilisateur ou email déjà utilisé",
     "userCreated": "Utilisateur créé avec succès",
     "invalidCredentials": "Identifiants invalides",
-    "loginSuccessful": "Connexion réussie"
+    "loginSuccessful": "Connexion réussie",
+    "accountBlocked": "Votre compte a été bloqué. Veuillez contacter l'administrateur."
   },
   "category": {
     "categoryCreated": "Catégorie créée avec succès",
@@ -87,7 +88,9 @@
     "reportUpdated": "Signalement mis à jour avec succès",
     "reportDeleted": "Signalement supprimé avec succès",
     "reportNotFound": "Signalement introuvable",
-    "alreadyReported": "Vous avez déjà signalé ce parrainage"
+    "alreadyReported": "Vous avez déjà signalé ce parrainage",
+    "warningNotificationSent": "Avertissement envoyé à l'utilisateur avec succès",
+    "referralDeletedAndNotificationSent": "Parrainage supprimé et notification envoyée avec succès"
   },
   "notification": {
     "notificationCreated": "Notification créée avec succès",
@@ -107,5 +110,11 @@
     "serviceRequestCreated": "Demande de service créée avec succès",
     "serviceRequestDeleted": "Demande de service supprimée avec succès",
     "serviceRequestNotFound": "Demande de service introuvable"
+  },
+  "user": {
+    "userNotFound": "Utilisateur introuvable",
+    "userBlocked": "Utilisateur bloqué avec succès",
+    "userUnblocked": "Utilisateur débloqué avec succès",
+    "userDeleted": "Utilisateur supprimé avec succès"
   }
 }

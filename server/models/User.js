@@ -31,6 +31,18 @@ const userSchema = new mongoose.Schema({
     enum: Object.values(ROLES),
     default: ROLES.USER,
   },
+  deletedReferralsCount: {
+    type: Number,
+    default: 0,
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  profilePhoto: {
+    type: String,
+    default: null,
+  },
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

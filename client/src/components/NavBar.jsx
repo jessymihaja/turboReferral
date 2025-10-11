@@ -13,6 +13,8 @@ import {
   FaChevronDown,
   FaBars,
   FaTimes,
+  FaUsers,
+  FaCog,
 } from 'react-icons/fa';
 import NotificationIcon from './NotificationIcon';
 import { useTranslation } from 'react-i18next';
@@ -142,6 +144,17 @@ const Navbar = ({ user, logout }) => {
                         <FaExclamationTriangle />
                         <span>{t('common.reports')}</span>
                       </Link>
+                      <Link
+                        to="/admin/users"
+                        style={styles.dropdownItem}
+                        onClick={() => {
+                          setAdminMenuOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <FaUsers />
+                        <span>Utilisateurs</span>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -155,7 +168,9 @@ const Navbar = ({ user, logout }) => {
           {user ? (
             <>
               <NotificationIcon />
-              <span style={styles.email}>{user.email}</span>
+              <Link to="/profile" style={styles.iconButton} title="Paramètres">
+                <FaCog style={{ fontSize: '18px', color: '#333' }} />
+              </Link>
               <button
                 onClick={() => {
                   logout();
@@ -270,14 +285,17 @@ const styles = {
     alignItems: 'center',
     gap: 'var(--space-md)',
   },
-  email: {
-    fontWeight: 'var(--font-weight-medium)',
-    fontSize: 'var(--font-size-sm)',
+  iconButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
     color: 'var(--color-text-secondary)',
-    maxWidth: '180px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    textDecoration: 'none',
+    transition: 'all var(--transition-base)',
+    backgroundColor: 'transparent',
   },
   logoutButton: {
     display: 'flex',
@@ -394,13 +412,18 @@ if (typeof window !== 'undefined') {
       background-color: var(--color-bg-hover);
       color: var(--color-primary);
     }
-    
+
+    nav a[title="Paramètres"]:hover {
+      background-color: var(--color-bg-hover);
+      color: var(--color-primary);
+    }
+
     nav .logoutButton:hover {
       background-color: var(--color-primary-dark);
       transform: translateY(-1px);
       box-shadow: var(--shadow-sm);
     }
-    
+
     nav .authButton:hover {
       background-color: var(--color-primary-dark);
       transform: translateY(-1px);

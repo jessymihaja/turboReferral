@@ -4,9 +4,17 @@ import { formatDistanceToNow, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale'; // Pour avoir le résultat en français
 import { FaClock } from 'react-icons/fa';
 
-function TimeAgo({ isoDateString }) {
+function TimeAgo({ isoDateString, date }) {
+  // Utiliser soit isoDateString soit date
+  const dateString = isoDateString || date;
+
+  // Si pas de date fournie, retourner un placeholder
+  if (!dateString) {
+    return <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>—</span>;
+  }
+
   // Convertir la chaîne ISO en objet Date
-  const dateObj = parseISO(isoDateString);
+  const dateObj = parseISO(dateString);
 
   // Utiliser un état pour mettre à jour le temps passé (facultatif, mais utile pour des mises à jour régulières)
   const [timeAgo, setTimeAgo] = useState('');

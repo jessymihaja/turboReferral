@@ -3,6 +3,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
 const { t } = require('../utils/i18n');
+const { optimizeServiceLogo, deleteImageVariants } = require('../utils/imageOptimizer');
 
 exports.getAllServices = asyncHandler(async (req, res) => {
   const services = await Service.find({ isValidated: true }).populate('category');
@@ -22,7 +23,8 @@ exports.createService = asyncHandler(async (req, res) => {
 
   let logo = '';
   if (req.file) {
-    logo = `/uploads/logos/${req.file.filename}`;
+    const optimizedImages = await optimizeServiceLogo(req.file.path, req.file.filename);
+    logo = optimizedImages.original;
   }
 
   const existing = await Service.findOne({ name });
@@ -89,18 +91,21 @@ exports.setServiceValidation = asyncHandler(async (req, res) => {
 exports.updateService = asyncHandler(async (req, res) => {
   const updates = req.body;
 
-  if (req.file) {
-    updates.logo = `/uploads/logos/${req.file.filename}`;
-  }
-
-  const service = await Service.findByIdAndUpdate(req.params.id, updates, {
-    new: true,
-    runValidators: true,
-  });
-
+  const service = await Service.findById(req.params.id);
   if (!service) {
     throw new AppError(t('service.serviceNotFound'), 404);
   }
+
+  if (req.file) {
+    if (service.logo) {
+      await deleteImageVariants(service.logo);
+    }
+    const optimizedImages = await optimizeServiceLogo(req.file.path, req.file.filename);
+    updates.logo = optimizedImages.original;
+  }
+
+  Object.assign(service, updates);
+  await service.save();
 
   ResponseHandler.success(res, service, t('service.serviceUpdated'));
 });

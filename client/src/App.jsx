@@ -16,6 +16,9 @@ import Notifications from './pages/Notifications';
 import Footer from './components/Footer';
 import AdminReferralsPage from './components/AdminReferralsPage';
 import PolitiqueConfidentialité from './pages/PolitiqueConfidentialité';
+import UsersManagement from './pages/UsersManagement';
+import UserDetails from './pages/UserDetails';
+import Profile from './pages/Profile';
 import './App.css';
 
 function NavbarComp() {
@@ -56,6 +59,30 @@ function App() {
         <Route path='/categories' element={<CategoryForm />} />
         <Route path='/pending-reports' element={<PendingReports />} />
         <Route path='/admin/referrals' element={<AdminReferralsPage />} />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <UsersManagement />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:id"
+          element={
+            <AdminRoute>
+              <UserDetails />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       <Footer />
     </UserProvider>
