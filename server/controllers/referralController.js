@@ -8,6 +8,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
 const { t } = require('../utils/i18n');
+const badgeService = require('../services/badgeService');
 
 exports.getAllReferrals = asyncHandler(async (req, res) => {
   const referrals = await Referral.find().populate('service user');
@@ -42,6 +43,8 @@ exports.createReferral = asyncHandler(async (req, res) => {
   await referral.save();
   await referral.populate('service');
 
+  await badgeService.updateUserBadges(user);
+
   ResponseHandler.created(res, referral, t('referral.referralCreated'));
 });
 
@@ -59,10 +62,14 @@ exports.deleteReferral = asyncHandler(async (req, res) => {
     throw new AppError(t('referral.cannotDeleteOthersReferral'), 403);
   }
 
+  const referralUserId = referral.user;
+
   await Notification.deleteMany({ referral: referral._id });
   await ReferralVote.deleteMany({ referral: referral._id });
   await Report.deleteMany({ referralId: referral._id });
   await Referral.deleteOne({ _id: referral._id });
+
+  await badgeService.updateUserBadges(referralUserId);
 
   ResponseHandler.success(res, null, t('referral.referralDeleted'));
 });

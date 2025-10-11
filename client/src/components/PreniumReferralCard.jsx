@@ -2,8 +2,9 @@ import { FaComment, FaThumbsUp, FaThumbsDown, FaCrown, FaCopy, FaCheck, FaExtern
 import TimeAgo from "./TimeAgo";
 import ReferralVoteForm from "./ReferralVoteForm";
 import ReportReferral from "./ReportReferral";
+import BadgeDisplay from "./BadgeDisplay";
 import { useEffect, useState } from "react";
-import { voteService } from '../services';
+import { voteService, badgeService } from '../services';
 import { useTranslation } from 'react-i18next';
 
 export default function PremiumReferralCard({ ref, onComment, user }) {
@@ -11,6 +12,7 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
   const [voteData, setVoteData] = useState({ upvotes: 0, downvotes: 0, totalVotes: 0 });
   const [copiedCode, setCopiedCode] = useState(false);
   const [openVoteForm, setOpenVoteForm] = useState(null);
+  const [badges, setBadges] = useState([]);
 
   useEffect(() => {
     async function fetchVotes() {
@@ -26,8 +28,22 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
         console.error("Erreur lors de la récupération des votes :", error);
       }
     }
+
+    async function fetchBadges() {
+      try {
+        if (ref.user && ref.user._id) {
+          const data = await badgeService.getUserBadges(ref.user._id);
+          const badgesArray = data.data || [];
+          setBadges(badgesArray);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des badges :", error);
+      }
+    }
+
     fetchVotes();
-  }, [ref._id]);
+    fetchBadges();
+  }, [ref._id, ref.user]);
 
   async function refreshVotes() {
     try {
@@ -222,11 +238,14 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
             {(ref.user?.username?.charAt(0).toUpperCase() || "?")}
           </span>
           <div>
-            <div style={{ fontWeight: "600", color: "#2c3e50" }}>
-              {ref.user?.username
-                ? ref.user.username.charAt(0).toUpperCase() +
-                  ref.user.username.slice(1).toLowerCase()
-                : ref.user}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+              <span style={{ fontWeight: "600", color: "#2c3e50" }}>
+                {ref.user?.username
+                  ? ref.user.username.charAt(0).toUpperCase() +
+                    ref.user.username.slice(1).toLowerCase()
+                  : ref.user}
+              </span>
+              <BadgeDisplay badges={badges} size="small" />
             </div>
             <small style={{ color: "#7f8c8d" }}>
               <TimeAgo isoDateString={ref.createdAt} />

@@ -1,10 +1,12 @@
 const ReferralVote = require('../models/ReferralVote');
+const Referral = require('../models/Referral');
 const mongoose = require('mongoose');
 const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
 const { VOTE_TYPES } = require('../config/constants');
 const { t } = require('../utils/i18n');
+const badgeService = require('../services/badgeService');
 
 exports.submitVote = asyncHandler(async (req, res) => {
   const { referralId } = req.params;
@@ -31,6 +33,12 @@ exports.submitVote = asyncHandler(async (req, res) => {
   });
 
   await newVote.save();
+
+  const referral = await Referral.findById(referralId);
+  if (referral) {
+    await badgeService.updateUserBadges(referral.user);
+  }
+
   ResponseHandler.created(res, null, t('vote.voteRecorded'));
 });
 
@@ -136,6 +144,11 @@ exports.deleteVote = asyncHandler(async (req, res) => {
 
   if (!deletedVote) {
     throw new AppError(t('vote.noVoteFound'), 404);
+  }
+
+  const referral = await Referral.findById(referralId);
+  if (referral) {
+    await badgeService.updateUserBadges(referral.user);
   }
 
   ResponseHandler.success(res, null, t('vote.voteDeleted'));

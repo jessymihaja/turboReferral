@@ -11,7 +11,8 @@ import CommentModal from '../components/CommentModal';
 import CustomToast from '../components/CustomToast';
 import ReportReferral from '../components/ReportReferral';
 import PreniumReferralCard from '../components/PreniumReferralCard';
-import { serviceService, referralService, voteService } from '../services';
+import BadgeDisplay from '../components/BadgeDisplay';
+import { serviceService, referralService, voteService, badgeService } from '../services';
 import api from '../services/api';
 import { useTranslation } from 'react-i18next';
 import styles from './ServiceDetail.module.css';
@@ -35,7 +36,8 @@ export default function ServiceDetail() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [openVoteForm, setOpenVoteForm] = useState(null); // { referralId, voteType }
+  const [openVoteForm, setOpenVoteForm] = useState(null);
+  const [userBadges, setUserBadges] = useState({});
 
   useEffect(() => {
     async function fetchData() {
@@ -132,7 +134,7 @@ export default function ServiceDetail() {
     try {
       const avgData = await voteService.getAllAverages();
       const averages = avgData.data || avgData;
-      
+
       setReferrals(prev => prev.map(ref => ({
         ...ref,
         upvotes: averages[ref._id]?.upvotes ?? 0,
@@ -143,6 +145,29 @@ export default function ServiceDetail() {
       console.error('Error refreshing vote counts:', err);
     }
   }
+
+  async function fetchUserBadges(userId) {
+    if (!userId || userBadges[userId]) return;
+
+    try {
+      const data = await badgeService.getUserBadges(userId);
+      const badgesArray = data.data || [];
+      setUserBadges(prev => ({
+        ...prev,
+        [userId]: badgesArray
+      }));
+    } catch (err) {
+      console.error('Error fetching badges:', err);
+    }
+  }
+
+  useEffect(() => {
+    referrals.forEach(ref => {
+      if (ref.user?._id) {
+        fetchUserBadges(ref.user._id);
+      }
+    });
+  }, [referrals]);
 
   const hasReferralForUser = user
     ? referrals.some(ref => ref.user?.username === user.username || ref.user === user.username)
@@ -487,10 +512,15 @@ export default function ServiceDetail() {
                       </div>
                     )}
                     <div>
-                      <div style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
-                        {ref.user?.username
-                          ? ref.user.username.charAt(0).toUpperCase() + ref.user.username.slice(1).toLowerCase()
-                          : ref.user}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
+                          {ref.user?.username
+                            ? ref.user.username.charAt(0).toUpperCase() + ref.user.username.slice(1).toLowerCase()
+                            : ref.user}
+                        </span>
+                        {ref.user?._id && userBadges[ref.user._id] && (
+                          <BadgeDisplay badges={userBadges[ref.user._id]} size="small" />
+                        )}
                       </div>
                       <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-tertiary)' }}>
                         <TimeAgo isoDateString={ref.createdAt} />

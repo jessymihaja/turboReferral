@@ -351,7 +351,7 @@ exports.getUserDetails = asyncHandler(async (req, res) => {
 
 exports.blockUser = asyncHandler(async (req, res) => {
   const userId = req.params.id;
-  const { isBlocked, reason } = req.body;
+  const { isBlocked } = req.body;
 
   const user = await User.findById(userId);
   if (!user) {

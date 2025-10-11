@@ -3,7 +3,8 @@ import { UserContext } from '../contexts/UserContext';
 import { FaTrash, FaPlus, FaFileUpload, FaLink, FaCode, FaInbox, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaExclamationTriangle } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import CustomToast from '../components/CustomToast';
-import { referralService, categoryService, serviceService } from '../services';
+import BadgeDisplay from '../components/BadgeDisplay';
+import { referralService, categoryService, serviceService, badgeService } from '../services';
 import { compressServiceLogo } from '../utils/imageCompressor';
 import './Dashboard.css';
 
@@ -33,6 +34,9 @@ export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
   const [formLoading, setFormLoading] = useState(false);
+
+  // Badges state
+  const [badges, setBadges] = useState([]);
 
   const loadMoreReferrals = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
@@ -92,8 +96,18 @@ export default function Dashboard() {
       }
     }
 
+    async function fetchUserBadges() {
+      try {
+        const data = await badgeService.getUserBadges(user._id);
+        setBadges(data.data || []);
+      } catch (err) {
+        console.error('Error fetching badges:', err);
+      }
+    }
+
     fetchCategories();
     fetchUserReferrals();
+    fetchUserBadges();
   }, [user]);
 
   // Infinite scroll observer
@@ -229,7 +243,14 @@ export default function Dashboard() {
               {user.username.charAt(0).toUpperCase()}
             </div>
           )}
-          <h1>{user.username}</h1>
+          <div>
+            <h1>{user.username}</h1>
+            {badges.length > 0 && (
+              <div style={{ marginTop: '0.5rem' }}>
+                <BadgeDisplay badges={badges} size="medium" />
+              </div>
+            )}
+          </div>
         </div>
         <div className="stats">
           <span>{referrals.length} parrainage{referrals.length > 1 ? 's' : ''}</span>

@@ -43,7 +43,8 @@
     "descriptionMaxLength": "La description ne peut pas dépasser {{max}} caractères",
     "commentMaxLength": "Le commentaire ne peut pas dépasser {{max}} caractères",
     "titleRequired": "Le titre est requis",
-    "contentRequired": "Le contenu est requis"
+    "contentRequired": "Le contenu est requis",
+    "badgeTypeRequired": "Le type de badge est requis"
   },
   "auth": {
     "usernameOrEmailInUse": "Nom d'utilisateur ou email déjà utilisé",
@@ -116,5 +117,14 @@
     "userBlocked": "Utilisateur bloqué avec succès",
     "userUnblocked": "Utilisateur débloqué avec succès",
     "userDeleted": "Utilisateur supprimé avec succès"
+  },
+  "badge": {
+    "fetchSuccess": "Badges récupérés avec succès",
+    "updateSuccess": "Badges mis à jour avec succès",
+    "referral_10": "10 Parrainages",
+    "referral_50": "50 Parrainages",
+    "referral_100": "100 Parrainages",
+    "trusted": "Fiable",
+    "risky": "Risqué"
   }
 }

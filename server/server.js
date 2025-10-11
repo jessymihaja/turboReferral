@@ -16,6 +16,7 @@ const reportRoutes = require('./routes/reportRoute');
 const notificationRoutes = require('./routes/notificationRoute');
 const promReferralRoutes = require('./routes/promReferralRoute');
 const userRoutes = require('./routes/userRoute');
+const badgeRoutes = require('./routes/badgeRoute');
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/promotions', promReferralRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/badges', badgeRoutes);
 
 app.use(errorHandler);
 

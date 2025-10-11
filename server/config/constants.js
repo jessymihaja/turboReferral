@@ -38,4 +38,20 @@ module.exports = {
     MAX_DESCRIPTION_LENGTH: 100,
     URL_REGEX: /^https?:\/\/.+$/,
   },
+
+  BADGE_TYPES: {
+    REFERRAL_10: 'referral_10',
+    REFERRAL_50: 'referral_50',
+    REFERRAL_100: 'referral_100',
+    TRUSTED: 'trusted',
+    RISKY: 'risky',
+  },
+
+  BADGE_THRESHOLDS: {
+    REFERRAL_10: 10,
+    REFERRAL_50: 50,
+    REFERRAL_100: 100,
+    TRUSTED_VOTE_PERCENT: 50,
+    RISKY_VOTE_PERCENT: 50,
+  },
 };
