@@ -6,6 +6,7 @@ import api from '../services/api';
 import { referralService } from '../services';
 import { useTranslation } from 'react-i18next';
 import './AdminReferrals.css';
+import AdminLayout from './AdminLayout';
 
 export default function AdminReferralsPage() {
   const { t } = useTranslation();
@@ -274,12 +275,10 @@ export default function AdminReferralsPage() {
 
   if (loading) {
     return (
-      <div className="page-container admin-referrals-page">
-        <div className="page-header">
-          <h1 className="page-title">{t('admin.referralsManagement')}</h1>
-          <p className="page-subtitle">{t('admin.manageReferralsDesc')}</p>
-        </div>
-
+      <AdminLayout
+        title={t('admin.referralsManagement')}
+        subtitle={t('admin.manageReferralsDesc')}
+      >
         <div className="referrals-stats-grid">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="referrals-skeleton-card">
@@ -293,17 +292,15 @@ export default function AdminReferralsPage() {
         <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
           <div className="spinner" />
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="page-container admin-referrals-page">
-      <div className="page-header">
-        <h1 className="page-title">{t('admin.referralsManagement')}</h1>
-        <p className="page-subtitle">{t('admin.manageReferralsDesc')}</p>
-      </div>
-
+    <AdminLayout
+      title={t('admin.referralsManagement')}
+      subtitle={t('admin.manageReferralsDesc')}
+    >
       <div className="referrals-stats-grid">
         <div className="referrals-stat-card">
           <div className="referrals-stat-header">
@@ -414,7 +411,7 @@ export default function AdminReferralsPage() {
           }}
         />
       )}
-    </div>
+    </AdminLayout>
   );
 }
 

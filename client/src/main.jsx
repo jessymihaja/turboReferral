@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
+import './assets/css/enhanced-styles.css'
 import './i18n/config';
 import App from './App';
 

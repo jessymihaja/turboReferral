@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUsers, FaEye, FaBan, FaCheck, FaSearch, FaFilter } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import AdminLayout from '../components/AdminLayout';
 import Table from '../components/Table';
 import api from '../services/api';
 import CustomToast from '../components/CustomToast';
@@ -159,13 +160,14 @@ export default function UsersManagement() {
   }
 
   return (
-    <div className="page-container users-management">
-      <div className="page-header">
-        <h1 className="page-title">
-          <FaUsers /> Gestion des utilisateurs
-        </h1>
-        <p className="page-subtitle">Gérer et modérer les utilisateurs de la plateforme</p>
-      </div>
+      <AdminLayout
+        title={
+          <>
+            <FaUsers /> Gestion des utilisateurs
+          </>
+        }
+        subtitle="Gérer et modérer les utilisateurs de la plateforme"
+      >
 
       <div className="filters-section">
         <div className="filter-group">
@@ -250,6 +252,6 @@ export default function UsersManagement() {
           </button>
         </div>
       )}
-    </div>
+     </AdminLayout>
   );
 }

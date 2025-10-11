@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FaCheck, FaEdit, FaBox, FaExclamationCircle, FaUsers, FaChartLine, FaStar, FaLink, FaCode, FaTrophy, FaPlus } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import AdminLayout from "../components/AdminLayout";
 import Table from "../components/Table";
 import ModalUpdateService from "../components/ModalUpdateService";
 import ModalValidateService from "../components/ModalValidateService";
@@ -228,11 +229,11 @@ export default function AdminDashboard() {
   })) || [];
 
   return (
-    <div className="page-container admin-dashboard">
-      <div className="page-header">
-        <h1 className="page-title">{t('admin.adminDashboard')}</h1>
-        <p className="page-subtitle">{t('admin.overviewAnalytics')}</p>
-      </div>
+    <AdminLayout
+      title={t('admin.adminDashboard')}
+      subtitle={t('admin.overviewAnalytics')}
+    >
+      <div className="admin-dashboard">
 
       {/* Main Stats */}
       <div className="admin-stats-grid">
@@ -504,7 +505,8 @@ export default function AdminDashboard() {
           onAdded={handleServiceAdded}
         />
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
 

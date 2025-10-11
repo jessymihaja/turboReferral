@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaCheck, FaTrash, FaEye, FaFlag, FaLink, FaCode, FaBan } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import AdminLayout from '../components/AdminLayout';
 import Table from '../components/Table';
 import CustomToast from '../components/CustomToast';
 import api from '../services/api';
@@ -240,7 +241,15 @@ export default function PendingReports() {
   ];
 
   return (
-    <div className="page-container">
+      <AdminLayout
+        title={
+          <>
+            <FaFlag style={{ display: 'inline', marginRight: 'var(--space-2)' }} />
+            {t('reports.pendingReports')}
+          </>
+        }
+        subtitle={t('reports.reviewAndModerate')}
+      >
       {toast.message && (
         <CustomToast
           message={toast.message}
@@ -249,13 +258,6 @@ export default function PendingReports() {
         />
       )}
 
-      <div className="page-header">
-        <h1 className="page-title">
-          <FaFlag style={{ display: 'inline', marginRight: 'var(--space-2)' }} />
-          {t('reports.pendingReports')}
-        </h1>
-        <p className="page-subtitle">{t('reports.reviewAndModerate')}</p>
-      </div>
 
       <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
         <div className="stat-card">
@@ -344,6 +346,6 @@ export default function PendingReports() {
           </div>
         </div>
       )}
-    </div>
+      </AdminLayout>
   );
 }

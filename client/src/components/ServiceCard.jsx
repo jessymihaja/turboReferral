@@ -123,7 +123,7 @@ export default function ServiceCard({ service }) {
             whileHover={{ x: 2 }}
             transition={{ duration: 0.2 }}
           >
-            <FaArrowRight size={12} style={{ color: 'var(--color-primary)' }} />
+            <FaArrowRight size={12} style={{ color: 'var(--color-primary-600)' }} />
           </motion.div>
         </motion.div>
       </motion.div>

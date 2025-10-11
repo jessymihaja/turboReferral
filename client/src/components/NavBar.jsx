@@ -22,7 +22,6 @@ import { useTranslation } from 'react-i18next';
 
 const Navbar = ({ user, logout }) => {
   const { t } = useTranslation();
-  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -85,79 +84,10 @@ const Navbar = ({ user, logout }) => {
               </Link>
               
               {user.role === 'admin' && (
-                <div style={styles.dropdownContainer}>
-                  <button
-                    onClick={() => setAdminMenuOpen(prev => !prev)}
-                    style={styles.adminLink}
-                    title={t('common.admin')}
-                  >
-                    <FaTools />
-                    <span style={styles.linkText}>{t('common.admin')}</span>
-                    <FaChevronDown style={{
-                      ...styles.chevron,
-                      transform: adminMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)'
-                    }} />
-                  </button>
-                  {adminMenuOpen && (
-                    <div style={styles.dropdownMenu}>
-                      <Link
-                        to="/admin"
-                        style={styles.dropdownItem}
-                        onClick={() => {
-                          setAdminMenuOpen(false);
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <FaTools />
-                        <span>{t('common.dashboard')}</span>
-                      </Link>
-                      <Link
-                        to="/admin/referrals"
-                        style={styles.dropdownItem}
-                        onClick={() => {
-                          setAdminMenuOpen(false);
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <FaChartBar />
-                        <span>{t('common.referrals')}</span>
-                      </Link>
-                      <Link
-                        to="/categories"
-                        style={styles.dropdownItem}
-                        onClick={() => {
-                          setAdminMenuOpen(false);
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <FaLightbulb />
-                        <span>{t('common.categories')}</span>
-                      </Link>
-                      <Link
-                        to="/pending-reports"
-                        style={styles.dropdownItem}
-                        onClick={() => {
-                          setAdminMenuOpen(false);
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <FaExclamationTriangle />
-                        <span>{t('common.reports')}</span>
-                      </Link>
-                      <Link
-                        to="/admin/users"
-                        style={styles.dropdownItem}
-                        onClick={() => {
-                          setAdminMenuOpen(false);
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <FaUsers />
-                        <span>Utilisateurs</span>
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                <Link to="/admin" style={styles.link} title={t('common.admin')}>
+                  <FaTools />
+                  <span style={styles.linkText}>{t('common.admin')}</span>
+                </Link>
               )}
             </>
           )}

@@ -18,14 +18,25 @@ export default function Footer() {
         overflow: "hidden"
       }}
     >
-      {/* Decorative gradient overlay */}
+      {/* Decorative gradient overlay (light, atténué) */}
       <div style={{
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        background: "radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)",
+        background: "radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)",
+        pointerEvents: "none"
+      }} />
+
+      {/* Overlay sombre pour renforcer le contraste du texte */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "linear-gradient(180deg, rgba(0,0,0,0.24) 0%, rgba(0,0,0,0.28) 55%, rgba(0,0,0,0.34) 100%)",
         pointerEvents: "none"
       }} />
 
@@ -52,12 +63,16 @@ export default function Footer() {
             color: "var(--color-text-inverse)",
             marginBottom: "var(--space-sm)",
             fontSize: "var(--font-size-xl)",
-            fontWeight: "var(--font-weight-bold)"
+            fontWeight: "var(--font-weight-bold)",
+            textShadow: "0 1px 2px rgba(0,0,0,0.45)"
           }}>turboReferral</h2>
           <p style={{
-            fontSize: "var(--font-size-sm)",
-            opacity: 0.9,
-            lineHeight: "var(--line-height-relaxed)"
+            fontSize: "var(--font-size-base)",
+            color: "var(--color-text-inverse)",
+            lineHeight: "var(--line-height-relaxed)",
+            letterSpacing: "0.2px",
+            margin: 0,
+            textShadow: "0 1px 2px rgba(0,0,0,0.35)"
           }}>
             {t('footer.tagline')}
           </p>
@@ -73,7 +88,9 @@ export default function Footer() {
           <h3 style={{
             marginBottom: "var(--space-md)",
             fontSize: "var(--font-size-base)",
-            fontWeight: "var(--font-weight-semibold)"
+            fontWeight: "var(--font-weight-semibold)",
+            color: "var(--color-text-inverse)",
+            textShadow: "0 1px 2px rgba(0,0,0,0.35)"
           }}>{t('footer.links')}</h3>
           <ul style={{ listStyle: "none", padding: 0, lineHeight: "2" }}>
             <li>
@@ -81,10 +98,20 @@ export default function Footer() {
                 <Link to="/" style={{
                   color: "var(--color-text-inverse)",
                   textDecoration: "none",
-                  opacity: 0.8,
-                  fontSize: "var(--font-size-sm)",
-                  transition: "opacity var(--transition-base)"
-                }}>{t('footer.home')}</Link>
+                  fontSize: "var(--font-size-base)",
+                  fontWeight: "var(--font-weight-medium)",
+                  position: "relative",
+                  transition: "color var(--transition-base)"
+                }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = 'none';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.25)';
+                    e.currentTarget.style.borderRadius = '8px';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >{t('footer.home')}</Link>
               </motion.div>
             </li>
             <li>
@@ -92,10 +119,62 @@ export default function Footer() {
                 <Link to="/politique-confidentialite" style={{
                   color: "var(--color-text-inverse)",
                   textDecoration: "none",
-                  opacity: 0.8,
-                  fontSize: "var(--font-size-sm)",
-                  transition: "opacity var(--transition-base)"
-                }}>{t('footer.privacy')}</Link>
+                  fontSize: "var(--font-size-base)",
+                  fontWeight: "var(--font-weight-medium)",
+                  position: "relative",
+                  transition: "color var(--transition-base)"
+                }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = 'none';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.25)';
+                    e.currentTarget.style.borderRadius = '8px';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >Confidentialités</Link>
+              </motion.div>
+            </li>
+            <li>
+              <motion.div whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                <Link to="/mentions-legales" style={{
+                  color: "var(--color-text-inverse)",
+                  textDecoration: "none",
+                  fontSize: "var(--font-size-base)",
+                  fontWeight: "var(--font-weight-medium)",
+                  position: "relative",
+                  transition: "color var(--transition-base)"
+                }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = 'none';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.25)';
+                    e.currentTarget.style.borderRadius = '8px';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >Mentions légales</Link>
+              </motion.div>
+            </li>
+            <li>
+              <motion.div whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                <Link to="/conditions-generales" style={{
+                  color: "var(--color-text-inverse)",
+                  textDecoration: "none",
+                  fontSize: "var(--font-size-base)",
+                  fontWeight: "var(--font-weight-medium)",
+                  position: "relative",
+                  transition: "color var(--transition-base)"
+                }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = 'none';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.25)';
+                    e.currentTarget.style.borderRadius = '8px';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >Conditions Générales d'Utilisation</Link>
               </motion.div>
             </li>
           </ul>
@@ -111,14 +190,16 @@ export default function Footer() {
           <h3 style={{
             marginBottom: "var(--space-md)",
             fontSize: "var(--font-size-base)",
-            fontWeight: "var(--font-weight-semibold)"
+            fontWeight: "var(--font-weight-semibold)",
+            color: "var(--color-text-inverse)",
+            textShadow: "0 1px 2px rgba(0,0,0,0.35)"
           }}>{t('footer.connect')}</h3>
           <div style={{ display: "flex", gap: "var(--space-md)" }}>
             <motion.a
               href="#"
               style={{
                 color: "var(--color-text-inverse)",
-                opacity: 0.8,
+                opacity: 1,
                 transition: "opacity var(--transition-base)"
               }}
               whileHover={{ scale: 1.2, opacity: 1 }}
@@ -131,7 +212,7 @@ export default function Footer() {
               href="#"
               style={{
                 color: "var(--color-text-inverse)",
-                opacity: 0.8,
+                opacity: 1,
                 transition: "opacity var(--transition-base)"
               }}
               whileHover={{ scale: 1.2, opacity: 1 }}
@@ -144,7 +225,7 @@ export default function Footer() {
               href="#"
               style={{
                 color: "var(--color-text-inverse)",
-                opacity: 0.8,
+                opacity: 1,
                 transition: "opacity var(--transition-base)"
               }}
               whileHover={{ scale: 1.2, opacity: 1 }}
@@ -157,7 +238,7 @@ export default function Footer() {
               href="#"
               style={{
                 color: "var(--color-text-inverse)",
-                opacity: 0.8,
+                opacity: 1,
                 transition: "opacity var(--transition-base)"
               }}
               whileHover={{ scale: 1.2, opacity: 1 }}
@@ -178,14 +259,16 @@ export default function Footer() {
           paddingTop: "var(--space-lg)",
           textAlign: "center",
           fontSize: "var(--font-size-sm)",
-          opacity: 0.8,
+          opacity: 0.95,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "var(--space-xs)"
+          gap: "var(--space-xs)",
+          letterSpacing: "0.2px",
+          textShadow: "0 1px 2px rgba(0,0,0,0.35)"
         }}
       >
-        © {new Date().getFullYear()} TurboReferral • {t('footer.madeWith')} <FaHeart style={{ color: "var(--color-error)" }} />
+        © {new Date().getFullYear()} TurboReferral • Tous droits réservés
       </div>
     </footer>
   );

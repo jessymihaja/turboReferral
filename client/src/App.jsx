@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,6 +16,8 @@ import Notifications from './pages/Notifications';
 import Footer from './components/Footer';
 import AdminReferralsPage from './components/AdminReferralsPage';
 import PolitiqueConfidentialité from './pages/PolitiqueConfidentialité';
+import MentionsLegales from './pages/MentionsLegales';
+import ConditionsGenerales from './pages/ConditionsGenerales';
 import UsersManagement from './pages/UsersManagement';
 import UserDetails from './pages/UserDetails';
 import Profile from './pages/Profile';
@@ -30,9 +32,15 @@ function NavbarComp() {
 }
 
 function App() {
+  const location = useLocation();
+  const isAdminPath = (
+    /^\/admin(\/|$)/.test(location.pathname) ||
+    location.pathname.startsWith('/pending-reports') ||
+    location.pathname.startsWith('/categories')
+  );
   return (
     <UserProvider>
-      <NavbarComp />
+      {!isAdminPath && <NavbarComp />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
@@ -40,6 +48,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/politique-confidentialite" element={<PolitiqueConfidentialité />} />
+          <Route path="/mentions-legales" element={<MentionsLegales />} />
+          <Route path="/conditions-generales" element={<ConditionsGenerales />} />
         <Route
           path="/dashboard"
           element={
@@ -56,9 +66,9 @@ function App() {
             </AdminRoute>
           }
         />
-        <Route path='/categories' element={<CategoryForm />} />
-        <Route path='/pending-reports' element={<PendingReports />} />
-        <Route path='/admin/referrals' element={<AdminReferralsPage />} />
+  <Route path='/categories' element={<AdminRoute><CategoryForm /></AdminRoute>} />
+  <Route path='/pending-reports' element={<AdminRoute><PendingReports /></AdminRoute>} />
+  <Route path='/admin/referrals' element={<AdminRoute><AdminReferralsPage /></AdminRoute>} />
         <Route
           path="/admin/users"
           element={
@@ -84,7 +94,7 @@ function App() {
           }
         />
       </Routes>
-      <Footer />
+      {!isAdminPath && <Footer />}
     </UserProvider>
   );
 }

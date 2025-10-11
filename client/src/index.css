@@ -18,6 +18,37 @@
   --color-secondary: var(--color-primary-700);
   --color-accent: #D4AF87;
   
+    /* Vibrant accent colors for better UI */
+    --color-purple-50: #F8F6FF;
+    --color-purple-100: #E9E5FF;
+    --color-purple-500: #8B5CF6;
+    --color-purple-600: #7C3AED;
+    --color-purple-700: #6D28D9;
+  
+    --color-blue-50: #EFF6FF;
+    --color-blue-100: #DBEAFE;
+    --color-blue-500: #3B82F6;
+    --color-blue-600: #2563EB;
+    --color-blue-700: #1D4ED8;
+  
+    --color-emerald-50: #ECFDF5;
+    --color-emerald-100: #D1FAE5;
+    --color-emerald-500: #10B981;
+    --color-emerald-600: #059669;
+    --color-emerald-700: #047857;
+  
+    --color-orange-50: #FFF7ED;
+    --color-orange-100: #FFEDD5;
+    --color-orange-500: #F97316;
+    --color-orange-600: #EA580C;
+    --color-orange-700: #C2410C;
+  
+    --color-pink-50: #FDF2F8;
+    --color-pink-100: #FCE7F3;
+    --color-pink-500: #EC4899;
+    --color-pink-600: #DB2777;
+    --color-pink-700: #BE185D;
+  
   /* Neutral tones - Premium scale */
   --color-neutral-50: #FDFCFB;
   --color-neutral-100: #FAF8F5;
@@ -51,25 +82,25 @@
   --color-border-focus: var(--color-primary-500);
   
   /* Semantic colors - Modern professional */
-  --color-success-50: #F0F7EF;
-  --color-success-500: #7A9B76;
-  --color-success-600: #6A8A66;
-  --color-success-light: #E8F0E7;
+    --color-success-50: var(--color-emerald-50);
+    --color-success-500: var(--color-emerald-500);
+    --color-success-600: var(--color-emerald-600);
+    --color-success-light: var(--color-emerald-100);
   
-  --color-error-50: #FDF4F3;
-  --color-error-500: #C17A6F;
-  --color-error-600: #B06A5F;
-  --color-error-light: #F5E8E6;
+    --color-error-50: #FEF2F2;
+    --color-error-500: #EF4444;
+    --color-error-600: #DC2626;
+    --color-error-light: #FEE2E2;
   
-  --color-warning-50: #FDF8F0;
-  --color-warning-500: #D9A86A;
-  --color-warning-600: #C9985A;
-  --color-warning-light: #F9F0E5;
+    --color-warning-50: var(--color-orange-50);
+    --color-warning-500: var(--color-orange-500);
+    --color-warning-600: var(--color-orange-600);
+    --color-warning-light: var(--color-orange-100);
   
-  --color-info-50: #F2F6FA;
-  --color-info-500: #8BA9C1;
-  --color-info-600: #7B99B1;
-  --color-info-light: #E8EEF5;
+    --color-info-50: var(--color-blue-50);
+    --color-info-500: var(--color-blue-500);
+    --color-info-600: var(--color-blue-600);
+    --color-info-light: var(--color-blue-100);
   
   /* Spacing scale - 4px base */
   --space-0: 0;

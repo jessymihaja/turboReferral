@@ -92,8 +92,23 @@ export default function Table({
     <div className={`table-container ${className}`}>
       {searchable && (
         <div className="table-header">
-          <div className="table-search">
-            <FaSearch className="table-search-icon" size={14} />
+          <div
+            className="table-search"
+            style={{ position: 'relative', maxWidth: 360, width: '100%' }}
+          >
+            <FaSearch
+              className="table-search-icon"
+              size={14}
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--color-text-tertiary)',
+                pointerEvents: 'none',
+                zIndex: 1
+              }}
+            />
             <input
               type="text"
               placeholder={t('table.search')}
@@ -102,7 +117,9 @@ export default function Table({
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="table-search-input"
+              className="table-search-input input-field"
+              style={{ paddingLeft: '2.25rem', width: '100%' }}
+              aria-label={t('table.search')}
             />
           </div>
         </div>

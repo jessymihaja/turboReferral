@@ -1,0 +1,407 @@
+/* Enhanced styles with better colors */
+
+/* Button enhancements */
+.btn-primary,
+.auth-button {
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
+  border: none;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.btn-primary:hover,
+.auth-button:hover {
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--color-neutral-100) 0%, var(--color-neutral-200) 100%);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: all var(--transition-base);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, var(--color-neutral-200) 0%, var(--color-neutral-300) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Success button */
+.btn-success {
+  background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
+  border: none;
+  color: white;
+  transition: all var(--transition-base);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--color-success-600) 0%, var(--color-emerald-700) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Error/danger button */
+.btn-danger {
+  background: linear-gradient(135deg, var(--color-error-500) 0%, var(--color-error-600) 100%);
+  border: none;
+  color: white;
+  transition: all var(--transition-base);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, var(--color-error-600) 0%, #B91C1C 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Warning button */
+.btn-warning {
+  background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-600) 100%);
+  border: none;
+  color: white;
+  transition: all var(--transition-base);
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, var(--color-warning-600) 0%, var(--color-orange-700) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Info button */
+.btn-info {
+  background: linear-gradient(135deg, var(--color-info-500) 0%, var(--color-info-600) 100%);
+  border: none;
+  color: white;
+  transition: all var(--transition-base);
+}
+
+.btn-info:hover {
+  background: linear-gradient(135deg, var(--color-info-600) 0%, var(--color-blue-700) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Card enhancements */
+.card,
+.stat-card,
+.service-card {
+  background: linear-gradient(135deg, var(--color-bg-elevated) 0%, var(--color-neutral-50) 100%);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover,
+.stat-card:hover,
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-primary-300);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    var(--color-primary-500) 0%, 
+    var(--color-purple-500) 25%, 
+    var(--color-blue-500) 50%, 
+    var(--color-emerald-500) 75%, 
+    var(--color-orange-500) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.card:hover::before,
+.stat-card:hover::before,
+.service-card:hover::before {
+  opacity: 1;
+}
+
+/* Form input enhancements */
+.form-control,
+.input-field,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  transition: all var(--transition-base);
+  background: var(--color-bg-elevated);
+}
+
+.form-control:focus,
+.input-field:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: var(--focus-ring);
+  background: white;
+}
+
+/* Badge enhancements */
+.badge {
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--space-1) var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.badge-success {
+  background: linear-gradient(135deg, var(--color-success-100) 0%, var(--color-emerald-50) 100%);
+  color: var(--color-success-700);
+  border: 1px solid var(--color-success-200);
+}
+
+.badge-error {
+  background: linear-gradient(135deg, var(--color-error-light) 0%, var(--color-error-50) 100%);
+  color: var(--color-error-600);
+  border: 1px solid #FECACA;
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, var(--color-warning-light) 0%, var(--color-warning-50) 100%);
+  color: var(--color-warning-700);
+  border: 1px solid #FED7AA;
+}
+
+.badge-info {
+  background: linear-gradient(135deg, var(--color-info-light) 0%, var(--color-info-50) 100%);
+  color: var(--color-info-700);
+  border: 1px solid #BFDBFE;
+}
+
+.badge-purple {
+  background: linear-gradient(135deg, var(--color-purple-100) 0%, var(--color-purple-50) 100%);
+  color: var(--color-purple-700);
+  border: 1px solid #C4B5FD;
+}
+
+/* Table enhancements */
+.table {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+.table thead {
+  background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-neutral-100) 100%);
+}
+
+.table th {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 2px solid var(--color-border-light);
+}
+
+.table td {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.table tbody tr:hover {
+  background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-neutral-50) 100%);
+}
+
+/* Modal enhancements */
+.modal-content {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--color-border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, 
+    var(--color-primary-500) 0%, 
+    var(--color-purple-500) 33%, 
+    var(--color-blue-500) 66%, 
+    var(--color-emerald-500) 100%
+  );
+}
+
+/* Progress bars */
+.progress-bar {
+  background: var(--color-neutral-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  height: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-slow);
+}
+
+.progress-fill.success {
+  background: linear-gradient(90deg, var(--color-success-400) 0%, var(--color-success-600) 100%);
+}
+
+.progress-fill.warning {
+  background: linear-gradient(90deg, var(--color-warning-400) 0%, var(--color-warning-600) 100%);
+}
+
+.progress-fill.error {
+  background: linear-gradient(90deg, var(--color-error-400) 0%, var(--color-error-600) 100%);
+}
+
+.progress-fill.info {
+  background: linear-gradient(90deg, var(--color-info-400) 0%, var(--color-info-600) 100%);
+}
+
+/* Alert enhancements */
+.alert {
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border-left: 4px solid;
+  margin-bottom: var(--space-4);
+}
+
+.alert-success {
+  background: linear-gradient(135deg, var(--color-success-50) 0%, #F0FDF4 100%);
+  border-left-color: var(--color-success-500);
+  color: var(--color-success-700);
+}
+
+.alert-error {
+  background: linear-gradient(135deg, var(--color-error-50) 0%, #FEF2F2 100%);
+  border-left-color: var(--color-error-500);
+  color: var(--color-error-700);
+}
+
+.alert-warning {
+  background: linear-gradient(135deg, var(--color-warning-50) 0%, #FFFBEB 100%);
+  border-left-color: var(--color-warning-500);
+  color: var(--color-warning-700);
+}
+
+.alert-info {
+  background: linear-gradient(135deg, var(--color-info-50) 0%, #F0F9FF 100%);
+  border-left-color: var(--color-info-500);
+  color: var(--color-info-700);
+}
+
+/* Loading spinner with colors */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--color-neutral-200);
+  border-top: 4px solid var(--color-primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Colorful skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-neutral-200) 0%, var(--color-neutral-100) 50%, var(--color-neutral-200) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Tooltip enhancements */
+.tooltip {
+  background: linear-gradient(135deg, var(--color-neutral-800) 0%, var(--color-neutral-900) 100%);
+  color: white;
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Link enhancements */
+a {
+  color: var(--color-primary-600);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+a:hover {
+  color: var(--color-primary-700);
+}
+
+a.link-primary:hover {
+  color: var(--color-primary-700);
+}
+
+a.link-secondary:hover {
+  color: var(--color-purple-600);
+}
+
+a.link-success:hover {
+  color: var(--color-success-600);
+}
+
+a.link-info:hover {
+  color: var(--color-info-600);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-purple-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-rainbow {
+  background: linear-gradient(135deg, 
+    var(--color-primary-500) 0%, 
+    var(--color-purple-500) 20%, 
+    var(--color-blue-500) 40%, 
+    var(--color-emerald-500) 60%, 
+    var(--color-orange-500) 80%, 
+    var(--color-pink-500) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

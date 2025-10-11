@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaPlus, FaTag, FaEdit, FaTrash, FaList } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import AdminLayout from '../components/AdminLayout';
 import Table from '../components/Table';
 import CustomToast from '../components/CustomToast';
 import { categoryService } from '../services';
@@ -152,7 +153,15 @@ export default function CategoryForm() {
   ];
 
   return (
-    <div className="page-container">
+      <AdminLayout
+        title={
+          <>
+            <FaTag style={{ display: 'inline', marginRight: 'var(--space-2)' }} />
+            {t('category.categoryManagement')}
+          </>
+        }
+        subtitle={t('category.createAndManage')}
+      >
       {toast.message && (
         <CustomToast
           message={toast.message}
@@ -161,13 +170,6 @@ export default function CategoryForm() {
         />
       )}
 
-      <div className="page-header">
-        <h1 className="page-title">
-          <FaTag style={{ display: 'inline', marginRight: 'var(--space-2)' }} />
-          {t('category.categoryManagement')}
-        </h1>
-        <p className="page-subtitle">{t('category.createAndManage')}</p>
-      </div>
 
       <div className="category-grid-layout">
         <form onSubmit={handleSubmit} className="form-container">
@@ -250,6 +252,6 @@ export default function CategoryForm() {
           />
         </div>
       </div>
-    </div>
+     </AdminLayout>
   );
 }

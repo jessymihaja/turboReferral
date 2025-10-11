@@ -114,7 +114,7 @@ export default function Home() {
             placeholder={t('home.searchServices')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="search-input"
+            className="search-input input-field"
             style={{ paddingLeft: 'var(--space-10)' }}
           />
         </div>
@@ -147,6 +147,15 @@ export default function Home() {
               className={`category-btn ${!selectedCategory ? 'active' : ''}`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              style={
+                !selectedCategory
+                  ? {
+                      background: 'linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-neutral-100) 100%)',
+                      border: '1px solid var(--color-primary-300)',
+                      color: 'var(--color-primary-700)'
+                    }
+                  : {}
+              }
             >
               {t('common.all')} ({services.filter(s => s.isValidated).length})
             </motion.button>
@@ -162,6 +171,15 @@ export default function Home() {
                   transition={{ duration: 0.3, delay: 0.4 + idx * 0.05 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  style={
+                    selectedCategory === cat._id
+                      ? {
+                          background: 'linear-gradient(135deg, var(--color-info-50) 0%, var(--color-neutral-100) 100%)',
+                          border: '1px solid var(--color-info-300)',
+                          color: 'var(--color-info-700)'
+                        }
+                      : {}
+                  }
                 >
                   {cat.name} ({count})
                 </motion.button>
@@ -210,7 +228,7 @@ export default function Home() {
           {/* Empty State */}
           {filteredServices.length === 0 && !loading && (
             <div className="empty-state">
-              <div className="empty-state-icon">
+              <div className="empty-state-icon" style={{ color: 'var(--color-info-600)' }}>
                 <FaInbox />
               </div>
               <p style={{

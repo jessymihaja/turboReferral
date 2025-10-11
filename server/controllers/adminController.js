@@ -360,8 +360,11 @@ exports.blockUser = asyncHandler(async (req, res) => {
 
   user.isBlocked = isBlocked;
   if (isBlocked) {
-    await Referral.updateMany({ user: userId }, { $set: { isActive: false } });
-    await Report.deleteMany({ reporterId: userId });
+    await Promise.all([
+      Referral.updateMany({ user: userId }, { $set: { isActive: false } }),
+      Report.deleteMany({ reporterId: userId }),
+      ReferralVote.deleteMany({ user: userId })
+    ]);
   } else {
     await Referral.updateMany({ user: userId }, { $set: { isActive: true } });
   }

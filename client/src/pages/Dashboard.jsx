@@ -351,7 +351,7 @@ export default function Dashboard() {
                 </label>
               </div>
 
-              <button type="submit" disabled={formLoading}>
+              <button type="submit" disabled={formLoading} className="btn-primary">
                 {formLoading ? t('dashboard.submitting') : t('dashboard.submitRequest')}
               </button>
             </form>
@@ -408,7 +408,12 @@ export default function Dashboard() {
                               ) : (
                                 <>
                                   <FaCode />
-                                  <code>{ref.code}</code>
+                                  <code style={{
+                                    backgroundColor: 'var(--color-neutral-100)',
+                                    border: '1px solid var(--color-border-light)',
+                                    borderRadius: 'var(--radius-sm)',
+                                    padding: '0 var(--space-2)'
+                                  }}>{ref.code}</code>
                                 </>
                               )}
                               {ref.description && <span className="desc">{ref.description}</span>}
@@ -416,7 +421,7 @@ export default function Dashboard() {
                             <button
                               onClick={() => handleDelete(ref._id)}
                               disabled={deletingId === ref._id}
-                              className="del-btn"
+                              className="del-btn btn-danger"
                               aria-label="Supprimer"
                             >
                               <FaTrash />
