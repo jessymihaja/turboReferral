@@ -9,6 +9,7 @@ const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
 const { t } = require('../utils/i18n');
 const badgeService = require('../services/badgeService');
+const referralScoringService = require('../services/referralScoringService');
 
 exports.getAllReferrals = asyncHandler(async (req, res) => {
   const referrals = await Referral.find().populate('service user');
@@ -75,20 +76,56 @@ exports.deleteReferral = asyncHandler(async (req, res) => {
 });
 
 exports.getReferralsByServiceId = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, sortBy = 'pertinence' } = req.query;
   const skip = (page - 1) * limit;
 
-  const [referrals, total] = await Promise.all([
-    Referral.find({ service: req.params.id })
-      .populate('service user')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit)),
-    Referral.countDocuments({ service: req.params.id })
+  const referrals = await Referral.find({ service: req.params.id })
+    .populate('service user');
+
+  const total = referrals.length;
+
+  const [voteCounts, promotions] = await Promise.all([
+    ReferralVote.aggregate([
+      { $match: { referral: { $in: referrals.map(r => r._id) } } },
+      {
+        $group: {
+          _id: '$referral',
+          upvotes: {
+            $sum: { $cond: [{ $eq: ['$vote', 'good'] }, 1, 0] }
+          },
+          downvotes: {
+            $sum: { $cond: [{ $eq: ['$vote', 'bad'] }, 1, 0] }
+          }
+        }
+      }
+    ]),
+    PromReferral.find({
+      referral: { $in: referrals.map(r => r._id) },
+      dateDebut: { $lte: new Date() },
+      dateFin: { $gte: new Date() }
+    })
   ]);
 
-  ResponseHandler.success(res, {
+  const voteStatsMap = {};
+  voteCounts.forEach(v => {
+    voteStatsMap[v._id.toString()] = {
+      upvotes: v.upvotes || 0,
+      downvotes: v.downvotes || 0
+    };
+  });
+
+  const enrichedReferrals = await referralScoringService.enrichReferralsWithScores(
     referrals,
+    voteStatsMap,
+    promotions
+  );
+
+  const sortedReferrals = referralScoringService.sortReferrals(enrichedReferrals, sortBy);
+
+  const paginatedReferrals = sortedReferrals.slice(skip, skip + parseInt(limit));
+
+  ResponseHandler.success(res, {
+    referrals: paginatedReferrals,
     pagination: {
       page: parseInt(page),
       limit: parseInt(limit),

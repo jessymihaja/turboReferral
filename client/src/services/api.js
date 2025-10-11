@@ -29,8 +29,19 @@ class ApiService {
     return response.json();
   }
 
-  async get(endpoint) {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+  async get(endpoint, options = {}) {
+    // Construction sécurisée de l'URL + support des query params (page, limit, sortBy, etc.)
+    const url = new URL(`${this.baseURL}${endpoint}`);
+    const { params } = options || {};
+    if (params && typeof params === 'object') {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: this.getAuthHeaders(),
     });

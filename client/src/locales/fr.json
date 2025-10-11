@@ -359,5 +359,13 @@
   "status": {
     "pending": "En attente",
     "validated": "Validé"
+  },
+  "sort": {
+    "pertinence": "Pertinence",
+    "votes": "Plus votés",
+    "positive": "Meilleure note",
+    "recent": "Plus récents",
+    "oldest": "Plus anciens",
+    "sortBy": "Trier par"
   }
 }

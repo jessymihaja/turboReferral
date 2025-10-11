@@ -7,9 +7,9 @@ export const referralService = {
     return response.data;
   },
 
-  async getByService(serviceId, page = 1, limit = 10) {
+  async getByService(serviceId, page = 1, limit = 10, sortBy = 'pertinence') {
     const response = await api.get(API_ENDPOINTS.REFERRALS.BY_SERVICE(serviceId), {
-      params: { page, limit }
+      params: { page, limit, sortBy }
     });
     return response.data;
   },

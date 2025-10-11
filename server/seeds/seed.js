@@ -192,49 +192,68 @@ const seedData = async () => {
 
     console.log(`✅ Created ${services.length} services`);
 
-    // Create Referrals
+    // Create Referrals with specific dates for scoring tests
     console.log('🔗 Creating referrals...');
     const referralsData = [];
 
-    // User 0 (john_doe) - 5 referrals (no badge yet)
+    const now = new Date();
+    const oneWeekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+    const twoWeeksAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
+    const oneMonthAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+    const threeMonthsAgo = new Date(now - 90 * 24 * 60 * 60 * 1000);
+    const sixMonthsAgo = new Date(now - 180 * 24 * 60 * 60 * 1000);
+
+    // User 0 (john_doe) - 5 referrals with varied dates (will get risky badge)
     referralsData.push(
       {
         service: services.find(s => s.name === 'Uber')._id,
         user: users[0]._id,
         link: 'https://uber.com/invite/johndoe123',
         description: 'Recevez 10€ de réduction sur votre première course',
+        createdAt: oneWeekAgo, // Very recent
       },
       {
         service: services.find(s => s.name === 'Amazon')._id,
         user: users[0]._id,
         link: 'https://amazon.fr/ref/john123',
         description: '15€ de réduction sur votre première commande',
+        createdAt: twoWeeksAgo, // Recent
       },
       {
         service: services.find(s => s.name === 'Revolut')._id,
         user: users[0]._id,
         link: 'https://revolut.com/referral/john1234',
         description: 'Carte gratuite et 10€ offerts',
+        createdAt: oneMonthAgo, // Moderately recent
       },
       {
         service: services.find(s => s.name === 'Uber Eats')._id,
         user: users[0]._id,
         link: 'https://ubereats.com/invite/john789',
         description: 'Livraison gratuite sur votre première commande',
+        createdAt: threeMonthsAgo, // Older
       },
       {
         service: services.find(s => s.name === 'Steam')._id,
         user: users[0]._id,
         code: 'JOHNGAMES',
         description: 'Rejoignez ma communauté Steam',
+        createdAt: sixMonthsAgo, // Very old
       }
     );
 
     // User 1 (jane_smith) - 15 referrals (should get 10+ badge)
+    // Mix of dates to test recency scoring
     for (let i = 0; i < 15; i++) {
       const serviceNames = ['Uber', 'Amazon', 'Spotify', 'Airbnb', 'Revolut', 'Steam', 'Uber Eats'];
       const serviceName = serviceNames[i % serviceNames.length];
       const service = services.find(s => s.name === serviceName);
+
+      // Vary creation dates
+      let createdDate;
+      if (i < 5) createdDate = oneWeekAgo;
+      else if (i < 10) createdDate = oneMonthAgo;
+      else createdDate = threeMonthsAgo;
 
       if (service) {
         referralsData.push({
@@ -242,6 +261,7 @@ const seedData = async () => {
           user: users[1]._id,
           link: `https://${serviceName.toLowerCase().replace(' ', '')}.com/invite/jane${i}`,
           description: `Code parrainage #${i + 1} pour ${serviceName}`,
+          createdAt: createdDate,
         });
       }
     }
@@ -252,12 +272,19 @@ const seedData = async () => {
       const serviceName = serviceNames[i % serviceNames.length];
       const service = services.find(s => s.name === serviceName);
 
+      // Most are older, some recent
+      let createdDate;
+      if (i < 5) createdDate = twoWeeksAgo;
+      else if (i < 20) createdDate = oneMonthAgo;
+      else createdDate = threeMonthsAgo;
+
       if (service) {
         referralsData.push({
           service: service._id,
           user: users[2]._id,
           code: `BOB${serviceName.toUpperCase().slice(0, 4)}${i}`,
           description: `Code parrainage Bob #${i + 1}`,
+          createdAt: createdDate,
         });
       }
     }
@@ -268,21 +295,35 @@ const seedData = async () => {
       const serviceName = serviceNames[i % serviceNames.length];
       const service = services.find(s => s.name === serviceName);
 
+      // Wide distribution of dates
+      let createdDate;
+      if (i < 10) createdDate = oneWeekAgo;
+      else if (i < 30) createdDate = oneMonthAgo;
+      else if (i < 60) createdDate = threeMonthsAgo;
+      else createdDate = sixMonthsAgo;
+
       if (service) {
         referralsData.push({
           service: service._id,
           user: users[3]._id,
           link: `https://${serviceName.toLowerCase().replace(' ', '')}.com/ref/alice${i}`,
           description: `Offre exclusive Alice #${i + 1}`,
+          createdAt: createdDate,
         });
       }
     }
 
-    // User 4 (charlie_expert) - 12 referrals for vote testing
+    // User 4 (charlie_expert) - 12 referrals (will get trusted badge + 10+ badge)
+    // Mix of recent and older
     for (let i = 0; i < 12; i++) {
       const serviceNames = ['Uber', 'Amazon', 'Spotify', 'Airbnb', 'Revolut', 'Steam'];
       const serviceName = serviceNames[i % serviceNames.length];
       const service = services.find(s => s.name === serviceName);
+
+      let createdDate;
+      if (i < 4) createdDate = oneWeekAgo; // Very recent
+      else if (i < 8) createdDate = twoWeeksAgo; // Recent
+      else createdDate = oneMonthAgo; // Moderately recent
 
       if (service) {
         referralsData.push({
@@ -290,6 +331,7 @@ const seedData = async () => {
           user: users[4]._id,
           code: `CHARLIE${i}`,
           description: `Code expert Charlie #${i + 1}`,
+          createdAt: createdDate,
         });
       }
     }
@@ -425,6 +467,22 @@ const seedData = async () => {
 
     console.log(`✅ Created ${notifications.length} notifications`);
 
+    // Create Promoted Referrals
+    console.log('👑 Creating promotions...');
+    const promotedReferrals = await PromReferral.create([
+      {
+        referral: referrals.find(r => r.user.toString() === users[4]._id.toString() && r.description.includes('#1'))._id,
+        dateDebut: new Date(now - 2 * 24 * 60 * 60 * 1000), // Started 2 days ago
+        dateFin: new Date(now + 5 * 24 * 60 * 60 * 1000), // Ends in 5 days
+      },
+      {
+        referral: referrals.find(r => r.user.toString() === users[3]._id.toString() && r.description.includes('#5'))._id,
+        dateDebut: new Date(now - 1 * 24 * 60 * 60 * 1000), // Started yesterday
+        dateFin: new Date(now + 10 * 24 * 60 * 60 * 1000), // Ends in 10 days
+      },
+    ]);
+    console.log(`✅ Created ${promotedReferrals.length} promotions`);
+
     const totalBadges = await Badge.countDocuments();
 
     console.log('\n✨ Seed data created successfully!\n');
@@ -435,6 +493,7 @@ const seedData = async () => {
     console.log(`   - Referrals: ${referrals.length}`);
     console.log(`   - Votes: ${votes.length}`);
     console.log(`   - Badges: ${totalBadges}`);
+    console.log(`   - Promotions: ${promotedReferrals.length}`);
     console.log(`   - Notifications: ${notifications.length}`);
     console.log('\n🔑 Login credentials:');
     console.log('   Admin: admin@turboreferral.com / password123');

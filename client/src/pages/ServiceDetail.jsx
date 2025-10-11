@@ -4,7 +4,7 @@ import { UserContext } from '../contexts/UserContext';
 import ReferralVoteForm from '../components/ReferralVoteForm';
 import {
   FaComment, FaThumbsUp, FaThumbsDown, FaCrown, FaLink,
-  FaCode, FaGlobe, FaArrowLeft, FaPlus, FaExternalLinkAlt, FaBox, FaFlag, FaCopy, FaCheck, FaTrash, FaSpinner
+  FaCode, FaGlobe, FaArrowLeft, FaPlus, FaExternalLinkAlt, FaBox, FaFlag, FaCopy, FaCheck, FaTrash, FaSpinner, FaSort
 } from 'react-icons/fa';
 import TimeAgo from '../components/TimeAgo';
 import CommentModal from '../components/CommentModal';
@@ -38,16 +38,18 @@ export default function ServiceDetail() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [openVoteForm, setOpenVoteForm] = useState(null);
   const [userBadges, setUserBadges] = useState({});
+  const [sortBy, setSortBy] = useState('pertinence');
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
+        setReferrals([]); // Clear previous referrals
+        setPage(1); // Reset to first page
 
-        const [serviceData, referralData, avgData, promotionsData] = await Promise.all([
+        const [serviceData, referralData, promotionsData] = await Promise.all([
           serviceService.getById(id),
-          referralService.getByService(id, 1, 10),
-          voteService.getAllAverages(),
+          referralService.getByService(id, 1, 10, sortBy),
           api.get(`/api/promotions/active/service/${id}`)
         ]);
 
@@ -56,21 +58,11 @@ export default function ServiceDetail() {
         const referralResponse = referralData.data || referralData;
         const referrals = referralResponse.referrals || [];
         const pagination = referralResponse.pagination || {};
-        
-        const averages = avgData.data || avgData;
         const promos = promotionsData.data || promotionsData;
 
-        const referralsWithAverages = referrals.map(ref => ({
-          ...ref,
-          upvotes: averages[ref._id]?.upvotes ?? 0,
-          downvotes: averages[ref._id]?.downvotes ?? 0,
-          totalVotes: averages[ref._id]?.totalVotes ?? 0
-        }));
-
-        setReferrals(referralsWithAverages);
+        setReferrals(referrals);
         setPromotions(promos);
         setHasMore(pagination.hasMore || false);
-        setPage(1);
 
       } catch (err) {
         setError(err.message || 'Error loading data');
@@ -79,7 +71,7 @@ export default function ServiceDetail() {
       }
     }
     fetchData();
-  }, [id]);
+  }, [id, sortBy]);
 
   async function loadMoreReferrals() {
     if (loadingMore || !hasMore) return;
@@ -88,24 +80,13 @@ export default function ServiceDetail() {
       setLoadingMore(true);
       const nextPage = page + 1;
       
-      const [referralData, avgData] = await Promise.all([
-        referralService.getByService(id, nextPage, 10),
-        voteService.getAllAverages()
-      ]);
+      const referralData = await referralService.getByService(id, nextPage, 10, sortBy);
 
       const referralResponse = referralData.data || referralData;
       const newReferrals = referralResponse.referrals || [];
       const pagination = referralResponse.pagination || {};
-      const averages = avgData.data || avgData;
 
-      const referralsWithAverages = newReferrals.map(ref => ({
-        ...ref,
-        upvotes: averages[ref._id]?.upvotes ?? 0,
-        downvotes: averages[ref._id]?.downvotes ?? 0,
-        totalVotes: averages[ref._id]?.totalVotes ?? 0
-      }));
-
-      setReferrals(prev => [...prev, ...referralsWithAverages]);
+      setReferrals(prev => [...prev, ...newReferrals]);
       setPage(nextPage);
       setHasMore(pagination.hasMore || false);
     } catch (err) {
@@ -128,19 +109,15 @@ export default function ServiceDetail() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, loadingMore, page, id]);
+  }, [hasMore, loadingMore, page, id, sortBy]);
 
   async function refreshVoteCounts() {
     try {
-      const avgData = await voteService.getAllAverages();
-      const averages = avgData.data || avgData;
+      const referralData = await referralService.getByService(id, 1, page * 10, sortBy);
+      const referralResponse = referralData.data || referralData;
+      const refreshedReferrals = referralResponse.referrals || [];
 
-      setReferrals(prev => prev.map(ref => ({
-        ...ref,
-        upvotes: averages[ref._id]?.upvotes ?? 0,
-        downvotes: averages[ref._id]?.downvotes ?? 0,
-        totalVotes: averages[ref._id]?.totalVotes ?? 0
-      })));
+      setReferrals(refreshedReferrals.slice(0, referrals.length));
     } catch (err) {
       console.error('Error refreshing vote counts:', err);
     }
@@ -457,9 +434,62 @@ export default function ServiceDetail() {
 
         {/* Center Column - Referrals List */}
         <div className={styles.mainContent}>
-          <h3 style={{ marginBottom: 'var(--space-4)', color: 'var(--color-text-primary)' }}>
-            {t('service.availableReferrals')}
-          </h3>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 'var(--space-4)',
+            flexWrap: 'wrap',
+            gap: 'var(--space-3)'
+          }}>
+            <h3 style={{ margin: 0, color: 'var(--color-text-primary)' }}>
+              {t('service.availableReferrals')}
+            </h3>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                color: 'var(--color-text-secondary)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: '500'
+              }}>
+                <FaSort />
+                {t('sort.sortBy')}
+              </label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  padding: 'var(--space-2) var(--space-3)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-bg-primary)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-base)',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <option value="pertinence">{t('sort.pertinence')}</option>
+                <option value="votes">{t('sort.votes')}</option>
+                <option value="positive">{t('sort.positive')}</option>
+                <option value="recent">{t('sort.recent')}</option>
+                <option value="oldest">{t('sort.oldest')}</option>
+              </select>
+            </div>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             {/* Promoted Referrals */}

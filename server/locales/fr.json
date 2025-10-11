@@ -126,5 +126,13 @@
     "referral_100": "100 Parrainages",
     "trusted": "Fiable",
     "risky": "Risqué"
+  },
+  "sort": {
+    "pertinence": "Pertinence",
+    "votes": "Plus votés",
+    "positive": "Meilleure note",
+    "recent": "Plus récents",
+    "oldest": "Plus anciens",
+    "sortBy": "Trier par"
   }
 }
