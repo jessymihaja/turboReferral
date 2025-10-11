@@ -3,6 +3,16 @@ import { API_URL, STORAGE_KEYS } from '../config/constants';
 class ApiService {
   constructor(baseURL) {
     this.baseURL = baseURL;
+    this.onUnauthorized = null;
+    this.onServerUnavailable = null;
+  }
+
+  setUnauthorizedCallback(callback) {
+    this.onUnauthorized = callback;
+  }
+
+  setServerUnavailableCallback(callback) {
+    this.onServerUnavailable = callback;
   }
 
   getAuthHeaders() {
@@ -20,6 +30,10 @@ class ApiService {
 
   async handleResponse(response) {
     if (!response.ok) {
+      if (response.status === 401 && this.onUnauthorized) {
+        this.onUnauthorized();
+      }
+
       const error = await response.json().catch(() => ({
         message: 'An error occurred',
       }));
@@ -30,96 +44,159 @@ class ApiService {
   }
 
   async get(endpoint, options = {}) {
-    // Construction sécurisée de l'URL + support des query params (page, limit, sortBy, etc.)
-    const url = new URL(`${this.baseURL}${endpoint}`);
-    const { params } = options || {};
-    if (params && typeof params === 'object') {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
-        }
+    try {
+      // Construction sécurisée de l'URL + support des query params (page, limit, sortBy, etc.)
+      const url = new URL(`${this.baseURL}${endpoint}`);
+      const { params } = options || {};
+      if (params && typeof params === 'object') {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            url.searchParams.append(key, String(value));
+          }
+        });
+      }
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
       });
+
+      return this.handleResponse(response);
+    } catch (error) {
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        if (this.onServerUnavailable) {
+          this.onServerUnavailable();
+        }
+      }
+      throw error;
     }
-
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: this.getAuthHeaders(),
-    });
-
-    return this.handleResponse(response);
   }
 
   async post(endpoint, data) {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'POST',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
 
-    return this.handleResponse(response);
+      return this.handleResponse(response);
+    } catch (error) {
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        if (this.onServerUnavailable) {
+          this.onServerUnavailable();
+        }
+      }
+      throw error;
+    }
   }
 
   async put(endpoint, data) {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PUT',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method: 'PUT',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
 
-    return this.handleResponse(response);
+      return this.handleResponse(response);
+    } catch (error) {
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        if (this.onServerUnavailable) {
+          this.onServerUnavailable();
+        }
+      }
+      throw error;
+    }
   }
 
   async patch(endpoint, data) {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PATCH',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method: 'PATCH',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
 
-    return this.handleResponse(response);
+      return this.handleResponse(response);
+    } catch (error) {
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        if (this.onServerUnavailable) {
+          this.onServerUnavailable();
+        }
+      }
+      throw error;
+    }
   }
 
   async delete(endpoint) {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'DELETE',
-      headers: this.getAuthHeaders(),
-    });
+    try {
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method: 'DELETE',
+        headers: this.getAuthHeaders(),
+      });
 
-    return this.handleResponse(response);
+      return this.handleResponse(response);
+    } catch (error) {
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        if (this.onServerUnavailable) {
+          this.onServerUnavailable();
+        }
+      }
+      throw error;
+    }
   }
 
   async postFormData(endpoint, formData) {
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    const headers = {};
+    try {
+      const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+      const headers = {};
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      return this.handleResponse(response);
+    } catch (error) {
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        if (this.onServerUnavailable) {
+          this.onServerUnavailable();
+        }
+      }
+      throw error;
     }
-
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'POST',
-      headers,
-      body: formData,
-    });
-
-    return this.handleResponse(response);
   }
 
   async putFormData(endpoint, formData) {
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    const headers = {};
+    try {
+      const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+      const headers = {};
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method: 'PUT',
+        headers,
+        body: formData,
+      });
+
+      return this.handleResponse(response);
+    } catch (error) {
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        if (this.onServerUnavailable) {
+          this.onServerUnavailable();
+        }
+      }
+      throw error;
     }
-
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PUT',
-      headers,
-      body: formData,
-    });
-
-    return this.handleResponse(response);
   }
 }
 

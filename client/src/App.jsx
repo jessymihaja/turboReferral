@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -7,7 +7,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import ServiceDetail from './pages/ServiceDetail';
 import ProtectedRoute from './components/ProtectedRoute';
 import { UserProvider, UserContext } from './contexts/UserContext';
-import { useContext } from 'react';
+import { MaintenanceProvider, useMaintenance } from './contexts/MaintenanceContext';
+import { useContext, useEffect } from 'react';
 import AdminRoute from './components/AdminRoute';
 import Navbar from './components/NavBar';
 import CategoryForm from './pages/CategoryForm';
@@ -21,6 +22,10 @@ import ConditionsGenerales from './pages/ConditionsGenerales';
 import UsersManagement from './pages/UsersManagement';
 import UserDetails from './pages/UserDetails';
 import Profile from './pages/Profile';
+import Maintenance from './pages/Maintenance';
+import NotFound from './pages/NotFound';
+import ErrorBoundary from './components/ErrorBoundary';
+import api from './services/api';
 import './App.css';
 
 function NavbarComp() {
@@ -31,15 +36,29 @@ function NavbarComp() {
   );
 }
 
-function App() {
+function AppContent() {
   const location = useLocation();
+  const { isMaintenanceMode, enableMaintenanceMode } = useMaintenance();
+
+  useEffect(() => {
+    api.setServerUnavailableCallback(() => {
+      console.log('Backend indisponible - mode maintenance activé');
+      enableMaintenanceMode();
+    });
+  }, [enableMaintenanceMode]);
+
+  if (isMaintenanceMode) {
+    return <Maintenance />;
+  }
+
   const isAdminPath = (
     /^\/admin(\/|$)/.test(location.pathname) ||
     location.pathname.startsWith('/pending-reports') ||
     location.pathname.startsWith('/categories')
   );
+
   return (
-    <UserProvider>
+    <>
       {!isAdminPath && <NavbarComp />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -48,8 +67,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/politique-confidentialite" element={<PolitiqueConfidentialité />} />
-          <Route path="/mentions-legales" element={<MentionsLegales />} />
-          <Route path="/conditions-generales" element={<ConditionsGenerales />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
+        <Route path="/conditions-generales" element={<ConditionsGenerales />} />
         <Route
           path="/dashboard"
           element={
@@ -66,9 +85,9 @@ function App() {
             </AdminRoute>
           }
         />
-  <Route path='/categories' element={<AdminRoute><CategoryForm /></AdminRoute>} />
-  <Route path='/pending-reports' element={<AdminRoute><PendingReports /></AdminRoute>} />
-  <Route path='/admin/referrals' element={<AdminRoute><AdminReferralsPage /></AdminRoute>} />
+        <Route path='/categories' element={<AdminRoute><CategoryForm /></AdminRoute>} />
+        <Route path='/pending-reports' element={<AdminRoute><PendingReports /></AdminRoute>} />
+        <Route path='/admin/referrals' element={<AdminRoute><AdminReferralsPage /></AdminRoute>} />
         <Route
           path="/admin/users"
           element={
@@ -93,9 +112,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!isAdminPath && <Footer />}
-    </UserProvider>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <MaintenanceProvider>
+        <UserProvider>
+          <AppContent />
+        </UserProvider>
+      </MaintenanceProvider>
+    </ErrorBoundary>
   );
 }
 
