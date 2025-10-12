@@ -39,10 +39,17 @@ const errorHandler = (err, req, res, next) => {
   const statusCode = error.statusCode || 500;
   const message = error.message || t('errors.serverError');
 
+  if (nodeEnv === 'development') {
+    console.error('Erreur détaillée:', {
+      message: err.message,
+      stack: err.stack,
+      statusCode
+    });
+  }
+
   res.status(statusCode).json({
     success: false,
-    message,
-    ...(nodeEnv === 'development' && { stack: err.stack }),
+    message
   });
 };
 

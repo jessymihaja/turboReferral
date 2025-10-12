@@ -5,7 +5,6 @@ import {
   FaEnvelope,
   FaCalendar,
   FaThumbsUp,
-  FaThumbsDown,
   FaLink,
   FaExclamationTriangle,
   FaBan,
@@ -102,7 +101,7 @@ export default function UserDetails() {
   async function handleToggleRole() {
     if (!userDetails) return;
 
-    const newRole = user.role === 'admin' ? 'user' : 'admin';
+    const newRole = userDetails.user.role === 'admin' ? 'user' : 'admin';
     const confirmMessage = newRole === 'admin'
       ? 'Êtes-vous sûr de vouloir promouvoir cet utilisateur en administrateur ?'
       : 'Êtes-vous sûr de vouloir rétrograder cet administrateur en utilisateur standard ?';
@@ -407,7 +406,7 @@ export default function UserDetails() {
                 <FaLink />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{stats.referrals.total}</div>
+                <div className="stat-value">{stats?.referrals?.total || 0}</div>
                 <div className="stat-label">Parrainages</div>
               </div>
             </div>
@@ -417,10 +416,10 @@ export default function UserDetails() {
                 <FaThumbsUp />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{stats.votesReceived.positive + stats.votesReceived.negative}</div>
+                <div className="stat-value">{(stats?.votesReceived?.positive || 0) + (stats?.votesReceived?.negative || 0)}</div>
                 <div className="stat-label">Votes reçus</div>
                 <div className="stat-sublabel">
-                  {stats.votesReceived.average}% de satisfaction
+                  {stats?.votesReceived?.average || 0}% de satisfaction
                 </div>
               </div>
             </div>
@@ -430,7 +429,7 @@ export default function UserDetails() {
                 <FaUser />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{stats.votesGiven.total}</div>
+                <div className="stat-value">{stats?.votesGiven?.total || 0}</div>
                 <div className="stat-label">Participations</div>
               </div>
             </div>
@@ -440,7 +439,7 @@ export default function UserDetails() {
                 <FaExclamationTriangle />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{stats.reportsReceived?.total || 0}</div>
+                <div className="stat-value">{stats?.reportsReceived?.total || 0}</div>
                 <div className="stat-label">Signalements reçus</div>
               </div>
             </div>
@@ -450,11 +449,11 @@ export default function UserDetails() {
         <div className="user-col-right">
           <div className="user-section">
             <h2 className="section-title">
-              <FaLink /> Parrainages ({stats.referrals.total})
+              <FaLink /> Parrainages ({stats?.referrals?.total || 0})
             </h2>
             <div className="section-content">
               <Table
-                data={stats.referrals.list}
+                data={stats?.referrals?.list || []}
                 columns={referralColumns}
                 searchable={true}
                 sortable={true}
@@ -467,11 +466,11 @@ export default function UserDetails() {
 
           <div className="user-section">
             <h2 className="section-title">
-              <FaExclamationTriangle /> Signalements effectués ({stats.reportsMade?.total || 0})
+              <FaExclamationTriangle /> Signalements effectués ({stats?.reportsMade?.total || 0})
             </h2>
             <div className="section-content">
               <Table
-                data={stats.reportsMade?.list || []}
+                data={stats?.reportsMade?.list || []}
                 columns={reportColumns}
                 searchable={false}
                 sortable={true}
@@ -484,11 +483,11 @@ export default function UserDetails() {
 
           <div className="user-section">
             <h2 className="section-title">
-              <FaExclamationTriangle /> Signalements reçus ({stats.reportsReceived?.total || 0})
+              <FaExclamationTriangle /> Signalements reçus ({stats?.reportsReceived?.total || 0})
             </h2>
             <div className="section-content">
               <Table
-                data={stats.reportsReceived?.list || []}
+                data={stats?.reportsReceived?.list || []}
                 columns={reportColumns}
                 searchable={false}
                 sortable={true}

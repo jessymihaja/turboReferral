@@ -13,7 +13,9 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    if (import.meta.env.MODE === 'development') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
+    }
   }
 
   handleReload = () => {
@@ -36,11 +38,6 @@ class ErrorBoundary extends React.Component {
             <p className="error-description">
               Désolé, quelque chose s'est mal passé. Nous travaillons pour résoudre le problème.
             </p>
-            {this.state.error && (
-              <div className="error-details">
-                <code>{this.state.error.toString()}</code>
-              </div>
-            )}
             <div className="error-actions">
               <button onClick={this.handleReload} className="error-button primary">
                 Recharger la page
