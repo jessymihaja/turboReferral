@@ -17,7 +17,7 @@ exports.getAllReferrals = asyncHandler(async (req, res) => {
 });
 
 exports.createReferral = asyncHandler(async (req, res) => {
-  const { service, link, code, description } = req.body;
+  const { service, link, code, description, type, dateDebut, dateFin } = req.body;
   const user = req.user._id;
 
   if ((!link && !code) || (link && code)) {
@@ -40,7 +40,18 @@ exports.createReferral = asyncHandler(async (req, res) => {
     }
   }
 
-  const referral = new Referral({ service, user, link, code, description });
+  const referralData = {
+    service,
+    user,
+    link,
+    code,
+    description,
+    type,
+    dateDebut,
+    dateFin
+  };
+
+  const referral = new Referral(referralData);
   await referral.save();
   await referral.populate('service');
 
@@ -198,4 +209,48 @@ exports.getReferralsWithPromoStatus = asyncHandler(async (req, res) => {
   }));
 
   ResponseHandler.success(res, referralsWithStatus);
+});
+
+exports.toggleReferralActive = asyncHandler(async (req, res) => {
+  const referral = await Referral.findById(req.params.id);
+
+  if (!referral) {
+    throw new AppError(t('referral.referralNotFound'), 404);
+  }
+
+  const isOwner = referral.user.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError(t('referral.cannotModifyOthersReferral'), 403);
+  }
+
+  referral.toggleActive();
+  await referral.save();
+
+  ResponseHandler.success(res, referral, t('referral.statusUpdated'));
+});
+
+exports.renewReferral = asyncHandler(async (req, res) => {
+  const referral = await Referral.findById(req.params.id);
+
+  if (!referral) {
+    throw new AppError(t('referral.referralNotFound'), 404);
+  }
+
+  const isOwner = referral.user.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError(t('referral.cannotModifyOthersReferral'), 403);
+  }
+
+  if (referral.type !== 'permanent') {
+    throw new AppError(t('referral.cannotRenewTemporary'), 400);
+  }
+
+  referral.renew();
+  await referral.save();
+
+  ResponseHandler.success(res, referral, t('referral.renewed'));
 });

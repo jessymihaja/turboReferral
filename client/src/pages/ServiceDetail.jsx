@@ -4,7 +4,8 @@ import { UserContext } from '../contexts/UserContext';
 import ReferralVoteForm from '../components/ReferralVoteForm';
 import {
   FaComment, FaThumbsUp, FaThumbsDown, FaCrown, FaLink,
-  FaCode, FaGlobe, FaArrowLeft, FaPlus, FaExternalLinkAlt, FaBox, FaFlag, FaCopy, FaCheck, FaTrash, FaSpinner, FaSort
+  FaCode, FaGlobe, FaArrowLeft, FaPlus, FaExternalLinkAlt, FaBox, FaFlag, FaCopy, FaCheck, FaTrash, FaSpinner, FaSort,
+  FaPowerOff, FaSyncAlt, FaClock, FaCalendarAlt
 } from 'react-icons/fa';
 import TimeAgo from '../components/TimeAgo';
 import CommentModal from '../components/CommentModal';
@@ -27,7 +28,14 @@ export default function ServiceDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [newReferral, setNewReferral] = useState({ link: undefined, code: undefined, description: '' });
+  const [newReferral, setNewReferral] = useState({
+    link: undefined,
+    code: undefined,
+    description: '',
+    type: 'permanent',
+    dateDebut: new Date().toISOString().split('T')[0],
+    dateFin: ''
+  });
   const [selectedReferral, setSelectedReferral] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState({ message: '', type: '' });
@@ -146,8 +154,11 @@ export default function ServiceDetail() {
     });
   }, [referrals]);
 
-  const hasReferralForUser = user
-    ? referrals.some(ref => ref.user?.username === user.username || ref.user === user.username)
+  const hasActiveReferralForUser = user
+    ? referrals.some(ref =>
+        (ref.user?.username === user.username || ref.user === user.username) &&
+        ref.isActive
+      )
     : false;
 
   async function handleSubmit(e) {
@@ -158,6 +169,21 @@ export default function ServiceDetail() {
       return;
     }
 
+    if (newReferral.code && newReferral.code.length > 20) {
+      setToast({ message: 'Le code ne peut pas dépasser 20 caractères', type: 'error' });
+      return;
+    }
+
+    if (newReferral.type === 'temporary' && !newReferral.dateFin) {
+      setToast({ message: 'La date de fin est requise pour les parrainages temporaires', type: 'error' });
+      return;
+    }
+
+    if (newReferral.type === 'temporary' && new Date(newReferral.dateFin) <= new Date(newReferral.dateDebut)) {
+      setToast({ message: 'La date de fin doit être après la date de début', type: 'error' });
+      return;
+    }
+
     try {
       const data = await referralService.create({
         service: id,
@@ -165,19 +191,28 @@ export default function ServiceDetail() {
         link: newReferral.link,
         code: newReferral.code,
         description: newReferral.description,
+        type: newReferral.type,
+        dateDebut: newReferral.dateDebut,
+        dateFin: newReferral.type === 'temporary' ? newReferral.dateFin : undefined,
       });
 
       const newRef = data.data || data;
-      // Add proper user object to match the structure of other referrals
-      setReferrals(prev => [...prev, { 
-        ...newRef, 
+      setReferrals(prev => [...prev, {
+        ...newRef,
         user: { _id: user._id, username: user.username },
-        upvotes: 0, 
-        downvotes: 0, 
-        totalVotes: 0 
+        upvotes: 0,
+        downvotes: 0,
+        totalVotes: 0
       }]);
       setSuccess(t('toast.referralAdded'));
-      setNewReferral({ link: '', code: '', description: '' });
+      setNewReferral({
+        link: '',
+        code: '',
+        description: '',
+        type: 'permanent',
+        dateDebut: new Date().toISOString().split('T')[0],
+        dateFin: ''
+      });
       setToast({ message: t('toast.referralAdded'), type: 'success' });
     } catch (err) {
       setToast({ message: err.message || t('toast.errorAddingReferral'), type: 'error' });
@@ -303,6 +338,43 @@ export default function ServiceDetail() {
       setToast({ message: t('toast.referralDeleted'), type: 'success' });
     } catch (err) {
       setToast({ message: err.message || t('toast.errorDeletingReferral'), type: 'error' });
+    }
+  }
+
+  async function toggleReferralActive(referralId) {
+    try {
+      const response = await api.patch(`/api/referrals/${referralId}/toggle-active`);
+      const updatedReferral = response.data.data || response.data;
+
+      setReferrals(prev => prev.map(ref =>
+        ref._id === referralId ? { ...ref, isActive: updatedReferral.isActive } : ref
+      ));
+
+      setToast({
+        message: updatedReferral.isActive ? 'Parrainage activé' : 'Parrainage désactivé',
+        type: 'success'
+      });
+    } catch (err) {
+      setToast({ message: err.message || 'Erreur lors de la mise à jour du statut', type: 'error' });
+    }
+  }
+
+  async function renewReferral(referralId) {
+    if (!window.confirm('Voulez-vous renouveler ce parrainage pour 3 mois supplémentaires ?')) {
+      return;
+    }
+
+    try {
+      const response = await api.patch(`/api/referrals/${referralId}/renew`);
+      const updatedReferral = response.data.data || response.data;
+
+      setReferrals(prev => prev.map(ref =>
+        ref._id === referralId ? { ...ref, ...updatedReferral } : ref
+      ));
+
+      setToast({ message: 'Parrainage renouvelé avec succès pour 3 mois', type: 'success' });
+    } catch (err) {
+      setToast({ message: err.message || 'Erreur lors du renouvellement', type: 'error' });
     }
   }
 
@@ -559,26 +631,70 @@ export default function ServiceDetail() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                     {user && (ref.user?._id === user._id || ref.user === user._id) && (
-                      <button
-                        onClick={() => deleteReferral(ref._id)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: 'var(--space-2)',
-                          borderRadius: 'var(--radius-md)',
-                          border: 'none',
-                          backgroundColor: 'transparent',
-                          color: 'var(--color-text-tertiary)',
-                          cursor: 'pointer',
-                          transition: 'all var(--transition-base)'
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.color = 'var(--color-error)'}
-                        onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
-                        title={t('service.deleteReferral')}
-                      >
-                        <FaTrash size={16} />
-                      </button>
+                      <>
+                        <button
+                          onClick={() => toggleReferralActive(ref._id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 'var(--space-2)',
+                            borderRadius: 'var(--radius-md)',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            color: ref.isActive ? 'var(--color-success)' : 'var(--color-text-tertiary)',
+                            cursor: 'pointer',
+                            transition: 'all var(--transition-base)'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.color = ref.isActive ? 'var(--color-error)' : 'var(--color-success)'}
+                          onMouseLeave={e => e.currentTarget.style.color = ref.isActive ? 'var(--color-success)' : 'var(--color-text-tertiary)'}
+                          title={ref.isActive ? 'Désactiver' : 'Activer'}
+                        >
+                          <FaPowerOff size={16} />
+                        </button>
+                        {ref.type === 'permanent' && (
+                          <button
+                            onClick={() => renewReferral(ref._id)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: 'var(--space-2)',
+                              borderRadius: 'var(--radius-md)',
+                              border: 'none',
+                              backgroundColor: 'transparent',
+                              color: 'var(--color-text-tertiary)',
+                              cursor: 'pointer',
+                              transition: 'all var(--transition-base)'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = 'var(--color-primary)'}
+                            onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
+                            title="Renouveler pour 3 mois"
+                          >
+                            <FaSyncAlt size={16} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deleteReferral(ref._id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 'var(--space-2)',
+                            borderRadius: 'var(--radius-md)',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            color: 'var(--color-text-tertiary)',
+                            cursor: 'pointer',
+                            transition: 'all var(--transition-base)'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.color = 'var(--color-error)'}
+                          onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
+                          title={t('service.deleteReferral')}
+                        >
+                          <FaTrash size={16} />
+                        </button>
+                      </>
                     )}
                     <ReportReferral referralId={ref._id} iconOnly />
                   </div>
@@ -633,6 +749,51 @@ export default function ServiceDetail() {
                     </div>
                   </div>
                 )}
+
+                {/* Status and Type Info */}
+                <div style={{
+                  display: 'flex',
+                  gap: 'var(--space-2)',
+                  marginBottom: 'var(--space-3)',
+                  flexWrap: 'wrap'
+                }}>
+                  <span style={{
+                    padding: 'var(--space-1) var(--space-2)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 'var(--font-size-xs)',
+                    fontWeight: '600',
+                    backgroundColor: ref.isActive ? 'var(--color-success-50)' : 'var(--color-error-50)',
+                    color: ref.isActive ? 'var(--color-success)' : 'var(--color-error)'
+                  }}>
+                    {ref.isActive ? 'Actif' : 'Inactif'}
+                  </span>
+                  <span style={{
+                    padding: 'var(--space-1) var(--space-2)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 'var(--font-size-xs)',
+                    fontWeight: '600',
+                    backgroundColor: 'var(--color-bg-muted)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
+                    {ref.type === 'permanent' ? 'Permanent' : 'Temporaire'}
+                  </span>
+                  {ref.dateFin && (
+                    <span style={{
+                      padding: 'var(--space-1) var(--space-2)',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: 'var(--font-size-xs)',
+                      fontWeight: '600',
+                      backgroundColor: 'var(--color-warning-50)',
+                      color: 'var(--color-warning)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-1)'
+                    }}>
+                      <FaClock size={10} />
+                      Expire le {new Date(ref.dateFin).toLocaleDateString('fr-FR')}
+                    </span>
+                  )}
+                </div>
 
                 {/* Description */}
                 {ref.description && (
@@ -728,9 +889,9 @@ export default function ServiceDetail() {
                 <FaPlus /> {t('service.addNewReferral')}
               </h3>
 
-              {hasReferralForUser && (
-                <div className="alert alert-info" style={{ marginBottom: 'var(--space-4)' }}>
-                  {t('service.youAlreadyHaveReferrals')}
+              {hasActiveReferralForUser && (
+                <div className="alert alert-warning" style={{ marginBottom: 'var(--space-4)' }}>
+                  Vous avez déjà un parrainage actif pour ce service. Vous pouvez le désactiver pour en ajouter un nouveau.
                 </div>
               )}
 
@@ -760,7 +921,7 @@ export default function ServiceDetail() {
 
                 <div className="form-group">
                   <label className="form-label">
-                    <FaCode /> {t('service.referralCode')}
+                    <FaCode /> {t('service.referralCode')} <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--font-size-xs)' }}>(max 20 caractères)</span>
                   </label>
                   <input
                     type="text"
@@ -769,6 +930,7 @@ export default function ServiceDetail() {
                     value={newReferral.code || ''}
                     onChange={(e) => setNewReferral({ ...newReferral, code: e.target.value, link: undefined })}
                     disabled={!!newReferral.link}
+                    maxLength={20}
                   />
                 </div>
 
@@ -783,6 +945,51 @@ export default function ServiceDetail() {
                     rows={3}
                   />
                 </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    <FaClock /> Type de parrainage
+                  </label>
+                  <select
+                    className="form-input"
+                    value={newReferral.type}
+                    onChange={(e) => setNewReferral({ ...newReferral, type: e.target.value })}
+                  >
+                    <option value="permanent">Permanent (renouvelable tous les 3 mois)</option>
+                    <option value="temporary">Temporaire (avec date de fin)</option>
+                  </select>
+                </div>
+
+                {newReferral.type === 'temporary' && (
+                  <>
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FaCalendarAlt /> Date de début
+                      </label>
+                      <input
+                        type="date"
+                        className="form-input"
+                        value={newReferral.dateDebut}
+                        onChange={(e) => setNewReferral({ ...newReferral, dateDebut: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FaCalendarAlt /> Date de fin
+                      </label>
+                      <input
+                        type="date"
+                        className="form-input"
+                        value={newReferral.dateFin}
+                        onChange={(e) => setNewReferral({ ...newReferral, dateFin: e.target.value })}
+                        min={newReferral.dateDebut}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
 
                 <button type="submit" className="btn-primary">
                   <FaPlus /> {t('service.addReferral')}

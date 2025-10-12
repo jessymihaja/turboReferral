@@ -44,7 +44,11 @@
     "commentMaxLength": "Le commentaire ne peut pas dépasser {{max}} caractères",
     "titleRequired": "Le titre est requis",
     "contentRequired": "Le contenu est requis",
-    "badgeTypeRequired": "Le type de badge est requis"
+    "badgeTypeRequired": "Le type de badge est requis",
+    "codeMaxLength": "Le code ne peut pas dépasser {{max}} caractères",
+    "typeRequired": "Le type est requis",
+    "dateFinRequired": "La date de fin est requise pour les parrainages temporaires et doit être après la date de début",
+    "oneActiveReferralPerService": "Vous ne pouvez avoir qu'un seul parrainage ou code actif par service"
   },
   "auth": {
     "usernameOrEmailInUse": "Nom d'utilisateur ou email déjà utilisé",
@@ -75,7 +79,11 @@
     "linkOrCodeNotBoth": "Vous devez fournir soit un lien soit un code, mais pas les deux",
     "serviceNotValidated": "Le service doit être validé avant d'y ajouter des parrainages",
     "cannotEditOthersReferral": "Vous ne pouvez pas modifier le parrainage d'un autre utilisateur",
-    "cannotDeleteOthersReferral": "Vous ne pouvez pas supprimer le parrainage d'un autre utilisateur"
+    "cannotDeleteOthersReferral": "Vous ne pouvez pas supprimer le parrainage d'un autre utilisateur",
+    "cannotModifyOthersReferral": "Vous ne pouvez pas modifier le parrainage d'un autre utilisateur",
+    "statusUpdated": "Statut du parrainage mis à jour avec succès",
+    "renewed": "Parrainage renouvelé avec succès pour 3 mois",
+    "cannotRenewTemporary": "Seuls les parrainages permanents peuvent être renouvelés"
   },
   "vote": {
     "voteRecorded": "Vote enregistré avec succès",

@@ -36,7 +36,17 @@ module.exports = {
   VALIDATION: {
     MAX_COMMENT_LENGTH: 300,
     MAX_DESCRIPTION_LENGTH: 100,
+    MAX_CODE_LENGTH: 20,
     URL_REGEX: /^https?:\/\/.+$/,
+  },
+
+  REFERRAL_TYPES: {
+    PERMANENT: 'permanent',
+    TEMPORARY: 'temporary',
+  },
+
+  REFERRAL_LIMITS: {
+    PERMANENT_DURATION_DAYS: 90, // 3 mois
   },
 
   BADGE_TYPES: {
