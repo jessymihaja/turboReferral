@@ -206,6 +206,10 @@
   padding: 0;
 }
 
+html {
+  zoom: 0.8;
+}
+
 body {
   margin: 0;
   min-width: 320px;
