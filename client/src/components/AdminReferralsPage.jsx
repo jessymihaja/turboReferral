@@ -38,7 +38,6 @@ export default function AdminReferralsPage() {
         setReferrals(referralsWithPromo);
         setLoading(false);
       } catch (err) {
-        console.error(err);
         setLoading(false);
       }
     };
@@ -51,7 +50,7 @@ export default function AdminReferralsPage() {
       await referralService.delete(id);
       setReferrals(referrals.filter((r) => r._id !== id));
     } catch (err) {
-      console.error(err);
+      // Error handled
     }
   }
 
@@ -389,20 +388,16 @@ export default function AdminReferralsPage() {
           isOpen={!!selectedReferral}
           onClose={() => setSelectedReferral(null)}
           onCreated={async (newPromo) => {
-            console.log("Promo created:", newPromo);
-            // Fetch the full promotion data with dates
             try {
               const promoData = await api.get(`/api/promotions/by-referral/${selectedReferral._id}`);
               const promotion = promoData.data || promoData;
-              
-              const updatedReferrals = referrals.map(r => 
+
+              const updatedReferrals = referrals.map(r =>
                 r._id === selectedReferral._id ? { ...r, isPromoted: true, promotion } : r
               );
               setReferrals(updatedReferrals);
             } catch (err) {
-              console.error("Error fetching promotion details:", err);
-              // Fallback to just marking as promoted
-              const updatedReferrals = referrals.map(r => 
+              const updatedReferrals = referrals.map(r =>
                 r._id === selectedReferral._id ? { ...r, isPromoted: true } : r
               );
               setReferrals(updatedReferrals);

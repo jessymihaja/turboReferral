@@ -42,7 +42,6 @@ function AppContent() {
 
   useEffect(() => {
     api.setServerUnavailableCallback(() => {
-      console.log('Backend indisponible - mode maintenance activé');
       enableMaintenanceMode();
     });
   }, [enableMaintenanceMode]);

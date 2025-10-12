@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./config/database');
-const { port } = require('./config/env');
+const { port, nodeEnv, corsOrigin } = require('./config/env');
 const { errorHandler } = require('./utils/errorHandler');
 
 const authRoutes = require('./routes/authRoute');
@@ -20,13 +21,30 @@ const badgeRoutes = require('./routes/badgeRoute');
 
 const app = express();
 
+const initDirectories = () => {
+  const directories = [
+    'uploads',
+    'uploads/services',
+    'uploads/profiles',
+    'uploads/logos'
+  ];
 
+  directories.forEach(dir => {
+    const dirPath = path.join(__dirname, dir);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+      if (nodeEnv === 'development') {
+        console.log(`Répertoire créé: ${dir}`);
+      }
+    }
+  });
+};
 
+initDirectories();
 connectDB();
 
-
 const corsOptions = {
-  origin: true,
+  origin: corsOrigin,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -54,5 +72,7 @@ app.use('/api/badges', badgeRoutes);
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port}`);
+  if (nodeEnv === 'development') {
+    console.log(`Serveur démarré sur le port ${port}`);
+  }
 });

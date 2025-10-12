@@ -41,6 +41,8 @@ const optimizeProfilePhoto = async (inputPath, filename) => {
   const outputDir = 'uploads/profiles';
   const baseName = path.parse(filename).name;
 
+  await fs.mkdir(outputDir, { recursive: true });
+
   const sizes = {
     original: { width: 400, height: 400 },
     thumbnail: { width: 64, height: 64 }
@@ -73,6 +75,8 @@ const optimizeProfilePhoto = async (inputPath, filename) => {
 const optimizeServiceLogo = async (inputPath, filename) => {
   const outputDir = 'uploads/services';
   const baseName = path.parse(filename).name;
+
+  await fs.mkdir(outputDir, { recursive: true });
 
   const sizes = {
     original: { width: 300, height: 300 },

@@ -15,7 +15,6 @@ export function UserProvider({ children }) {
   const storedToken = localStorage.getItem('token');
   if (storedUser && storedToken) {
     const userParsed = JSON.parse(storedUser);
-    console.log('UserContext - utilisateur chargé du localStorage:', userParsed);
     setUser(userParsed);
     setToken(storedToken);
   }
@@ -33,7 +32,6 @@ export function UserProvider({ children }) {
   // Configurer le callback pour déconnexion automatique sur 401
   useEffect(() => {
     api.setUnauthorizedCallback(() => {
-      console.log('Token expiré - déconnexion automatique');
       logout();
     });
   }, []);
