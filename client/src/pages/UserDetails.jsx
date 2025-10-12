@@ -280,8 +280,8 @@ export default function UserDetails() {
       header: 'Statut',
       align: 'center',
       render: (report) => (
-        <span className={`badge ${report?.status === 1 ? 'badge-success' : 'badge-error'}`}>
-          {report?.status === 1 ? 'Résolu' : 'En attente'}
+        <span className={`badge ${report?.status === 0 ? 'badge-success' : 'badge-warning'}`}>
+          {report?.status === 0 ? 'Résolu' : 'En attente'}
         </span>
       )
     },
@@ -440,8 +440,8 @@ export default function UserDetails() {
                 <FaExclamationTriangle />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{stats.reports.total}</div>
-                <div className="stat-label">Signalement reçus</div>
+                <div className="stat-value">{stats.reportsReceived?.total || 0}</div>
+                <div className="stat-label">Signalements reçus</div>
               </div>
             </div>
           </div>
@@ -467,11 +467,28 @@ export default function UserDetails() {
 
           <div className="user-section">
             <h2 className="section-title">
-              <FaExclamationTriangle /> Signalement effectué ({stats.reports.total})
+              <FaExclamationTriangle /> Signalements effectués ({stats.reportsMade?.total || 0})
             </h2>
             <div className="section-content">
               <Table
-                data={stats.reports.list}
+                data={stats.reportsMade?.list || []}
+                columns={reportColumns}
+                searchable={false}
+                sortable={true}
+                paginated={true}
+                pageSize={5}
+                emptyMessage="Aucun signalement effectué"
+              />
+            </div>
+          </div>
+
+          <div className="user-section">
+            <h2 className="section-title">
+              <FaExclamationTriangle /> Signalements reçus ({stats.reportsReceived?.total || 0})
+            </h2>
+            <div className="section-content">
+              <Table
+                data={stats.reportsReceived?.list || []}
                 columns={reportColumns}
                 searchable={false}
                 sortable={true}

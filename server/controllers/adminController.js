@@ -283,7 +283,8 @@ exports.getUserDetails = asyncHandler(async (req, res) => {
     totalReferrals,
     votesGiven,
     votesReceived,
-    reports
+    reportsReceived,
+    reportsMade
   ] = await Promise.all([
     Referral.countDocuments({ user: userId }),
     ReferralVote.find({ user: userId }).populate('referral'),
@@ -298,7 +299,16 @@ exports.getUserDetails = asyncHandler(async (req, res) => {
           { path: 'user', select: 'username profilePhoto' }
         ]
       })
-      .populate('reporterId', 'username')
+      .populate('reporterId', 'username'),
+    Report.find({ reporterId: userId })
+      .populate({
+        path: 'referralId',
+        populate: [
+          { path: 'service', select: 'name' },
+          { path: 'user', select: 'username profilePhoto' }
+        ]
+      })
+      .sort({ reportedAt: -1 })
   ]);
 
   const positiveVotes = votesReceived.filter(v => v.vote === VOTE_TYPES.GOOD).length;
@@ -339,9 +349,13 @@ exports.getUserDetails = asyncHandler(async (req, res) => {
         positive: positiveVotesGiven,
         negative: negativeVotesGiven
       },
-      reports: {
-        total: reports.length,
-        list: reports
+      reportsReceived: {
+        total: reportsReceived.length,
+        list: reportsReceived
+      },
+      reportsMade: {
+        total: reportsMade.length,
+        list: reportsMade
       }
     }
   };
