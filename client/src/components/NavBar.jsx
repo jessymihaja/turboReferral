@@ -98,8 +98,18 @@ const Navbar = ({ user, logout }) => {
           {user ? (
             <>
               <NotificationIcon />
-              <Link to="/profile" style={styles.iconButton} title="Paramètres">
-                <FaCog style={{ fontSize: '18px', color: '#333' }} />
+              <Link to="/profile" style={styles.profileLink} title="Profil">
+                {user.profilePhoto ? (
+                  <img
+                    src={`${import.meta.env.VITE_API_URL}${user.profilePhoto}`}
+                    alt={user.username}
+                    style={styles.profilePhoto}
+                  />
+                ) : (
+                  <div style={styles.profileInitial}>
+                    {user.username?.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </Link>
               <button
                 onClick={() => {
@@ -227,6 +237,35 @@ const styles = {
     transition: 'all var(--transition-base)',
     backgroundColor: 'transparent',
   },
+  profileLink: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    textDecoration: 'none',
+    transition: 'all var(--transition-base)',
+    border: '2px solid var(--color-border-light)',
+    overflow: 'hidden',
+  },
+  profilePhoto: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    borderRadius: '50%',
+  },
+  profileInitial: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
+    color: 'white',
+    fontWeight: 'var(--font-weight-bold)',
+    fontSize: 'var(--font-size-base)',
+  },
   logoutButton: {
     display: 'flex',
     alignItems: 'center',
@@ -343,9 +382,9 @@ if (typeof window !== 'undefined') {
       color: var(--color-primary);
     }
 
-    nav a[title="Paramètres"]:hover {
-      background-color: var(--color-bg-hover);
-      color: var(--color-primary);
+    nav a[title="Profil"]:hover {
+      transform: scale(1.05);
+      border-color: var(--color-primary);
     }
 
     nav .logoutButton:hover {

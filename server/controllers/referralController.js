@@ -10,6 +10,7 @@ const { AppError } = require('../utils/errorHandler');
 const { t } = require('../utils/i18n');
 const badgeService = require('../services/badgeService');
 const referralScoringService = require('../services/referralScoringService');
+const expirationNotificationService = require('../services/expirationNotificationService');
 
 exports.getAllReferrals = asyncHandler(async (req, res) => {
   const referrals = await Referral.find().populate('service user');
@@ -253,4 +254,10 @@ exports.renewReferral = asyncHandler(async (req, res) => {
   await referral.save();
 
   ResponseHandler.success(res, referral, t('referral.renewed'));
+});
+
+exports.getExpiringReferrals = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const expiringReferrals = await expirationNotificationService.getExpiringReferralsForUser(userId);
+  ResponseHandler.success(res, expiringReferrals);
 });

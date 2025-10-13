@@ -1,40 +1,29 @@
 import { useEffect, useState } from "react";
-import { FaCheck, FaEdit, FaBox, FaExclamationCircle, FaUsers, FaChartLine, FaStar, FaLink, FaCode, FaTrophy, FaPlus } from 'react-icons/fa';
+import { FaCheck, FaBox, FaExclamationCircle, FaUsers, FaChartLine, FaStar, FaLink, FaTrophy } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import AdminLayout from "../components/AdminLayout";
-import Table from "../components/Table";
-import ModalUpdateService from "../components/ModalUpdateService";
-import ModalValidateService from "../components/ModalValidateService";
-import ModalAddService from "../components/ModalAddService";
-import { referralService } from '../services';
 import api from '../services/api';
 import './AdminDashboard.css';
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
-  const [services, setServices] = useState([]);
   const [stats, setStats] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedService, setSelectedService] = useState(null);
-  const [serviceToValidate, setServiceToValidate] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        const [statsData, analyticsData, servicesData] = await Promise.all([
+        const [statsData, analyticsData] = await Promise.all([
           api.get('/api/admin/stats'),
           api.get('/api/admin/analytics'),
-          api.get('/api/admin/services'),
         ]);
 
         setStats(statsData.data || statsData);
         setAnalytics(analyticsData.data || analyticsData);
-        setServices(servicesData.data || servicesData);
       } catch (err) {
         setError(err.message || t('errors.errorLoadingData'));
       } finally {
@@ -45,119 +34,6 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  function handleOpenValidateModal(service) {
-    setServiceToValidate(service);
-  }
-
-  function handleServiceValidated(updated) {
-    setServices(services.map((s) => (s._id === updated._id ? updated : s)));
-    setServiceToValidate(null);
-  }
-
-  function handleServiceAdded(newService) {
-    setServices([newService, ...services]);
-    setShowAddModal(false);
-  }
-
-  async function handleDeleteReferral(id) {
-    if (!confirm(t('errors.deleteConfirm'))) return;
-    try {
-      await referralService.delete(id);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  const serviceColumns = [
-    {
-      key: 'logo',
-      header: t('table.logo'),
-      sortable: false,
-      width: '80px',
-      align: 'center',
-      render: (service) => (
-        service.logo ? (
-          <img
-            src={`${import.meta.env.VITE_API_URL}${service.logo}`}
-            alt={service.name}
-            className="table-img"
-          />
-        ) : (
-          <div className="avatar">
-            <FaBox />
-          </div>
-        )
-      )
-    },
-    {
-      key: 'name',
-      header: t('table.name'),
-      accessor: (service) => service.name
-    },
-    {
-      key: 'description',
-      header: t('table.description'),
-      accessor: (service) => service.description || '—',
-      render: (service) => (
-        <div className="truncate" style={{ maxWidth: '300px' }} title={service.description}>
-          {service.description || '—'}
-        </div>
-      )
-    },
-    {
-      key: 'category',
-      header: t('table.category'),
-      accessor: (service) => service.category?.name || '—',
-      render: (service) => service.category?.name || '—'
-    },
-    {
-      key: 'isValidated',
-      header: t('table.status'),
-      align: 'center',
-      render: (service) => (
-        <span className={`badge ${service.isValidated ? 'badge-success' : 'badge-warning'}`}>
-          {service.isValidated ? (
-            <>
-              <FaCheck size={10} /> {t('admin.validated')}
-            </>
-          ) : (
-            <>
-              <FaExclamationCircle size={10} /> {t('admin.pending')}
-            </>
-          )}
-        </span>
-      )
-    },
-    {
-      key: 'actions',
-      header: t('table.actions'),
-      sortable: false,
-      align: 'center',
-      width: '180px',
-      render: (service) => (
-        <div className="table-actions" style={{ gap: 'var(--space-2)' }}>
-          {!service.isValidated && (
-            <button
-              onClick={() => handleOpenValidateModal(service)}
-              className="btn-sm btn-success"
-              title={t('admin.validateService')}
-            >
-              <FaCheck size={12} />
-            </button>
-          )}
-          <button
-            onClick={() => setSelectedService(service)}
-            className="btn-sm btn-primary"
-            title={t('admin.editService')}
-          >
-            <FaEdit size={12} />
-          </button>
-        </div>
-      )
-    }
-  ];
-
-  const referralColumns = [];
 
   if (loading) {
     return (
@@ -306,7 +182,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Charts Section */}
+      {/* Charts */}
       <div className="admin-charts-grid">
         {/* Growth Chart */}
         <div className="admin-chart-card">
@@ -448,63 +324,6 @@ export default function AdminDashboard() {
           </ResponsiveContainer>
         </div>
       </div>
-
-      {/* Services Management Section */}
-      <section className="admin-section">
-        <div className="admin-section-header">
-          <div className="admin-section-icon">
-            <FaBox />
-          </div>
-          <div style={{ flex: 1 }}>
-            <h2 className="admin-section-title">{t('admin.servicesManagement')}</h2>
-          </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
-          >
-            <FaPlus /> {t('admin.addService')}
-          </button>
-        </div>
-        <div className="admin-table-wrapper">
-          <Table
-            data={services}
-            columns={serviceColumns}
-            searchable={true}
-            sortable={true}
-            paginated={true}
-            pageSize={10}
-            emptyMessage={t('admin.noServicesFound')}
-          />
-        </div>
-      </section>
-
-      {selectedService && (
-        <ModalUpdateService
-          service={selectedService}
-          onClose={() => setSelectedService(null)}
-          onUpdated={(updatedService) => {
-            setServices(
-              services.map((s) => (s._id === updatedService._id ? updatedService : s))
-            );
-          }}
-        />
-      )}
-
-      {serviceToValidate && (
-        <ModalValidateService
-          service={serviceToValidate}
-          onClose={() => setServiceToValidate(null)}
-          onValidated={handleServiceValidated}
-        />
-      )}
-
-      {showAddModal && (
-        <ModalAddService
-          onClose={() => setShowAddModal(false)}
-          onAdded={handleServiceAdded}
-        />
-      )}
       </div>
     </AdminLayout>
   );

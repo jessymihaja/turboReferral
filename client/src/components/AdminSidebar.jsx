@@ -9,7 +9,8 @@ import {
   FaCog,
   FaHome,
   FaTimes,
-  FaBars
+  FaBars,
+  FaBox
 } from 'react-icons/fa';
 import { useState } from 'react';
 
@@ -27,25 +28,31 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
       path: '/admin/referrals',
       label: 'Référencements',
       icon: FaChartBar,
-      color: '--color-info-600'
+      color: '--color-primary-600'
+    },
+    {
+      path: '/admin/services',
+      label: 'Services',
+      icon: FaBox,
+      color: '--color-primary-600'
     },
     {
       path: '/categories',
       label: 'Catégories',
       icon: FaLightbulb,
-      color: '--color-warning-600'
+      color: '--color-primary-600'
     },
     {
       path: '/pending-reports',
       label: 'Signalements',
       icon: FaExclamationTriangle,
-      color: '--color-error-600'
+      color: '--color-primary-600'
     },
     {
       path: '/admin/users',
       label: 'Utilisateurs',
       icon: FaUsers,
-      color: '--color-success-600'
+      color: '--color-primary-600'
     }
   ];
 
@@ -115,7 +122,8 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
           zIndex: 1000,
           display: 'flex',
           flexDirection: 'column',
-          padding: '0'
+          padding: '0',
+          minHeight: '100vh'
         }}
       >
         {/* Header */}
@@ -239,7 +247,7 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
                     gap: 'var(--space-md)',
                     padding: 'var(--space-md)',
                     borderRadius: 'var(--radius-lg)',
-                    color: isActive ? 'white' : 'var(--color-text-primary)',
+                    color: isActive ? '#ffffff' : 'var(--color-text-primary)',
                     textDecoration: 'none',
                     fontSize: 'var(--font-size-base)',
                     fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
@@ -247,7 +255,8 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
                     backgroundColor: isActive ? `var(${item.color})` : 'transparent',
                     border: isActive ? 'none' : '1px solid transparent',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none'
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {

@@ -77,6 +77,7 @@
 .admin-dashboard {
   animation: fadeInUp 0.6s ease-out;
   max-width: 100%;
+  width: 100%;
 }
 
 .admin-dashboard .page-container {
@@ -84,7 +85,6 @@
   padding-left: var(--space-4);
   padding-right: var(--space-4);
   width: 100%;
-  min-width: 1200px;
 }
 
 /* Page Header */
@@ -412,7 +412,6 @@
   opacity: 0;
   animation-fill-mode: forwards;
   width: 100%;
-  min-width: 1200px;
 }
 
 .admin-chart-card {

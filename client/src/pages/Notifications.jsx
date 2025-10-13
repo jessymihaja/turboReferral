@@ -103,11 +103,12 @@ const Notifications = () => {
   }
 
   return (
-    <div className="notifications-container">
-      <h2 style={{color:'#5D4037'}}>{t('notifications.myNotifications')}</h2>
-      <p className="instruction-text">{t('notifications.clickToNavigate')}</p>
+    <div className="page-wrapper">
+      <div className="notifications-container">
+        <h2 style={{color:'#5D4037'}}>{t('notifications.myNotifications')}</h2>
+        <p className="instruction-text">{t('notifications.clickToNavigate')}</p>
 
-      <div className="notifications-list">
+        <div className="notifications-list">
         {notifications.length === 0 ? (
           <p>{t('notifications.noNotifications')}</p>
         ) : (
@@ -147,6 +148,7 @@ const Notifications = () => {
             )}
           </>
         )}
+        </div>
       </div>
     </div>
   );

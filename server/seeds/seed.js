@@ -210,6 +210,10 @@ const seedData = async () => {
         user: users[0]._id,
         link: 'https://uber.com/invite/johndoe123',
         description: 'Recevez 10€ de réduction sur votre première course',
+        type: 'permanent',
+        dateDebut: oneWeekAgo,
+        dateFin: new Date(oneWeekAgo.getTime() + 90 * 24 * 60 * 60 * 1000), // 90 days from creation
+        isActive: true,
         createdAt: oneWeekAgo, // Very recent
       },
       {
@@ -217,6 +221,10 @@ const seedData = async () => {
         user: users[0]._id,
         link: 'https://amazon.fr/ref/john123',
         description: '15€ de réduction sur votre première commande',
+        type: 'temporary',
+        dateDebut: twoWeeksAgo,
+        dateFin: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // Expires in 7 days
+        isActive: true,
         createdAt: twoWeeksAgo, // Recent
       },
       {
@@ -224,6 +232,10 @@ const seedData = async () => {
         user: users[0]._id,
         link: 'https://revolut.com/referral/john1234',
         description: 'Carte gratuite et 10€ offerts',
+        type: 'permanent',
+        dateDebut: oneMonthAgo,
+        dateFin: new Date(oneMonthAgo.getTime() + 90 * 24 * 60 * 60 * 1000),
+        isActive: false, // Inactive
         createdAt: oneMonthAgo, // Moderately recent
       },
       {
@@ -231,6 +243,10 @@ const seedData = async () => {
         user: users[0]._id,
         link: 'https://ubereats.com/invite/john789',
         description: 'Livraison gratuite sur votre première commande',
+        type: 'temporary',
+        dateDebut: threeMonthsAgo,
+        dateFin: new Date(threeMonthsAgo.getTime() + 30 * 24 * 60 * 60 * 1000), // Already expired
+        isActive: true,
         createdAt: threeMonthsAgo, // Older
       },
       {
@@ -238,6 +254,10 @@ const seedData = async () => {
         user: users[0]._id,
         code: 'JOHNGAMES',
         description: 'Rejoignez ma communauté Steam',
+        type: 'permanent',
+        dateDebut: sixMonthsAgo,
+        dateFin: new Date(sixMonthsAgo.getTime() + 90 * 24 * 60 * 60 * 1000),
+        isActive: true,
         createdAt: sixMonthsAgo, // Very old
       }
     );
@@ -256,11 +276,18 @@ const seedData = async () => {
       else createdDate = threeMonthsAgo;
 
       if (service) {
+        const isPermanent = i % 3 !== 0; // 2/3 permanent, 1/3 temporary
         referralsData.push({
           service: service._id,
           user: users[1]._id,
           link: `https://${serviceName.toLowerCase().replace(' ', '')}.com/invite/jane${i}`,
           description: `Code parrainage #${i + 1} pour ${serviceName}`,
+          type: isPermanent ? 'permanent' : 'temporary',
+          dateDebut: createdDate,
+          dateFin: isPermanent
+            ? new Date(createdDate.getTime() + 90 * 24 * 60 * 60 * 1000)
+            : new Date(now.getTime() + (15 + i) * 24 * 60 * 60 * 1000), // Temporary: expires in 15+ days
+          isActive: i % 5 !== 4, // 80% active
           createdAt: createdDate,
         });
       }
@@ -279,11 +306,18 @@ const seedData = async () => {
       else createdDate = threeMonthsAgo;
 
       if (service) {
+        const isPermanent = i % 4 !== 0; // 3/4 permanent, 1/4 temporary
         referralsData.push({
           service: service._id,
           user: users[2]._id,
           code: `BOB${serviceName.toUpperCase().slice(0, 4)}${i}`,
           description: `Code parrainage Bob #${i + 1}`,
+          type: isPermanent ? 'permanent' : 'temporary',
+          dateDebut: createdDate,
+          dateFin: isPermanent
+            ? new Date(createdDate.getTime() + 90 * 24 * 60 * 60 * 1000)
+            : new Date(now.getTime() + (10 + i % 20) * 24 * 60 * 60 * 1000), // Temporary: varied expiry
+          isActive: i % 4 !== 3, // 75% active
           createdAt: createdDate,
         });
       }
@@ -303,11 +337,18 @@ const seedData = async () => {
       else createdDate = sixMonthsAgo;
 
       if (service) {
+        const isPermanent = i % 2 === 0; // 50/50 split
         referralsData.push({
           service: service._id,
           user: users[3]._id,
           link: `https://${serviceName.toLowerCase().replace(' ', '')}.com/ref/alice${i}`,
           description: `Offre exclusive Alice #${i + 1}`,
+          type: isPermanent ? 'permanent' : 'temporary',
+          dateDebut: createdDate,
+          dateFin: isPermanent
+            ? new Date(createdDate.getTime() + 90 * 24 * 60 * 60 * 1000)
+            : new Date(now.getTime() + (5 + i % 30) * 24 * 60 * 60 * 1000), // Temporary: varied expiry
+          isActive: i % 10 !== 9, // 90% active
           createdAt: createdDate,
         });
       }
@@ -326,11 +367,18 @@ const seedData = async () => {
       else createdDate = oneMonthAgo; // Moderately recent
 
       if (service) {
+        const isPermanent = i % 3 === 0; // 1/3 permanent, 2/3 temporary
         referralsData.push({
           service: service._id,
           user: users[4]._id,
           code: `CHARLIE${i}`,
           description: `Code expert Charlie #${i + 1}`,
+          type: isPermanent ? 'permanent' : 'temporary',
+          dateDebut: createdDate,
+          dateFin: isPermanent
+            ? new Date(createdDate.getTime() + 90 * 24 * 60 * 60 * 1000)
+            : new Date(now.getTime() + (20 + i * 2) * 24 * 60 * 60 * 1000), // Temporary: long expiry
+          isActive: true, // All active (trusted user)
           createdAt: createdDate,
         });
       }

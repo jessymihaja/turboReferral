@@ -47,6 +47,7 @@ module.exports = {
 
   REFERRAL_LIMITS: {
     PERMANENT_DURATION_DAYS: 90, // 3 mois
+    EXPIRATION_WARNING_DAYS: 3, // Alerte 3 jours avant expiration
   },
 
   BADGE_TYPES: {

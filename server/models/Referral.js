@@ -118,4 +118,24 @@ referralSchema.methods.toggleActive = function() {
   return this;
 };
 
+referralSchema.methods.isExpiringSoon = function() {
+  if (!this.dateFin) return false;
+
+  const now = new Date();
+  const endDate = new Date(this.dateFin);
+  const daysUntilExpiration = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+
+  return daysUntilExpiration > 0 && daysUntilExpiration <= REFERRAL_LIMITS.EXPIRATION_WARNING_DAYS;
+};
+
+referralSchema.methods.getDaysUntilExpiration = function() {
+  if (!this.dateFin) return null;
+
+  const now = new Date();
+  const endDate = new Date(this.dateFin);
+  const daysUntilExpiration = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+
+  return daysUntilExpiration;
+};
+
 module.exports = mongoose.model('Referral', referralSchema);

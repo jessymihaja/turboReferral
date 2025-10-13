@@ -26,6 +26,7 @@
   left: var(--space-3);
   color: var(--color-text-tertiary);
   pointer-events: none;
+  z-index: 1;
 }
 
 .input-with-icon {

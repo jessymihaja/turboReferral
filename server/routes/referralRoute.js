@@ -13,11 +13,13 @@ const {
   getReferralsWithPromoStatus,
   toggleReferralActive,
   renewReferral,
+  getExpiringReferrals,
 } = require('../controllers/referralController');
 
 const { updateReferral } = require('../controllers/adminController');
 
 router.get('/with-status', getReferralsWithPromoStatus);
+router.get('/expiring', authenticateToken, getExpiringReferrals);
 router.get('/user/:id', idValidator, getReferralsByUserId);
 router.get('/service/:id', idValidator, getReferralsByServiceId);
 router.get('/', getAllReferrals);

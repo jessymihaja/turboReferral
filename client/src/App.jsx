@@ -21,6 +21,7 @@ import MentionsLegales from './pages/MentionsLegales';
 import ConditionsGenerales from './pages/ConditionsGenerales';
 import UsersManagement from './pages/UsersManagement';
 import UserDetails from './pages/UserDetails';
+import ServicesManagement from './pages/ServicesManagement';
 import Profile from './pages/Profile';
 import Maintenance from './pages/Maintenance';
 import NotFound from './pages/NotFound';
@@ -100,6 +101,14 @@ function AppContent() {
           element={
             <AdminRoute>
               <UserDetails />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/services"
+          element={
+            <AdminRoute>
+              <ServicesManagement />
             </AdminRoute>
           }
         />

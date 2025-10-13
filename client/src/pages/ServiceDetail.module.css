@@ -15,10 +15,31 @@
 
 .rightSidebar {
   position: sticky;
-  top: calc(70px + var(--space-6));
-  height: fit-content;
+  top: calc(70px + var(--space-4));
+  max-height: calc(100vh - 70px - var(--space-4));
+  overflow-y: auto;
   z-index: 10;
   transition: z-index 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+  padding-bottom: var(--space-4);
+}
+
+.rightSidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rightSidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rightSidebar::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+.rightSidebar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-dark);
 }
 
 .rightSidebar:focus-within {

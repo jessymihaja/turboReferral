@@ -5,7 +5,7 @@ import ReferralVoteForm from '../components/ReferralVoteForm';
 import {
   FaComment, FaThumbsUp, FaThumbsDown, FaCrown, FaLink,
   FaCode, FaGlobe, FaArrowLeft, FaPlus, FaExternalLinkAlt, FaBox, FaFlag, FaCopy, FaCheck, FaTrash, FaSpinner, FaSort,
-  FaPowerOff, FaSyncAlt, FaClock, FaCalendarAlt
+  FaPowerOff, FaSyncAlt, FaClock, FaCalendarAlt, FaBell
 } from 'react-icons/fa';
 import TimeAgo from '../components/TimeAgo';
 import CommentModal from '../components/CommentModal';
@@ -750,50 +750,54 @@ export default function ServiceDetail() {
                   </div>
                 )}
 
-                {/* Status and Type Info */}
-                <div style={{
-                  display: 'flex',
-                  gap: 'var(--space-2)',
-                  marginBottom: 'var(--space-3)',
-                  flexWrap: 'wrap'
-                }}>
-                  <span style={{
-                    padding: 'var(--space-1) var(--space-2)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--font-size-xs)',
-                    fontWeight: '600',
-                    backgroundColor: ref.isActive ? 'var(--color-success-50)' : 'var(--color-error-50)',
-                    color: ref.isActive ? 'var(--color-success)' : 'var(--color-error)'
-                  }}>
-                    {ref.isActive ? 'Actif' : 'Inactif'}
-                  </span>
-                  <span style={{
-                    padding: 'var(--space-1) var(--space-2)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--font-size-xs)',
-                    fontWeight: '600',
-                    backgroundColor: 'var(--color-bg-muted)',
-                    color: 'var(--color-text-secondary)'
-                  }}>
-                    {ref.type === 'permanent' ? 'Permanent' : 'Temporaire'}
-                  </span>
-                  {ref.dateFin && (
-                    <span style={{
-                      padding: 'var(--space-1) var(--space-2)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontSize: 'var(--font-size-xs)',
-                      fontWeight: '600',
-                      backgroundColor: 'var(--color-warning-50)',
-                      color: 'var(--color-warning)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 'var(--space-1)'
-                    }}>
-                      <FaClock size={10} />
-                      Expire le {new Date(ref.dateFin).toLocaleDateString('fr-FR')}
-                    </span>
-                  )}
-                </div>
+                {/* Type Info - Show expiration badges */}
+                {ref.dateFin && (() => {
+                  const daysLeft = Math.ceil((new Date(ref.dateFin) - new Date()) / (1000 * 60 * 60 * 24));
+
+                  if (ref.type === 'temporary') {
+                    return (
+                      <div style={{
+                        marginBottom: 'var(--space-3)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                        padding: 'var(--space-2) var(--space-3)',
+                        borderRadius: 'var(--radius-md)',
+                        backgroundColor: 'var(--color-warning-50)',
+                        color: 'var(--color-warning)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: '600'
+                      }}>
+                        <FaClock size={14} />
+                        <span>Expire dans {daysLeft} jours</span>
+                      </div>
+                    );
+                  }
+
+                  if (ref.type === 'permanent' && daysLeft > 0 && daysLeft <= 3 && user && (ref.user?._id === user._id || ref.user === user._id)) {
+                    return (
+                      <div style={{
+                        marginBottom: 'var(--space-3)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                        padding: 'var(--space-2) var(--space-3)',
+                        borderRadius: 'var(--radius-md)',
+                        backgroundColor: 'var(--color-error-50)',
+                        color: 'var(--color-error)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: '600',
+                        border: '1px solid var(--color-error)',
+                        animation: 'pulse 2s ease-in-out infinite'
+                      }}>
+                        <FaBell size={14} />
+                        <span>⚠️ Expire dans {daysLeft} jour{daysLeft > 1 ? 's' : ''} ! Pensez à renouveler</span>
+                      </div>
+                    );
+                  }
+
+                  return null;
+                })()}
 
                 {/* Description */}
                 {ref.description && (
@@ -884,16 +888,33 @@ export default function ServiceDetail() {
         {/* Right Sidebar - Add Referral Form */}
         {user && (
           <div className={styles.rightSidebar}>
-            <div className={styles.formCard}>
-              <h3 style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-lg)' }}>
-                <FaPlus /> {t('service.addNewReferral')}
-              </h3>
-
-              {hasActiveReferralForUser && (
-                <div className="alert alert-warning" style={{ marginBottom: 'var(--space-4)' }}>
-                  Vous avez déjà un parrainage actif pour ce service. Vous pouvez le désactiver pour en ajouter un nouveau.
+            {hasActiveReferralForUser ? (
+              <div className={styles.formCard}>
+                <div style={{
+                  textAlign: 'center',
+                  padding: 'var(--space-6)',
+                  color: 'var(--color-text-secondary)'
+                }}>
+                  <div style={{
+                    fontSize: '3rem',
+                    marginBottom: 'var(--space-3)',
+                    opacity: 0.5
+                  }}>
+                    <FaPlus />
+                  </div>
+                  <h3 style={{ marginBottom: 'var(--space-2)', color: 'var(--color-text-primary)' }}>
+                    Parrainage actif
+                  </h3>
+                  <p style={{ fontSize: 'var(--font-size-sm)', lineHeight: '1.6' }}>
+                    Vous avez déjà un parrainage actif pour ce service. Désactivez-le depuis votre tableau de bord pour en ajouter un nouveau.
+                  </p>
                 </div>
-              )}
+              </div>
+            ) : (
+              <div className={styles.formCard}>
+                <h3 style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-lg)' }}>
+                  <FaPlus /> {t('service.addNewReferral')}
+                </h3>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                 <div className="form-group">
@@ -995,7 +1016,8 @@ export default function ServiceDetail() {
                   <FaPlus /> {t('service.addReferral')}
                 </button>
               </form>
-            </div>
+              </div>
+            )}
           </div>
         )}
       </div>

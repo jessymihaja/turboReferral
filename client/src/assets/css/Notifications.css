@@ -2,12 +2,16 @@
   padding: 20px;
   max-width: 800px;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .notifications-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
 }
 
 .notification-item {
@@ -109,4 +113,10 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.page-wrapper {
+  min-height: calc(100vh - 70px - 100px);
+  display: flex;
+  flex-direction: column;
 }

@@ -1,11 +1,12 @@
 import { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import { UserContext } from '../contexts/UserContext';
-import { FaTrash, FaPlus, FaFileUpload, FaLink, FaCode, FaInbox, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaExclamationTriangle } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaFileUpload, FaLink, FaCode, FaInbox, FaChevronDown, FaChevronUp, FaExternalLinkAlt, FaExclamationTriangle, FaPowerOff, FaSyncAlt, FaClock, FaBell } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import CustomToast from '../components/CustomToast';
 import BadgeDisplay from '../components/BadgeDisplay';
 import { referralService, categoryService, serviceService, badgeService } from '../services';
 import { compressServiceLogo } from '../utils/imageCompressor';
+import api from '../services/api';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -159,6 +160,43 @@ export default function Dashboard() {
       setToast({ message: err.message, type: 'error' });
     } finally {
       setDeletingId(null);
+    }
+  }
+
+  async function toggleReferralActive(referralId) {
+    try {
+      const response = await api.patch(`/api/referrals/${referralId}/toggle-active`);
+      const updatedReferral = response.data.data || response.data;
+
+      setReferrals(prev => prev.map(ref =>
+        ref._id === referralId ? { ...ref, isActive: updatedReferral.isActive } : ref
+      ));
+
+      setToast({
+        message: updatedReferral.isActive ? 'Parrainage activé' : 'Parrainage désactivé',
+        type: 'success'
+      });
+    } catch (err) {
+      setToast({ message: err.message || 'Erreur lors de la mise à jour du statut', type: 'error' });
+    }
+  }
+
+  async function renewReferral(referralId) {
+    if (!confirm('Voulez-vous renouveler ce parrainage pour 3 mois supplémentaires ?')) {
+      return;
+    }
+
+    try {
+      const response = await api.patch(`/api/referrals/${referralId}/renew`);
+      const updatedReferral = response.data.data || response.data;
+
+      setReferrals(prev => prev.map(ref =>
+        ref._id === referralId ? { ...ref, ...updatedReferral } : ref
+      ));
+
+      setToast({ message: 'Parrainage renouvelé avec succès pour 3 mois', type: 'success' });
+    } catch (err) {
+      setToast({ message: err.message || 'Erreur lors du renouvellement', type: 'error' });
     }
   }
 
@@ -400,32 +438,120 @@ export default function Dashboard() {
                         {refs.map(ref => (
                           <div key={ref._id} className="ref-row">
                             <div className="ref-info">
-                              {ref.link ? (
-                                <>
-                                  <FaLink />
-                                  <a href={ref.link} target="_blank" rel="noreferrer">{ref.link}</a>
-                                </>
-                              ) : (
-                                <>
-                                  <FaCode />
-                                  <code style={{
-                                    backgroundColor: 'var(--color-neutral-100)',
-                                    border: '1px solid var(--color-border-light)',
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                                {ref.link ? (
+                                  <>
+                                    <FaLink />
+                                    <a href={ref.link} target="_blank" rel="noreferrer">{ref.link}</a>
+                                  </>
+                                ) : (
+                                  <>
+                                    <FaCode />
+                                    <code style={{
+                                      backgroundColor: 'var(--color-neutral-100)',
+                                      border: '1px solid var(--color-border-light)',
+                                      borderRadius: 'var(--radius-sm)',
+                                      padding: '0 var(--space-2)'
+                                    }}>{ref.code}</code>
+                                  </>
+                                )}
+
+                                {/* Status Badge */}
+                                <span style={{
+                                  padding: 'var(--space-1) var(--space-2)',
+                                  borderRadius: 'var(--radius-sm)',
+                                  fontSize: 'var(--font-size-xs)',
+                                  fontWeight: '600',
+                                  backgroundColor: ref.isActive ? 'var(--color-success-50)' : 'var(--color-error-50)',
+                                  color: ref.isActive ? 'var(--color-success)' : 'var(--color-error)'
+                                }}>
+                                  {ref.isActive ? 'Actif' : 'Inactif'}
+                                </span>
+
+                                {/* Temporary badge with expiration */}
+                                {ref.type === 'temporary' && ref.dateFin && (
+                                  <span style={{
+                                    padding: 'var(--space-1) var(--space-2)',
                                     borderRadius: 'var(--radius-sm)',
-                                    padding: '0 var(--space-2)'
-                                  }}>{ref.code}</code>
-                                </>
-                              )}
+                                    fontSize: 'var(--font-size-xs)',
+                                    fontWeight: '600',
+                                    backgroundColor: 'var(--color-warning-50)',
+                                    color: 'var(--color-warning)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 'var(--space-1)'
+                                  }}>
+                                    <FaClock size={10} />
+                                    {Math.ceil((new Date(ref.dateFin) - new Date()) / (1000 * 60 * 60 * 24))} jours restants
+                                  </span>
+                                )}
+
+                                {/* Expiring soon warning for permanent referrals */}
+                                {ref.type === 'permanent' && ref.dateFin && (() => {
+                                  const daysLeft = Math.ceil((new Date(ref.dateFin) - new Date()) / (1000 * 60 * 60 * 24));
+                                  return daysLeft > 0 && daysLeft <= 3 ? (
+                                    <span style={{
+                                      padding: 'var(--space-1) var(--space-2)',
+                                      borderRadius: 'var(--radius-sm)',
+                                      fontSize: 'var(--font-size-xs)',
+                                      fontWeight: '600',
+                                      backgroundColor: 'var(--color-error-50)',
+                                      color: 'var(--color-error)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 'var(--space-1)',
+                                      animation: 'pulse 2s ease-in-out infinite'
+                                    }}>
+                                      <FaBell size={10} />
+                                      Expire dans {daysLeft} jour{daysLeft > 1 ? 's' : ''} !
+                                    </span>
+                                  ) : null;
+                                })()}
+                              </div>
                               {ref.description && <span className="desc">{ref.description}</span>}
                             </div>
-                            <button
-                              onClick={() => handleDelete(ref._id)}
-                              disabled={deletingId === ref._id}
-                              className="del-btn btn-danger"
-                              aria-label="Supprimer"
-                            >
-                              <FaTrash />
-                            </button>
+                            <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                              <button
+                                onClick={() => toggleReferralActive(ref._id)}
+                                className="btn-icon"
+                                title={ref.isActive ? 'Désactiver' : 'Activer'}
+                                style={{
+                                  color: ref.isActive ? 'var(--color-success)' : 'var(--color-text-tertiary)',
+                                  border: 'none',
+                                  background: 'transparent',
+                                  cursor: 'pointer',
+                                  padding: 'var(--space-2)',
+                                  transition: 'color 0.2s'
+                                }}
+                              >
+                                <FaPowerOff />
+                              </button>
+                              {ref.type === 'permanent' && (
+                                <button
+                                  onClick={() => renewReferral(ref._id)}
+                                  className="btn-icon"
+                                  title="Renouveler pour 3 mois"
+                                  style={{
+                                    color: 'var(--color-text-tertiary)',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    cursor: 'pointer',
+                                    padding: 'var(--space-2)',
+                                    transition: 'color 0.2s'
+                                  }}
+                                >
+                                  <FaSyncAlt />
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDelete(ref._id)}
+                                disabled={deletingId === ref._id}
+                                className="del-btn btn-danger"
+                                aria-label="Supprimer"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>

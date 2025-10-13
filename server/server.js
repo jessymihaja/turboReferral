@@ -18,6 +18,7 @@ const notificationRoutes = require('./routes/notificationRoute');
 const promReferralRoutes = require('./routes/promReferralRoute');
 const userRoutes = require('./routes/userRoute');
 const badgeRoutes = require('./routes/badgeRoute');
+const { startExpirationCheckJob } = require('./jobs/expirationCheckJob');
 
 const app = express();
 
@@ -42,6 +43,7 @@ const initDirectories = () => {
 
 initDirectories();
 connectDB();
+startExpirationCheckJob();
 
 const corsOptions = {
   origin: corsOrigin,
