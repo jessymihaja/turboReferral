@@ -1,14 +1,31 @@
 import { useState, useEffect } from "react";
 import { FaEdit, FaTimes, FaImage, FaCheck } from 'react-icons/fa';
 import CustomToast from "./CustomToast";
+import MultilingualInput from "./MultilingualInput";
 import { serviceService, categoryService } from '../services';
 import { useTranslation } from 'react-i18next';
 import { compressServiceLogo } from '../utils/imageCompressor';
 
 export default function ModalUpdateService({ service, onClose, onUpdated }) {
   const { t } = useTranslation();
-  const [name, setName] = useState(service.name);
-  const [description, setDescription] = useState(service.description || "");
+  
+  // Initialize multilingual data from service
+  const initializeNames = () => {
+    if (typeof service.name === 'string') {
+      return { fr: service.name };
+    }
+    return service.name || {};
+  };
+
+  const initializeDescriptions = () => {
+    if (typeof service.description === 'string') {
+      return { fr: service.description || "" };
+    }
+    return service.description || {};
+  };
+
+  const [names, setNames] = useState(initializeNames());
+  const [descriptions, setDescriptions] = useState(initializeDescriptions());
   const [category, setCategory] = useState(service.category?._id || "");
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
@@ -36,12 +53,17 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
       return;
     }
 
+    if (!names.fr || !names.fr.trim()) {
+      setToast({ message: t('modal.serviceNameRequired'), type: 'error' });
+      return;
+    }
+
     setLoading(true);
 
     try {
       const formData = new FormData();
-      formData.append("name", name);
-      formData.append("description", description);
+      formData.append("name", JSON.stringify(names));
+      formData.append("description", JSON.stringify(descriptions));
       formData.append("category", category);
       if (logo) formData.append("logo", logo, logo.name || 'logo.webp');
 
@@ -99,24 +121,24 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
           <div className="modal-body">
             <div className="form-group">
               <label className="form-label form-label-required">{t('modal.serviceNameRequired')}</label>
-              <input
-                type="text"
-                className="form-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+              <MultilingualInput
+                values={names}
+                onValuesChange={setNames}
                 placeholder={t('modal.enterServiceName')}
+                type="input"
+                maxLength={100}
               />
             </div>
 
             <div className="form-group">
               <label className="form-label">{t('dashboard.description')}</label>
-              <textarea
-                className="form-textarea"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
+              <MultilingualInput
+                values={descriptions}
+                onValuesChange={setDescriptions}
                 placeholder={t('modal.enterDescription')}
+                type="textarea"
+                minRows={4}
+                maxLength={500}
               />
             </div>
 

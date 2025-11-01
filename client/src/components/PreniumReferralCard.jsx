@@ -8,7 +8,7 @@ import { voteService, badgeService } from '../services';
 import { useTranslation } from 'react-i18next';
 
 export default function PremiumReferralCard({ ref, onComment, user }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [voteData, setVoteData] = useState({ upvotes: 0, downvotes: 0, totalVotes: 0 });
   const [copiedCode, setCopiedCode] = useState(false);
   const [openVoteForm, setOpenVoteForm] = useState(null);
@@ -354,7 +354,10 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
 
       {/* Description */}
       <p style={{ marginBottom: "0.8rem", color: "#2c3e50" }}>
-        {ref.description}
+        {typeof ref.description === 'string' 
+          ? ref.description 
+          : (ref.description?.[i18n.language] || ref.description?.fr || ref.description?.en || '')
+        }
       </p>
 
       {/* Votes + Commentaires */}

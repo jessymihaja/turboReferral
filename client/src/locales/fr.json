@@ -10,6 +10,7 @@
     "reports": "Signalements",
     "referrals": "Parrainages",
     "services": "Services",
+    "users": "Utilisateurs",
     "search": "Rechercher",
     "filter": "Filtrer",
     "loading": "Chargement...",
@@ -29,7 +30,8 @@
     "all": "Tous",
     "showing": "Affichage de",
     "to": "à",
-    "entries": "entrées"
+    "entries": "entrées",
+    "current": "Actuel"
   },
   "navigation": {
     "toggleMenu": "Basculer le menu",
@@ -245,6 +247,7 @@
     "validateService": "Valider le service",
     "addService": "Ajouter un service",
     "promoteReferral": "Promouvoir le parrainage",
+    "editReferral": "Modifier le parrainage",
     "serviceNameRequired": "Nom du service requis",
     "enterServiceName": "Entrez le nom du service",
     "enterDescription": "Entrez la description du service...",
@@ -304,7 +307,8 @@
     "home": "Accueil",
     "privacy": "Confidentialité",
     "connect": "Connexion",
-    "madeWith": "Réalisé avec"
+    "madeWith": "Réalisé avec",
+    "copyright": "Tous droits réservés"
   },
   "referralInfo": {
     "howItWorks": "Comment ça marche ?",

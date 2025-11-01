@@ -17,6 +17,7 @@ import {
   FaCog,
 } from 'react-icons/fa';
 import NotificationIcon from './NotificationIcon';
+import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
 
@@ -95,6 +96,7 @@ const Navbar = ({ user, logout }) => {
 
         {/* User Section */}
         <div style={styles.userSection}>
+          <LanguageSwitcher />
           {user ? (
             <>
               <NotificationIcon />

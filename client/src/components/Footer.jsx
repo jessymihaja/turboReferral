@@ -3,6 +3,7 @@ import { FaFacebookF, FaTwitter, FaLinkedinIn, FaGithub, FaHeart } from "react-i
 import { Link } from "react-router-dom";
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -180,12 +181,36 @@ export default function Footer() {
           </ul>
         </motion.div>
 
-        {/* Social */}
+        {/* Language Switcher */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <h3 style={{
+            marginBottom: "var(--space-md)",
+            fontSize: "var(--font-size-base)",
+            fontWeight: "var(--font-weight-semibold)",
+            color: "var(--color-text-inverse)",
+            textShadow: "0 1px 2px rgba(0,0,0,0.35)"
+          }}>Langue / Language</h3>
+          <div style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+            borderRadius: '8px', 
+            padding: '8px',
+            display: 'inline-block'
+          }}>
+            <LanguageSwitcher variant="footer" />
+          </div>
+        </motion.div>
+
+        {/* Social Links */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
           <h3 style={{
             marginBottom: "var(--space-md)",
@@ -268,7 +293,7 @@ export default function Footer() {
           textShadow: "0 1px 2px rgba(0,0,0,0.35)"
         }}
       >
-        © {new Date().getFullYear()} TurboReferral • Tous droits réservés
+        © {new Date().getFullYear()} TurboReferral • {t('footer.copyright', 'Tous droits réservés')}
       </div>
     </footer>
   );

@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed": "node seeds/seed.js",
+    "seed:prod": "node scripts/seed-production.js",
     "check-prod": "node scripts/check-production.js"
   },
   "keywords": [],

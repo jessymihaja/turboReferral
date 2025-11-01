@@ -116,72 +116,126 @@ const seedData = async () => {
     console.log('🏪 Creating services...');
     const services = await Service.create([
       {
-        name: 'Uber',
-        description: 'Service de VTC',
+        name: {
+          fr: 'Uber',
+          en: 'Uber'
+        },
+        description: {
+          fr: 'Service de VTC',
+          en: 'Ride-hailing service'
+        },
         category: categories.find(c => c.name === 'Mobilité')._id,
         isValidated: true,
         website: 'https://uber.com',
         requestedBy: users[0]._id,
       },
       {
-        name: 'Amazon',
-        description: 'Marketplace en ligne',
+        name: {
+          fr: 'Amazon',
+          en: 'Amazon'
+        },
+        description: {
+          fr: 'Marketplace en ligne',
+          en: 'Online marketplace'
+        },
         category: categories.find(c => c.name === 'Shopping')._id,
         isValidated: true,
         website: 'https://amazon.fr',
         requestedBy: users[0]._id,
       },
       {
-        name: 'Spotify',
-        description: 'Streaming musical',
+        name: {
+          fr: 'Spotify',
+          en: 'Spotify'
+        },
+        description: {
+          fr: 'Streaming musical',
+          en: 'Music streaming'
+        },
         category: categories.find(c => c.name === 'Streaming')._id,
         isValidated: true,
         website: 'https://spotify.com',
         requestedBy: users[1]._id,
       },
       {
-        name: 'Airbnb',
-        description: 'Location de logements',
+        name: {
+          fr: 'Airbnb',
+          en: 'Airbnb'
+        },
+        description: {
+          fr: 'Location de logements',
+          en: 'Accommodation rental'
+        },
         category: categories.find(c => c.name === 'Voyage')._id,
         isValidated: true,
         website: 'https://airbnb.fr',
         requestedBy: users[1]._id,
       },
       {
-        name: 'Revolut',
-        description: 'Banque en ligne',
+        name: {
+          fr: 'Revolut',
+          en: 'Revolut'
+        },
+        description: {
+          fr: 'Banque en ligne',
+          en: 'Online banking'
+        },
         category: categories.find(c => c.name === 'Finance')._id,
         isValidated: true,
         website: 'https://revolut.com',
         requestedBy: users[2]._id,
       },
       {
-        name: 'Steam',
-        description: 'Plateforme de jeux PC',
+        name: {
+          fr: 'Steam',
+          en: 'Steam'
+        },
+        description: {
+          fr: 'Plateforme de jeux PC',
+          en: 'PC gaming platform'
+        },
         category: categories.find(c => c.name === 'Jeux')._id,
         isValidated: true,
         website: 'https://store.steampowered.com',
         requestedBy: users[2]._id,
       },
       {
-        name: 'Uber Eats',
-        description: 'Livraison de repas',
+        name: {
+          fr: 'Uber Eats',
+          en: 'Uber Eats'
+        },
+        description: {
+          fr: 'Livraison de repas',
+          en: 'Food delivery'
+        },
         category: categories.find(c => c.name === 'Food')._id,
         isValidated: true,
         website: 'https://ubereats.com',
         requestedBy: users[0]._id,
       },
       {
-        name: 'Netflix',
-        description: 'Streaming vidéo',
+        name: {
+          fr: 'Netflix',
+          en: 'Netflix'
+        },
+        description: {
+          fr: 'Streaming vidéo',
+          en: 'Video streaming'
+        },
         category: categories.find(c => c.name === 'Streaming')._id,
         isValidated: false,
         website: 'https://netflix.com',
         requestedBy: users[1]._id,
       },
       {
-        name: 'Disney+',
-        description: 'Streaming vidéo et films',
+        name: {
+          fr: 'Disney+',
+          en: 'Disney+'
+        },
+        description: {
+          fr: 'Streaming vidéo et films',
+          en: 'Video and movies streaming'
+        },
         category: categories.find(c => c.name === 'Streaming')._id,
         isValidated: false,
         website: 'https://disneyplus.com',
@@ -206,10 +260,13 @@ const seedData = async () => {
     // User 0 (john_doe) - 5 referrals with varied dates (will get risky badge)
     referralsData.push(
       {
-        service: services.find(s => s.name === 'Uber')._id,
+        service: services.find(s => s.name.fr === 'Uber')._id,
         user: users[0]._id,
         link: 'https://uber.com/invite/johndoe123',
-        description: 'Recevez 10€ de réduction sur votre première course',
+        description: {
+          fr: 'Recevez 10€ de réduction sur votre première course',
+          en: 'Get €10 off your first ride'
+        },
         type: 'permanent',
         dateDebut: oneWeekAgo,
         dateFin: new Date(oneWeekAgo.getTime() + 90 * 24 * 60 * 60 * 1000), // 90 days from creation
@@ -217,10 +274,13 @@ const seedData = async () => {
         createdAt: oneWeekAgo, // Very recent
       },
       {
-        service: services.find(s => s.name === 'Amazon')._id,
+        service: services.find(s => s.name.fr === 'Amazon')._id,
         user: users[0]._id,
         link: 'https://amazon.fr/ref/john123',
-        description: '15€ de réduction sur votre première commande',
+        description: {
+          fr: '15€ de réduction sur votre première commande',
+          en: '€15 off your first order'
+        },
         type: 'temporary',
         dateDebut: twoWeeksAgo,
         dateFin: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // Expires in 7 days
@@ -228,10 +288,13 @@ const seedData = async () => {
         createdAt: twoWeeksAgo, // Recent
       },
       {
-        service: services.find(s => s.name === 'Revolut')._id,
+        service: services.find(s => s.name.fr === 'Revolut')._id,
         user: users[0]._id,
         link: 'https://revolut.com/referral/john1234',
-        description: 'Carte gratuite et 10€ offerts',
+        description: {
+          fr: 'Carte gratuite et 10€ offerts',
+          en: 'Free card and €10 offered'
+        },
         type: 'permanent',
         dateDebut: oneMonthAgo,
         dateFin: new Date(oneMonthAgo.getTime() + 90 * 24 * 60 * 60 * 1000),
@@ -239,10 +302,13 @@ const seedData = async () => {
         createdAt: oneMonthAgo, // Moderately recent
       },
       {
-        service: services.find(s => s.name === 'Uber Eats')._id,
+        service: services.find(s => s.name.fr === 'Uber Eats')._id,
         user: users[0]._id,
         link: 'https://ubereats.com/invite/john789',
-        description: 'Livraison gratuite sur votre première commande',
+        description: {
+          fr: 'Livraison gratuite sur votre première commande',
+          en: 'Free delivery on your first order'
+        },
         type: 'temporary',
         dateDebut: threeMonthsAgo,
         dateFin: new Date(threeMonthsAgo.getTime() + 30 * 24 * 60 * 60 * 1000), // Already expired
@@ -250,10 +316,13 @@ const seedData = async () => {
         createdAt: threeMonthsAgo, // Older
       },
       {
-        service: services.find(s => s.name === 'Steam')._id,
+        service: services.find(s => s.name.fr === 'Steam')._id,
         user: users[0]._id,
         code: 'JOHNGAMES',
-        description: 'Rejoignez ma communauté Steam',
+        description: {
+          fr: 'Rejoignez ma communauté Steam',
+          en: 'Join my Steam community'
+        },
         type: 'permanent',
         dateDebut: sixMonthsAgo,
         dateFin: new Date(sixMonthsAgo.getTime() + 90 * 24 * 60 * 60 * 1000),
@@ -267,7 +336,7 @@ const seedData = async () => {
     for (let i = 0; i < 15; i++) {
       const serviceNames = ['Uber', 'Amazon', 'Spotify', 'Airbnb', 'Revolut', 'Steam', 'Uber Eats'];
       const serviceName = serviceNames[i % serviceNames.length];
-      const service = services.find(s => s.name === serviceName);
+      const service = services.find(s => s.name.fr === serviceName);
 
       // Vary creation dates
       let createdDate;
@@ -297,7 +366,7 @@ const seedData = async () => {
     for (let i = 0; i < 52; i++) {
       const serviceNames = ['Uber', 'Amazon', 'Spotify', 'Airbnb', 'Revolut', 'Steam', 'Uber Eats'];
       const serviceName = serviceNames[i % serviceNames.length];
-      const service = services.find(s => s.name === serviceName);
+      const service = services.find(s => s.name.fr === serviceName);
 
       // Most are older, some recent
       let createdDate;
@@ -327,7 +396,7 @@ const seedData = async () => {
     for (let i = 0; i < 105; i++) {
       const serviceNames = ['Uber', 'Amazon', 'Spotify', 'Airbnb', 'Revolut', 'Steam', 'Uber Eats'];
       const serviceName = serviceNames[i % serviceNames.length];
-      const service = services.find(s => s.name === serviceName);
+      const service = services.find(s => s.name.fr === serviceName);
 
       // Wide distribution of dates
       let createdDate;
@@ -359,7 +428,7 @@ const seedData = async () => {
     for (let i = 0; i < 12; i++) {
       const serviceNames = ['Uber', 'Amazon', 'Spotify', 'Airbnb', 'Revolut', 'Steam'];
       const serviceName = serviceNames[i % serviceNames.length];
-      const service = services.find(s => s.name === serviceName);
+      const service = services.find(s => s.name.fr === serviceName);
 
       let createdDate;
       if (i < 4) createdDate = oneWeekAgo; // Very recent
@@ -481,21 +550,21 @@ const seedData = async () => {
         userId: users[0]._id,
         title: 'Service "Uber" approuvé',
         content: 'Votre demande de service "Uber" a été approuvée et est maintenant disponible.',
-        link: `/services/${services.find(s => s.name === 'Uber')._id}`,
+        link: `/services/${services.find(s => s.name.fr === 'Uber')._id}`,
         isRead: true,
       },
       {
         userId: users[1]._id,
         title: 'Service "Netflix" en attente',
         content: 'Votre demande de service "Netflix" est en cours de validation par un administrateur.',
-        link: `/services/${services.find(s => s.name === 'Netflix')._id}`,
+        link: `/services/${services.find(s => s.name.fr === 'Netflix')._id}`,
         isRead: false,
       },
       {
         userId: users[2]._id,
         title: 'Service "Disney+" rejeté',
         content: 'Votre demande de service "Disney+" a été rejetée: Service déjà présent sous un autre nom.',
-        link: `/services/${services.find(s => s.name === 'Disney+')._id}`,
+        link: `/services/${services.find(s => s.name.fr === 'Disney+')._id}`,
         isRead: false,
       },
       {
@@ -508,7 +577,7 @@ const seedData = async () => {
         userId: users[1]._id,
         title: 'Service "Spotify" approuvé',
         content: 'Votre demande de service "Spotify" a été approuvée et est maintenant disponible.',
-        link: `/services/${services.find(s => s.name === 'Spotify')._id}`,
+        link: `/services/${services.find(s => s.name.fr === 'Spotify')._id}`,
         isRead: true,
       },
     ]);

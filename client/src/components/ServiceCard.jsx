@@ -4,7 +4,22 @@ import { FaBox, FaArrowRight } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
 export default function ServiceCard({ service }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  // Get localized service name and description
+  const getLocalizedName = () => {
+    if (typeof service.name === 'string') {
+      return service.name; // Legacy format
+    }
+    return service.name?.[i18n.language] || service.name?.fr || 'Unknown Service';
+  };
+
+  const getLocalizedDescription = () => {
+    if (typeof service.description === 'string') {
+      return service.description; // Legacy format
+    }
+    return service.description?.[i18n.language] || service.description?.fr || '';
+  };
   return (
     <Link
       to={`/services/${service._id}`}
@@ -54,7 +69,7 @@ export default function ServiceCard({ service }) {
           {service.logo ? (
             <motion.img
               src={`${import.meta.env.VITE_API_URL}${service.logo}`}
-              alt={service.name}
+              alt={getLocalizedName()}
               style={{
                 width: '100%',
                 height: '100%',
@@ -81,10 +96,10 @@ export default function ServiceCard({ service }) {
             color: 'var(--color-text-primary)',
             margin: 0
           }}>
-            {service.name}
+            {getLocalizedName()}
           </h3>
 
-          {service.description && (
+          {getLocalizedDescription() && (
             <p style={{
               fontSize: 'var(--font-size-sm)',
               color: 'var(--color-text-tertiary)',
@@ -95,7 +110,7 @@ export default function ServiceCard({ service }) {
               overflow: 'hidden',
               lineHeight: 'var(--line-height-snug)'
             }}>
-              {service.description}
+              {getLocalizedDescription()}
             </p>
           )}
         </div>

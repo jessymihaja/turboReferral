@@ -34,9 +34,25 @@ const referralSchema = new mongoose.Schema({
     maxlength: [VALIDATION.MAX_CODE_LENGTH, t('validation.codeMaxLength', { max: VALIDATION.MAX_CODE_LENGTH })],
   },
   description: {
-    type: String,
-    maxlength: [VALIDATION.MAX_DESCRIPTION_LENGTH, t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH })],
-    trim: true,
+    type: mongoose.Schema.Types.Mixed, // Allows both String and Object
+    validate: {
+      validator: function(value) {
+        if (!value) return true; // Optional field
+        
+        if (typeof value === 'string') {
+          return value.length <= VALIDATION.MAX_DESCRIPTION_LENGTH;
+        } else if (typeof value === 'object' && value !== null) {
+          for (const lang in value) {
+            if (typeof value[lang] === 'string' && value[lang].length > VALIDATION.MAX_DESCRIPTION_LENGTH) {
+              return false;
+            }
+          }
+          return true;
+        }
+        return false;
+      },
+      message: t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH })
+    }
   },
   isActive: {
     type: Boolean,
@@ -136,6 +152,25 @@ referralSchema.methods.getDaysUntilExpiration = function() {
   const daysUntilExpiration = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
 
   return daysUntilExpiration;
+};
+
+referralSchema.methods.getLocalizedDescription = function(language = 'fr') {
+  if (!this.description) return '';
+  
+  // Handle legacy string descriptions
+  if (typeof this.description === 'string') {
+    return this.description;
+  }
+  
+  // Handle multilingual object descriptions
+  if (typeof this.description === 'object' && this.description !== null) {
+    return this.description[language] || 
+           this.description.fr || 
+           this.description.en || 
+           Object.values(this.description).find(desc => desc && typeof desc === 'string') || '';
+  }
+  
+  return '';
 };
 
 module.exports = mongoose.model('Referral', referralSchema);

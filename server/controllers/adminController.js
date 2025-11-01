@@ -42,7 +42,17 @@ exports.updateReferral = asyncHandler(async (req, res) => {
 
   if (link !== undefined) referral.link = link;
   if (code !== undefined) referral.code = code;
-  if (description !== undefined) referral.description = description;
+  
+  if (description !== undefined) {
+    if (typeof description === 'string') {
+      // If description is a simple string, update French version
+      referral.description = { ...referral.description, fr: description };
+    } else if (typeof description === 'object' && description !== null) {
+      // If description is an object with language keys, merge with existing
+      referral.description = { ...referral.description, ...description };
+    }
+  }
+  
   if (promo !== undefined) referral.promo = promo;
 
   await referral.save();

@@ -4,13 +4,14 @@ import { FaTrash, FaPlus, FaFileUpload, FaLink, FaCode, FaInbox, FaChevronDown, 
 import { useTranslation } from 'react-i18next';
 import CustomToast from '../components/CustomToast';
 import BadgeDisplay from '../components/BadgeDisplay';
+import MultilingualInput from '../components/MultilingualInput';
 import { referralService, categoryService, serviceService, badgeService } from '../services';
 import { compressServiceLogo } from '../utils/imageCompressor';
 import api from '../services/api';
 import './Dashboard.css';
 
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useContext(UserContext);
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +29,8 @@ export default function Dashboard() {
   const [collapsedServices, setCollapsedServices] = useState({});
 
   // Form state
-  const [serviceName, setServiceName] = useState('');
-  const [serviceDescription, setServiceDescription] = useState('');
+  const [serviceNames, setServiceNames] = useState({});
+  const [serviceDescriptions, setServiceDescriptions] = useState({});
   const [serviceLogoFile, setServiceLogoFile] = useState(null);
   const [serviceWebsite, setServiceWebsite] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -133,14 +134,24 @@ export default function Dashboard() {
     };
   }, [hasMore, loadingMore, loadMoreReferrals]);
 
-  function groupByService(referrals) {
+  // Helper to get localized service name
+  const getLocalizedServiceName = useCallback((service) => {
+    if (!service || !service.name) return 'Unknown Service';
+    
+    if (typeof service.name === 'string') {
+      return service.name; // Legacy format
+    }
+    return service.name[i18n.language] || service.name.fr || 'Unknown Service';
+  }, [i18n.language]);
+
+  const groupByService = useCallback((referrals) => {
     return referrals.reduce((acc, ref) => {
-      const serviceName = ref.service?.name || 'Unknown Service';
+      const serviceName = getLocalizedServiceName(ref.service);
       if (!acc[serviceName]) acc[serviceName] = [];
       acc[serviceName].push(ref);
       return acc;
     }, {});
-  }
+  }, [getLocalizedServiceName]);
 
   function toggleServiceCollapse(serviceName) {
     setCollapsedServices(prev => ({
@@ -203,7 +214,8 @@ export default function Dashboard() {
   async function handleServiceRequestSubmit(e) {
     e.preventDefault();
 
-    if (!serviceName.trim()) {
+    // Validate that at least French name is provided
+    if (!serviceNames.fr || !serviceNames.fr.trim()) {
       setToast({ message: t('dashboard.serviceNameRequired'), type: 'error' });
       return;
     }
@@ -212,8 +224,10 @@ export default function Dashboard() {
 
     try {
       const formData = new FormData();
-      formData.append('name', serviceName.trim());
-      formData.append('description', serviceDescription.trim());
+      
+      // Send multilingual data
+      formData.append('name', JSON.stringify(serviceNames));
+      formData.append('description', JSON.stringify(serviceDescriptions));
       formData.append('website', serviceWebsite.trim());
       formData.append('category', selectedCategory || '');
 
@@ -224,8 +238,8 @@ export default function Dashboard() {
       await serviceService.create(formData);
 
       setToast({ message: t('dashboard.serviceRequested'), type: 'success' });
-      setServiceName('');
-      setServiceDescription('');
+      setServiceNames({});
+      setServiceDescriptions({});
       setServiceLogoFile(null);
       setServiceWebsite('');
       setSelectedCategory('');
@@ -334,12 +348,13 @@ export default function Dashboard() {
             </h2>
 
             <form onSubmit={handleServiceRequestSubmit}>
-              <input
-                type="text"
+              <MultilingualInput
+                values={serviceNames}
+                onValuesChange={setServiceNames}
                 placeholder={t('dashboard.serviceName')}
-                value={serviceName}
-                onChange={e => setServiceName(e.target.value)}
-                required
+                type="input"
+                maxLength={100}
+                className="mb-4"
               />
 
               <select
@@ -352,11 +367,14 @@ export default function Dashboard() {
                 ))}
               </select>
 
-              <textarea
+              <MultilingualInput
+                values={serviceDescriptions}
+                onValuesChange={setServiceDescriptions}
                 placeholder={t('dashboard.description')}
-                value={serviceDescription}
-                onChange={e => setServiceDescription(e.target.value)}
-                rows={2}
+                type="textarea"
+                minRows={2}
+                maxLength={500}
+                className="mb-4"
               />
 
               <input

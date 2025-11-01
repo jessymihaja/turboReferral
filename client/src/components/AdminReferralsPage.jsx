@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { FaCrown, FaUser, FaLink, FaCode, FaCalendar, FaThumbsUp, FaThumbsDown, FaTrash, FaChartLine, FaComment } from "react-icons/fa";
+import { FaCrown, FaUser, FaLink, FaCode, FaCalendar, FaThumbsUp, FaThumbsDown, FaTrash, FaChartLine, FaComment, FaEdit } from "react-icons/fa";
 import Table from "./Table";
 import PromoteReferralModal from "./PromoteReferralModal";
+import ModalEditReferral from "./ModalEditReferral";
 import api from '../services/api';
 import { referralService } from '../services';
 import { useTranslation } from 'react-i18next';
@@ -9,10 +10,11 @@ import './AdminReferrals.css';
 import AdminLayout from './AdminLayout';
 
 export default function AdminReferralsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReferral, setSelectedReferral] = useState(null);
+  const [editReferral, setEditReferral] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -164,12 +166,20 @@ export default function AdminReferralsPage() {
     {
       key: 'description',
       header: t('table.description'),
-      accessor: (row) => row.description || '—',
-      render: (row) => (
-        <div className="truncate" style={{ maxWidth: '200px' }} title={row.description}>
-          {row.description || '—'}
-        </div>
-      )
+      accessor: (row) => {
+        if (typeof row.description === 'string') return row.description || '—';
+        return row.description?.[i18n.language] || row.description?.fr || row.description?.en || '—';
+      },
+      render: (row) => {
+        const desc = typeof row.description === 'string' 
+          ? row.description 
+          : (row.description?.[i18n.language] || row.description?.fr || row.description?.en || '');
+        return (
+          <div className="truncate" style={{ maxWidth: '200px' }} title={desc}>
+            {desc || '—'}
+          </div>
+        );
+      }
     },
     {
       key: 'isPromoted',
@@ -253,6 +263,13 @@ export default function AdminReferralsPage() {
       width: '180px',
       render: (row) => (
         <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center' }}>
+          <button
+            onClick={() => setEditReferral(row)}
+            className="btn-sm btn-primary"
+            title={t('common.edit')}
+          >
+            <FaEdit size={12} />
+          </button>
           <button
             onClick={() => setSelectedReferral(row)}
             className="btn-sm btn-promote"
@@ -403,6 +420,21 @@ export default function AdminReferralsPage() {
               setReferrals(updatedReferrals);
             }
             setSelectedReferral(null);
+          }}
+        />
+      )}
+
+      {editReferral && (
+        <ModalEditReferral
+          referral={editReferral}
+          isOpen={!!editReferral}
+          onClose={() => setEditReferral(null)}
+          onUpdated={(updatedReferral) => {
+            const updatedReferrals = referrals.map(r =>
+              r._id === editReferral._id ? { ...r, ...updatedReferral } : r
+            );
+            setReferrals(updatedReferrals);
+            setEditReferral(null);
           }}
         />
       )}

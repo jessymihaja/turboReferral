@@ -19,7 +19,7 @@ exports.getServiceById = asyncHandler(async (req, res) => {
 });
 
 exports.createService = asyncHandler(async (req, res) => {
-  const { name, description, website, category } = req.body;
+  let { name, description, website, category } = req.body;
 
   let logo = '';
   if (req.file) {
@@ -27,14 +27,58 @@ exports.createService = asyncHandler(async (req, res) => {
     logo = optimizedImages.original;
   }
 
-  const existing = await Service.findOne({ name });
+  // Parse JSON strings from form data if needed
+  if (typeof name === 'string') {
+    try {
+      name = JSON.parse(name);
+    } catch (e) {
+      // If parsing fails, treat as legacy string format
+    }
+  }
+
+  if (typeof description === 'string') {
+    try {
+      description = JSON.parse(description);
+    } catch (e) {
+      // If parsing fails, treat as legacy string format
+    }
+  }
+
+  // Handle multilingual names
+  let nameObj = {};
+  if (typeof name === 'string') {
+    // If name is a simple string, use it for French by default
+    nameObj.fr = name;
+  } else if (typeof name === 'object' && name !== null) {
+    // If name is an object with language keys
+    nameObj = name;
+  }
+
+  // Handle multilingual descriptions
+  let descriptionObj = {};
+  if (typeof description === 'string') {
+    // If description is a simple string, use it for French by default
+    descriptionObj.fr = description;
+  } else if (typeof description === 'object' && description !== null) {
+    // If description is an object with language keys
+    descriptionObj = description;
+  }
+
+  // Check for existing service by name (check both string and multilingual formats)
+  const existing = await Service.findOne({
+    $or: [
+      { name: name }, // Legacy string name
+      { 'name.fr': typeof name === 'string' ? name : name?.fr },
+      { 'name.en': typeof name === 'string' ? name : name?.en }
+    ]
+  });
   if (existing) {
     throw new AppError(t('service.serviceAlreadyExists'), 400);
   }
 
   const service = new Service({
-    name,
-    description,
+    name: nameObj,
+    description: descriptionObj,
     logo,
     website,
     isValidated: false,
@@ -102,6 +146,30 @@ exports.updateService = asyncHandler(async (req, res) => {
     }
     const optimizedImages = await optimizeServiceLogo(req.file.path, req.file.filename);
     updates.logo = optimizedImages.original;
+  }
+
+  // Handle multilingual names
+  if (updates.name !== undefined) {
+    if (typeof updates.name === 'string') {
+      // If name is a simple string, update French version
+      service.name = { ...service.name, fr: updates.name };
+    } else if (typeof updates.name === 'object' && updates.name !== null) {
+      // If name is an object with language keys, merge with existing
+      service.name = { ...service.name, ...updates.name };
+    }
+    delete updates.name; // Remove from updates to avoid overwriting
+  }
+
+  // Handle multilingual descriptions
+  if (updates.description !== undefined) {
+    if (typeof updates.description === 'string') {
+      // If description is a simple string, update French version
+      service.description = { ...service.description, fr: updates.description };
+    } else if (typeof updates.description === 'object' && updates.description !== null) {
+      // If description is an object with language keys, merge with existing
+      service.description = { ...service.description, ...updates.description };
+    }
+    delete updates.description; // Remove from updates to avoid overwriting
   }
 
   Object.assign(service, updates);

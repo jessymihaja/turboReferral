@@ -13,44 +13,46 @@ import {
   FaBox
 } from 'react-icons/fa';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const AdminSidebar = ({ isOpen, onToggle }) => {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const adminMenuItems = [
     {
       path: '/admin',
-      label: 'Dashboard',
+      label: t('admin.adminDashboard'),
       icon: FaTools,
       color: '--color-primary-600'
     },
     {
       path: '/admin/referrals',
-      label: 'Référencements',
+      label: t('common.referrals'),
       icon: FaChartBar,
       color: '--color-primary-600'
     },
     {
       path: '/admin/services',
-      label: 'Services',
+      label: t('common.services'),
       icon: FaBox,
       color: '--color-primary-600'
     },
     {
       path: '/categories',
-      label: 'Catégories',
+      label: t('common.categories'),
       icon: FaLightbulb,
       color: '--color-primary-600'
     },
     {
       path: '/pending-reports',
-      label: 'Signalements',
+      label: t('common.reports'),
       icon: FaExclamationTriangle,
       color: '--color-primary-600'
     },
     {
       path: '/admin/users',
-      label: 'Utilisateurs',
+      label: t('common.users'),
       icon: FaUsers,
       color: '--color-primary-600'
     }
@@ -156,14 +158,14 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
                 fontWeight: 'var(--font-weight-bold)',
                 color: 'var(--color-text-primary)'
               }}>
-                Administration
+                {t('common.admin')}
               </h3>
               <p style={{
                 margin: 0,
                 fontSize: 'var(--font-size-sm)',
                 color: 'var(--color-text-muted)'
               }}>
-                Panneau de contrôle
+                {t('common.dashboard')}
               </p>
             </div>
           </div>
@@ -210,7 +212,7 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
               }}
             >
               <FaHome size={16} />
-              <span>Retour au site</span>
+              <span>{t('common.back')}</span>
             </Link>
           </div>
 
@@ -223,11 +225,11 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
-              Gestion
+              {t('admin.overviewAnalytics')}
             </h4>
           </div>
 
-          {adminMenuItems.map((item, index) => {
+          {adminMenuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             

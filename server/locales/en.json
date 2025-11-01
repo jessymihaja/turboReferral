@@ -1,0 +1,146 @@
+{
+  "errors": {
+    "resourceNotFound": "Resource not found",
+    "alreadyExists": "{{field}} already exists",
+    "serverError": "Server error",
+    "invalidToken": "Invalid token",
+    "tokenExpired": "Token expired",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access forbidden",
+    "badRequest": "Invalid request"
+  },
+  "success": {
+    "success": "Success",
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully"
+  },
+  "validation": {
+    "usernameRequired": "Username is required",
+    "usernameMinLength": "Username must be at least {{min}} characters long",
+    "usernameMaxLength": "Username cannot exceed {{max}} characters",
+    "usernameInvalid": "Username can only contain letters, numbers and underscores",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email format",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least {{min}} characters long",
+    "nameRequired": "Name is required",
+    "descriptionRequired": "Description is required",
+    "categoryRequired": "Category is required",
+    "linkOrCodeRequired": "A link or code is required",
+    "linkInvalid": "Invalid link format",
+    "userRequired": "User is required",
+    "serviceRequired": "Service is required",
+    "referralRequired": "Referral is required",
+    "voteTypeRequired": "Vote type is required",
+    "voteTypeInvalid": "Invalid vote type",
+    "reasonRequired": "Reason is required",
+    "startDateRequired": "Start date is required",
+    "endDateRequired": "End date is required",
+    "endDateInvalid": "End date must be after start date",
+    "logoInvalid": "Invalid file type. Accepted formats: jpeg, jpg, png, gif, webp",
+    "logoTooLarge": "File is too large. Maximum size: 5MB",
+    "descriptionMaxLength": "Description cannot exceed {{max}} characters",
+    "commentMaxLength": "Comment cannot exceed {{max}} characters",
+    "titleRequired": "Title is required",
+    "contentRequired": "Content is required",
+    "badgeTypeRequired": "Badge type is required",
+    "codeMaxLength": "Code cannot exceed {{max}} characters",
+    "typeRequired": "Type is required",
+    "dateFinRequired": "End date is required for temporary referrals and must be after start date",
+    "oneActiveReferralPerService": "You can only have one active referral or code per service"
+  },
+  "auth": {
+    "usernameOrEmailInUse": "Username or email already in use",
+    "userCreated": "User created successfully",
+    "invalidCredentials": "Invalid credentials",
+    "loginSuccessful": "Login successful",
+    "accountBlocked": "Your account has been blocked. Please contact the administrator."
+  },
+  "category": {
+    "categoryCreated": "Category created successfully",
+    "categoryUpdated": "Category updated successfully",
+    "categoryDeleted": "Category deleted successfully",
+    "categoryNotFound": "Category not found"
+  },
+  "service": {
+    "serviceCreated": "Service created successfully",
+    "serviceUpdated": "Service updated successfully",
+    "serviceDeleted": "Service deleted successfully",
+    "serviceNotFound": "Service not found",
+    "serviceValidated": "Service validated successfully",
+    "serviceAlreadyExists": "A service with this name already exists"
+  },
+  "referral": {
+    "referralCreated": "Referral created successfully",
+    "referralUpdated": "Referral updated successfully",
+    "referralDeleted": "Referral deleted successfully",
+    "referralNotFound": "Referral not found",
+    "linkOrCodeNotBoth": "You must provide either a link or a code, but not both",
+    "serviceNotValidated": "The service must be validated before adding referrals",
+    "cannotEditOthersReferral": "You cannot edit another user's referral",
+    "cannotDeleteOthersReferral": "You cannot delete another user's referral",
+    "cannotModifyOthersReferral": "You cannot modify another user's referral",
+    "statusUpdated": "Referral status updated successfully",
+    "renewed": "Referral renewed successfully for 3 months",
+    "cannotRenewTemporary": "Only permanent referrals can be renewed"
+  },
+  "vote": {
+    "voteRecorded": "Vote recorded successfully",
+    "voteUpdated": "Vote updated successfully",
+    "voteDeleted": "Vote deleted successfully",
+    "alreadyVoted": "You have already voted for this referral",
+    "noVoteFound": "No vote found"
+  },
+  "report": {
+    "reportCreated": "Report created successfully",
+    "reportUpdated": "Report updated successfully",
+    "reportDeleted": "Report deleted successfully",
+    "reportNotFound": "Report not found",
+    "alreadyReported": "You have already reported this referral",
+    "warningNotificationSent": "Warning sent to user successfully",
+    "referralDeletedAndNotificationSent": "Referral deleted and notification sent successfully"
+  },
+  "notification": {
+    "notificationCreated": "Notification created successfully",
+    "notificationMarkedRead": "Notification marked as read",
+    "allNotificationsMarkedRead": "All notifications have been marked as read",
+    "notificationDeleted": "Notification deleted successfully",
+    "notificationNotFound": "Notification not found"
+  },
+  "promReferral": {
+    "promReferralCreated": "Referral promoted successfully",
+    "promReferralUpdated": "Promotion updated successfully",
+    "promReferralDeleted": "Promotion deleted successfully",
+    "promReferralNotFound": "Promotion not found",
+    "referralAlreadyPromoted": "This referral is already promoted for this period"
+  },
+  "serviceRequest": {
+    "serviceRequestCreated": "Service request created successfully",
+    "serviceRequestDeleted": "Service request deleted successfully",
+    "serviceRequestNotFound": "Service request not found"
+  },
+  "user": {
+    "userNotFound": "User not found",
+    "userBlocked": "User blocked successfully",
+    "userUnblocked": "User unblocked successfully",
+    "userDeleted": "User deleted successfully"
+  },
+  "badge": {
+    "fetchSuccess": "Badges retrieved successfully",
+    "updateSuccess": "Badges updated successfully",
+    "referral_10": "10 Referrals",
+    "referral_50": "50 Referrals",
+    "referral_100": "100 Referrals",
+    "trusted": "Trusted",
+    "risky": "Risky"
+  },
+  "sort": {
+    "pertinence": "Relevance",
+    "votes": "Most voted",
+    "positive": "Best rating",
+    "recent": "Most recent",
+    "oldest": "Oldest",
+    "sortBy": "Sort by"
+  }
+}

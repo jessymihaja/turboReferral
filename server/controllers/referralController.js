@@ -41,12 +41,22 @@ exports.createReferral = asyncHandler(async (req, res) => {
     }
   }
 
+  // Handle multilingual descriptions
+  let descriptionObj = {};
+  if (typeof description === 'string') {
+    // If description is a simple string, use it for French by default
+    descriptionObj.fr = description;
+  } else if (typeof description === 'object' && description !== null) {
+    // If description is an object with language keys
+    descriptionObj = description;
+  }
+
   const referralData = {
     service,
     user,
     link,
     code,
-    description,
+    description: descriptionObj,
     type,
     dateDebut,
     dateFin
@@ -260,4 +270,42 @@ exports.getExpiringReferrals = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const expiringReferrals = await expirationNotificationService.getExpiringReferralsForUser(userId);
   ResponseHandler.success(res, expiringReferrals);
+});
+
+exports.updateReferral = asyncHandler(async (req, res) => {
+  const { link, code, description, type, dateFin } = req.body;
+
+  const referral = await Referral.findById(req.params.id);
+  if (!referral) {
+    throw new AppError(t('referral.referralNotFound'), 404);
+  }
+
+  // Check if user owns this referral
+  const isOwner = referral.user.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+  
+  if (!isOwner && !isAdmin) {
+    throw new AppError(t('referral.cannotEditOthersReferral'), 403);
+  }
+
+  if (link !== undefined) referral.link = link;
+  if (code !== undefined) referral.code = code;
+  
+  if (description !== undefined) {
+    if (typeof description === 'string') {
+      // If description is a simple string, update French version
+      referral.description = { ...referral.description, fr: description };
+    } else if (typeof description === 'object' && description !== null) {
+      // If description is an object with language keys, merge with existing
+      referral.description = { ...referral.description, ...description };
+    }
+  }
+  
+  if (type !== undefined) referral.type = type;
+  if (dateFin !== undefined) referral.dateFin = dateFin;
+
+  await referral.save();
+  await referral.populate('service');
+
+  ResponseHandler.success(res, referral, t('referral.referralUpdated'));
 });

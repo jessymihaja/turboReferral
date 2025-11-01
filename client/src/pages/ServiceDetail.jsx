@@ -13,13 +13,14 @@ import CustomToast from '../components/CustomToast';
 import ReportReferral from '../components/ReportReferral';
 import PreniumReferralCard from '../components/PreniumReferralCard';
 import BadgeDisplay from '../components/BadgeDisplay';
+import MultilingualDescriptionInput from '../components/MultilingualDescriptionInput';
 import { serviceService, referralService, voteService, badgeService } from '../services';
 import api from '../services/api';
 import { useTranslation } from 'react-i18next';
 import styles from './ServiceDetail.module.css';
 
 export default function ServiceDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
@@ -31,7 +32,7 @@ export default function ServiceDetail() {
   const [newReferral, setNewReferral] = useState({
     link: undefined,
     code: undefined,
-    description: '',
+    description: { fr: '', en: '' },
     type: 'permanent',
     dateDebut: new Date().toISOString().split('T')[0],
     dateFin: ''
@@ -208,7 +209,7 @@ export default function ServiceDetail() {
       setNewReferral({
         link: '',
         code: '',
-        description: '',
+        description: { fr: '', en: '' },
         type: 'permanent',
         dateDebut: new Date().toISOString().split('T')[0],
         dateFin: ''
@@ -807,7 +808,10 @@ export default function ServiceDetail() {
                     lineHeight: '1.6',
                     fontSize: 'var(--font-size-sm)'
                   }}>
-                    {ref.description}
+                    {typeof ref.description === 'string' 
+                      ? ref.description 
+                      : (ref.description[i18n.language] || ref.description.fr || ref.description.en || '')
+                    }
                   </p>
                 )}
 
@@ -957,13 +961,11 @@ export default function ServiceDetail() {
 
                 <div className="form-group">
                   <label className="form-label">{t('dashboard.description')}</label>
-                  <textarea
-                    className="form-textarea"
+                  <MultilingualDescriptionInput
+                    descriptions={newReferral.description}
+                    onDescriptionChange={(descriptions) => setNewReferral({ ...newReferral, description: descriptions })}
                     placeholder={t('service.describeYourReferral')}
-                    value={newReferral.description}
-                    onChange={(e) => setNewReferral({ ...newReferral, description: e.target.value })}
                     maxLength={100}
-                    rows={3}
                   />
                 </div>
 

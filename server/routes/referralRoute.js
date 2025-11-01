@@ -7,6 +7,7 @@ const { referralValidators, idValidator } = require('../utils/validators');
 const {
   getAllReferrals,
   createReferral,
+  updateReferral,
   deleteReferral,
   getReferralsByServiceId,
   getReferralsByUserId,
@@ -16,7 +17,7 @@ const {
   getExpiringReferrals,
 } = require('../controllers/referralController');
 
-const { updateReferral } = require('../controllers/adminController');
+const { updateReferral: adminUpdateReferral } = require('../controllers/adminController');
 
 router.get('/with-status', getReferralsWithPromoStatus);
 router.get('/expiring', authenticateToken, getExpiringReferrals);
@@ -24,7 +25,8 @@ router.get('/user/:id', idValidator, getReferralsByUserId);
 router.get('/service/:id', idValidator, getReferralsByServiceId);
 router.get('/', getAllReferrals);
 router.post('/', authenticateToken, referralValidators.create, createReferral);
-router.put('/:id', adminAuthMiddleware, idValidator, updateReferral);
+router.put('/:id/admin', adminAuthMiddleware, idValidator, adminUpdateReferral);
+router.put('/:id', authenticateToken, idValidator, referralValidators.update, updateReferral);
 router.patch('/:id/toggle-active', authenticateToken, idValidator, toggleReferralActive);
 router.patch('/:id/renew', authenticateToken, idValidator, renewReferral);
 router.delete('/:id', authenticateToken, idValidator, deleteReferral);

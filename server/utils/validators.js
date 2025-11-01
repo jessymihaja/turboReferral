@@ -51,9 +51,45 @@ const referralValidators = {
     body('code').optional().trim().notEmpty().withMessage(t('validation.linkOrCodeRequired')),
     body('description')
       .optional()
+      .custom((value) => {
+        if (typeof value === 'string') {
+          if (value.length > VALIDATION.MAX_DESCRIPTION_LENGTH) {
+            throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
+          }
+        } else if (typeof value === 'object' && value !== null) {
+          for (const lang in value) {
+            if (typeof value[lang] === 'string' && value[lang].length > VALIDATION.MAX_DESCRIPTION_LENGTH) {
+              throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
+            }
+          }
+        }
+        return true;
+      }),
+    validate,
+  ],
+  update: [
+    body('link')
+      .optional()
       .trim()
-      .isLength({ max: VALIDATION.MAX_DESCRIPTION_LENGTH })
-      .withMessage(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH })),
+      .matches(VALIDATION.URL_REGEX)
+      .withMessage(t('validation.linkInvalid')),
+    body('code').optional().trim(),
+    body('description')
+      .optional()
+      .custom((value) => {
+        if (typeof value === 'string') {
+          if (value.length > VALIDATION.MAX_DESCRIPTION_LENGTH) {
+            throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
+          }
+        } else if (typeof value === 'object' && value !== null) {
+          for (const lang in value) {
+            if (typeof value[lang] === 'string' && value[lang].length > VALIDATION.MAX_DESCRIPTION_LENGTH) {
+              throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
+            }
+          }
+        }
+        return true;
+      }),
     validate,
   ],
 };

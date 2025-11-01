@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { FaPlus, FaTimes, FaImage, FaCheck } from 'react-icons/fa';
 import CustomToast from "./CustomToast";
+import MultilingualInput from "./MultilingualInput";
 import { serviceService, categoryService } from '../services';
 import { useTranslation } from 'react-i18next';
 import { compressServiceLogo } from '../utils/imageCompressor';
 
 export default function ModalAddService({ onClose, onAdded }) {
   const { t } = useTranslation();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [names, setNames] = useState({});
+  const [descriptions, setDescriptions] = useState({});
   const [website, setWebsite] = useState("");
   const [category, setCategory] = useState("");
   const [logo, setLogo] = useState(null);
@@ -32,7 +33,7 @@ export default function ModalAddService({ onClose, onAdded }) {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!name.trim()) {
+    if (!names.fr || !names.fr.trim()) {
       setToast({ message: t('modal.serviceNameRequired'), type: 'error' });
       return;
     }
@@ -46,8 +47,8 @@ export default function ModalAddService({ onClose, onAdded }) {
 
     try {
       const formData = new FormData();
-      formData.append("name", name.trim());
-      formData.append("description", description.trim());
+      formData.append("name", JSON.stringify(names));
+      formData.append("description", JSON.stringify(descriptions));
       formData.append("website", website.trim());
       formData.append("category", category);
 
@@ -111,13 +112,12 @@ export default function ModalAddService({ onClose, onAdded }) {
           <div className="modal-body">
             <div className="form-group">
               <label className="form-label form-label-required">{t('dashboard.serviceName')}</label>
-              <input
-                type="text"
-                className="form-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+              <MultilingualInput
+                values={names}
+                onValuesChange={setNames}
                 placeholder={t('dashboard.enterServiceName')}
+                type="input"
+                maxLength={100}
               />
             </div>
 
@@ -140,12 +140,13 @@ export default function ModalAddService({ onClose, onAdded }) {
 
             <div className="form-group">
               <label className="form-label">{t('dashboard.description')}</label>
-              <textarea
-                className="form-textarea"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
+              <MultilingualInput
+                values={descriptions}
+                onValuesChange={setDescriptions}
                 placeholder={t('dashboard.briefDescription')}
+                type="textarea"
+                minRows={3}
+                maxLength={500}
               />
             </div>
 
