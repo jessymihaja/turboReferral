@@ -358,7 +358,9 @@
     "errorLoadingData": "Erreur lors du chargement des données",
     "errorCreatingPromotion": "Erreur lors de la création de la promotion",
     "deleteConfirm": "Supprimer ce parrainage ?",
-    "unknown": "Inconnu"
+    "unknown": "Inconnu",
+    "captchaRequired": "Veuillez compléter le captcha",
+    "captchaError": "Erreur lors du chargement du captcha"
   },
   "status": {
     "pending": "En attente",

@@ -375,6 +375,14 @@
   to { transform: rotate(360deg); }
 }
 
+/* Cloudflare Turnstile Widget Styles */
+.cf-turnstile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 65px;
+}
+
 @media (max-width: 768px) {
   .auth-page {
     padding: var(--space-md);

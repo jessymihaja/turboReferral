@@ -358,7 +358,9 @@
     "errorLoadingData": "Error loading data",
     "errorCreatingPromotion": "Error creating promotion",
     "deleteConfirm": "Delete this referral?",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "captchaRequired": "Please complete the captcha",
+    "captchaError": "Error loading captcha"
   },
   "status": {
     "pending": "Pending",

@@ -4,6 +4,7 @@ import { FaUser, FaEnvelope, FaLock, FaCheck, FaArrowRight, FaExclamationCircle 
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../contexts/UserContext';
 import { authService } from '../services';
+import { TURNSTILE_SITE_KEY } from '../config/constants';
 import '../assets/css/auth.css';
 
 export default function Register() {
@@ -20,13 +21,27 @@ export default function Register() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [turnstileToken, setTurnstileToken] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
       navigate('/dashboard', { replace: true });
     }
-  }, [user, navigate]);
+
+    window.onTurnstileSuccess = (token) => {
+      setTurnstileToken(token);
+    };
+
+    window.onTurnstileError = () => {
+      setGeneralError(t('errors.captchaError') || 'Erreur lors du chargement du captcha');
+    };
+
+    return () => {
+      delete window.onTurnstileSuccess;
+      delete window.onTurnstileError;
+    };
+  }, [user, navigate, t]);
 
   const calculatePasswordStrength = (password) => {
     if (!password) return 0;
@@ -156,18 +171,28 @@ export default function Register() {
       return;
     }
 
+    if (!turnstileToken) {
+      setGeneralError(t('errors.captchaRequired') || 'Veuillez compléter le captcha');
+      return;
+    }
+
     setLoading(true);
 
     try {
       await authService.register({
         username: formData.username,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        turnstileToken
       });
       setSuccess(t('errors.registrationSuccessful'));
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setGeneralError(err.message || t('errors.registrationFailed'));
+      if (window.turnstile) {
+        window.turnstile.reset();
+        setTurnstileToken('');
+      }
     } finally {
       setLoading(false);
     }
@@ -282,6 +307,16 @@ export default function Register() {
                   <FaExclamationCircle /> {fieldErrors.confirm}
                 </div>
               )}
+            </div>
+
+            <div className="auth-form-group">
+              <div 
+                className="cf-turnstile" 
+                data-sitekey={TURNSTILE_SITE_KEY}
+                data-callback="onTurnstileSuccess"
+                data-error-callback="onTurnstileError"
+                data-theme="light"
+              />
             </div>
 
             {generalError && (
