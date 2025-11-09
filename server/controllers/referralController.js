@@ -8,6 +8,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ResponseHandler = require('../utils/responseHandler');
 const { AppError } = require('../utils/errorHandler');
 const { t } = require('../utils/i18n');
+const { validateTurnstileToken } = require('../utils/turnstileValidator');
 const badgeService = require('../services/badgeService');
 const referralScoringService = require('../services/referralScoringService');
 const expirationNotificationService = require('../services/expirationNotificationService');
@@ -18,8 +19,36 @@ exports.getAllReferrals = asyncHandler(async (req, res) => {
 });
 
 exports.createReferral = asyncHandler(async (req, res) => {
-  const { service, link, code, description, type, dateDebut, dateFin } = req.body;
+  const { service, link, code, description, type, dateDebut, dateFin, turnstileToken } = req.body;
   const user = req.user._id;
+
+  if (!turnstileToken) {
+    throw new AppError('Le captcha est requis', 400);
+  }
+
+  const remoteip = req.headers['cf-connecting-ip'] || 
+                   req.headers['x-forwarded-for'] || 
+                   req.ip || 
+                   req.connection.remoteAddress;
+
+  const validation = await validateTurnstileToken(turnstileToken, remoteip);
+
+  if (!validation.success) {
+    const errorMessages = {
+      'missing-input-secret': 'Configuration du captcha incorrecte',
+      'invalid-input-secret': 'Configuration du captcha incorrecte',
+      'missing-input-response': 'Token de captcha manquant',
+      'invalid-input-response': 'Token de captcha invalide ou expiré',
+      'bad-request': 'Requête de captcha malformée',
+      'timeout-or-duplicate': 'Token de captcha expiré ou déjà utilisé',
+      'internal-error': 'Erreur interne du captcha',
+    };
+
+    const errorCode = validation['error-codes']?.[0];
+    const errorMessage = errorMessages[errorCode] || 'Échec de la validation du captcha';
+    
+    throw new AppError(errorMessage, 400);
+  }
 
   if ((!link && !code) || (link && code)) {
     throw new AppError(t('referral.linkOrCodeNotBoth'), 400);

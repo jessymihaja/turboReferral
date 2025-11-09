@@ -1,5 +1,6 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Turnstile from 'react-turnstile';
 import { UserContext } from '../contexts/UserContext';
 import ReferralVoteForm from '../components/ReferralVoteForm';
 import {
@@ -17,6 +18,7 @@ import MultilingualDescriptionInput from '../components/MultilingualDescriptionI
 import { serviceService, referralService, voteService, badgeService } from '../services';
 import api from '../services/api';
 import { useTranslation } from 'react-i18next';
+import { TURNSTILE_SITE_KEY } from '../config/constants';
 import styles from './ServiceDetail.module.css';
 
 export default function ServiceDetail() {
@@ -48,6 +50,8 @@ export default function ServiceDetail() {
   const [openVoteForm, setOpenVoteForm] = useState(null);
   const [userBadges, setUserBadges] = useState({});
   const [sortBy, setSortBy] = useState('pertinence');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -165,6 +169,11 @@ export default function ServiceDetail() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    if (!turnstileToken) {
+      setToast({ message: t('errors.captchaRequired') || 'Veuillez compléter le captcha', type: 'error' });
+      return;
+    }
+
     if ((!newReferral.link && !newReferral.code) || (newReferral.link && newReferral.code)) {
       setToast({ message: t('toast.provideEitherLinkOrCode'), type: 'error' });
       return;
@@ -195,6 +204,7 @@ export default function ServiceDetail() {
         type: newReferral.type,
         dateDebut: newReferral.dateDebut,
         dateFin: newReferral.type === 'temporary' ? newReferral.dateFin : undefined,
+        turnstileToken,
       });
 
       const newRef = data.data || data;
@@ -215,8 +225,18 @@ export default function ServiceDetail() {
         dateFin: ''
       });
       setToast({ message: t('toast.referralAdded'), type: 'success' });
+      
+      if (turnstileRef.current) {
+        turnstileRef.current.reset();
+        setTurnstileToken('');
+      }
     } catch (err) {
       setToast({ message: err.message || t('toast.errorAddingReferral'), type: 'error' });
+      
+      if (turnstileRef.current) {
+        turnstileRef.current.reset();
+        setTurnstileToken('');
+      }
     }
   }
 
@@ -1013,6 +1033,16 @@ export default function ServiceDetail() {
                     </div>
                   </>
                 )}
+
+                <div className="form-group" style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Turnstile
+                    ref={turnstileRef}
+                    sitekey={TURNSTILE_SITE_KEY}
+                    onVerify={(token) => setTurnstileToken(token)}
+                    onError={() => setToast({ message: t('errors.captchaError') || 'Erreur lors du chargement du captcha', type: 'error' })}
+                    theme="light"
+                  />
+                </div>
 
                 <button type="submit" className="btn-primary">
                   <FaPlus /> {t('service.addReferral')}
