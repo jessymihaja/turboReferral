@@ -28,6 +28,7 @@ import NotFound from './pages/NotFound';
 import ErrorBoundary from './components/ErrorBoundary';
 import api from './services/api';
 import './App.css';
+import './assets/css/mobile.css';
 
 function NavbarComp() {
   const { user, logout } = useContext(UserContext);

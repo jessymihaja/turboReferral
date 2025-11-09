@@ -210,6 +210,12 @@ html {
   zoom: 0.8;
 }
 
+@media (max-width: 768px) {
+  html {
+    zoom: 1;
+  }
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -246,6 +252,16 @@ body::after {
   width: 600px;
   height: 600px;
   background: radial-gradient(circle, rgba(34, 211, 238, 0.4) 0%, rgba(251, 146, 60, 0.2) 50%, transparent 100%);
+}
+
+@media (max-width: 768px) {
+  body::before,
+  body::after {
+    width: 400px;
+    height: 400px;
+    filter: blur(60px);
+    opacity: 0.3;
+  }
 }
 
 #root {

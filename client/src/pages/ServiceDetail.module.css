@@ -294,11 +294,13 @@
   .container {
     grid-template-columns: 1fr;
     gap: var(--space-4);
+    padding: var(--space-3);
   }
 
   .sidebar,
   .rightSidebar {
     position: static;
+    max-height: none;
   }
 
   .serviceCard,
@@ -309,11 +311,27 @@
   .referralCard {
     padding: var(--space-md);
   }
+
+  .container:has(.rightSidebar:focus-within) .sidebar,
+  .container:has(.rightSidebar:focus-within) .mainContent {
+    filter: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: var(--space-2);
+    gap: var(--space-3);
+  }
+
   .serviceCard,
   .formCard {
     padding: var(--space-md);
+  }
+
+  .referralCard {
+    padding: var(--space-3);
   }
 }

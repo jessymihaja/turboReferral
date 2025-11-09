@@ -469,7 +469,7 @@ export default function ServiceDetail() {
             </div>
 
             <h2 className="service-name" style={{ textAlign: 'center', marginBottom: 'var(--space-2)' }}>
-              {service.name}
+              {typeof service.name === 'object' ? service.name[i18n.language] || service.name.fr : service.name}
             </h2>
 
             {service.website && (
@@ -500,7 +500,7 @@ export default function ServiceDetail() {
                 paddingBottom: 'var(--space-4)',
                 borderBottom: '1px solid var(--color-border-light)'
               }}>
-                {service.description}
+                {typeof service.description === 'object' ? service.description[i18n.language] || service.description.fr : service.description}
               </p>
             )}
 

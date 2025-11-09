@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaInbox, FaFilter, FaArrowUp } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import ServiceCard from '../components/ServiceCard';
@@ -7,7 +6,7 @@ import ReferralInfo from '../components/ReferralInfo';
 import { serviceService, categoryService } from '../services';
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -49,9 +48,17 @@ export default function Home() {
   };
 
   const filteredServices = services.filter(service => {
+    const serviceName = typeof service.name === 'object' 
+      ? (service.name[i18n.language] || service.name.fr || '')
+      : (service.name || '');
+    
+    const serviceDesc = typeof service.description === 'object'
+      ? (service.description[i18n.language] || service.description.fr || '')
+      : (service.description || '');
+
     const matchQuery = query.trim()
-      ? service.name.toLowerCase().includes(query.toLowerCase()) ||
-        service.description?.toLowerCase().includes(query.toLowerCase())
+      ? serviceName.toLowerCase().includes(query.toLowerCase()) ||
+        serviceDesc.toLowerCase().includes(query.toLowerCase())
       : true;
 
     const matchCategory = selectedCategory
@@ -64,11 +71,13 @@ export default function Home() {
   return (
     <div className="page-container">
       {/* Hero Header */}
-      <motion.div
+      <div
         className="page-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -20 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        style={{
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'translateY(0)' : 'translateY(-20px)',
+          transition: 'all 0.6s ease-out'
+        }}
       >
         <h1 className="page-title" style={{
           background: 'linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-primary) 100%)',
@@ -86,15 +95,15 @@ export default function Home() {
         <p className="page-subtitle">
           {t('home.findBestServices')}
         </p>
-      </motion.div>
+      </div>
 
       {/* Search Bar */}
-      <motion.div
+      <div
         className="search-container"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0.95 }}
-        transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
         style={{
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'scale(1)' : 'scale(0.95)',
+          transition: 'all 0.5s ease-out 0.2s',
           background: 'linear-gradient(135deg, rgba(214, 156, 90, 0.05) 0%, rgba(212, 165, 116, 0.05) 100%)',
           padding: 'var(--space-1)',
           borderRadius: 'var(--radius-full)'
@@ -118,15 +127,17 @@ export default function Home() {
             style={{ paddingLeft: 'var(--space-10)' }}
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Category Filter */}
       {categories.length > 0 && (
-        <motion.div
-          style={{ marginBottom: 'var(--space-8)' }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 10 }}
-          transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
+        <div
+          style={{
+            marginBottom: 'var(--space-8)',
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(10px)',
+            transition: 'all 0.5s ease-out 0.3s'
+          }}
         >
           <div style={{
             display: 'flex',
@@ -142,11 +153,9 @@ export default function Home() {
           </div>
 
           <div className="category-filter">
-            <motion.button
+            <button
               onClick={() => setSelectedCategory('')}
               className={`category-btn ${!selectedCategory ? 'active' : ''}`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               style={
                 !selectedCategory
                   ? {
@@ -158,19 +167,14 @@ export default function Home() {
               }
             >
               {t('common.all')} ({services.filter(s => s.isValidated).length})
-            </motion.button>
-            {categories.map((cat, idx) => {
+            </button>
+            {categories.map((cat) => {
               const count = services.filter(s => s.category?._id === cat._id && s.isValidated).length;
               return (
-                <motion.button
+                <button
                   key={cat._id}
                   onClick={() => setSelectedCategory(cat._id)}
                   className={`category-btn ${selectedCategory === cat._id ? 'active' : ''}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 0.4 + idx * 0.05 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                   style={
                     selectedCategory === cat._id
                       ? {
@@ -182,11 +186,11 @@ export default function Home() {
                   }
                 >
                   {cat.name} ({count})
-                </motion.button>
+                </button>
               );
             })}
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Services Grid */}
@@ -196,34 +200,20 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <motion.div
-            className="card-grid"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.05,
-                },
-              },
-              hidden: {},
-            }}
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredServices.map(service => (
-                <motion.div
-                  key={service._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                  layout
-                >
-                  <ServiceCard service={service} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          <div className="card-grid">
+            {filteredServices.map((service, idx) => (
+              <div
+                key={service._id}
+                style={{
+                  opacity: 0,
+                  animation: 'fadeInUp 0.4s ease-out forwards',
+                  animationDelay: `${idx * 0.05}s`
+                }}
+              >
+                <ServiceCard service={service} />
+              </div>
+            ))}
+          </div>
 
           {/* Empty State */}
           {filteredServices.length === 0 && !loading && (
@@ -256,39 +246,32 @@ export default function Home() {
       <ReferralInfo />
 
       {/* Scroll to Top Button */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            onClick={scrollToTop}
-            style={{
-              position: 'fixed',
-              bottom: 'var(--space-8)',
-              right: 'var(--space-8)',
-              width: '56px',
-              height: '56px',
-              borderRadius: 'var(--radius-full)',
-              background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
-              color: 'var(--color-text-inverse)',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(214, 156, 90, 0.4)',
-              zIndex: 1000,
-              transition: 'all 0.3s ease'
-            }}
-            whileHover={{ scale: 1.1, boxShadow: '0 6px 20px rgba(214, 156, 90, 0.5)' }}
-            whileTap={{ scale: 0.9 }}
-            aria-label="Scroll to top"
-          >
-            <FaArrowUp size={20} />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed',
+            bottom: 'var(--space-8)',
+            right: 'var(--space-8)',
+            width: '56px',
+            height: '56px',
+            borderRadius: 'var(--radius-full)',
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
+            color: 'var(--color-text-inverse)',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 16px rgba(214, 156, 90, 0.4)',
+            zIndex: 1000,
+            transition: 'all 0.3s ease'
+          }}
+          aria-label="Scroll to top"
+        >
+          <FaArrowUp size={20} />
+        </button>
+      )}
     </div>
   );
 }

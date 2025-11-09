@@ -1,0 +1,320 @@
+/* Mobile-specific styles */
+
+/* Touch-friendly tap targets */
+@media (max-width: 768px) {
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improved touch interaction */
+  * {
+    -webkit-tap-highlight-color: rgba(214, 156, 90, 0.2);
+    -webkit-touch-callout: none;
+  }
+
+  /* Prevent text selection on mobile for better UX */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Mobile scrolling improvements */
+  .scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  /* Hide scrollbar on mobile */
+  .scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile form improvements */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevent zoom on iOS */
+  }
+
+  /* Mobile navigation spacing */
+  nav {
+    padding: 0 var(--space-4) !important;
+  }
+
+  /* Mobile modal adjustments */
+  .modal-overlay {
+    padding: var(--space-2);
+  }
+
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* Mobile table improvements */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+  /* Mobile card layouts */
+  .card {
+    margin-bottom: var(--space-3);
+  }
+
+  /* Stack flex items on mobile */
+  .flex-stack-mobile {
+    flex-direction: column !important;
+    gap: var(--space-3) !important;
+  }
+
+  /* Full width on mobile */
+  .full-width-mobile {
+    width: 100% !important;
+  }
+
+  /* Hide on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* Show only on mobile */
+  .show-mobile {
+    display: block !important;
+  }
+
+  /* Mobile spacing utilities */
+  .mobile-p-2 {
+    padding: var(--space-2) !important;
+  }
+
+  .mobile-p-3 {
+    padding: var(--space-3) !important;
+  }
+
+  .mobile-p-4 {
+    padding: var(--space-4) !important;
+  }
+
+  .mobile-m-2 {
+    margin: var(--space-2) !important;
+  }
+
+  .mobile-m-3 {
+    margin: var(--space-3) !important;
+  }
+
+  .mobile-m-4 {
+    margin: var(--space-4) !important;
+  }
+
+  /* Mobile text sizes */
+  .mobile-text-sm {
+    font-size: var(--font-size-sm) !important;
+  }
+
+  .mobile-text-base {
+    font-size: var(--font-size-base) !important;
+  }
+
+  .mobile-text-lg {
+    font-size: var(--font-size-lg) !important;
+  }
+
+  /* Better mobile menu */
+  .mobile-menu {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-bg-elevated);
+    z-index: 999;
+    overflow-y: auto;
+    padding: var(--space-4);
+  }
+
+  /* Mobile drawer */
+  .mobile-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    padding: var(--space-4);
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform var(--transition-base);
+  }
+
+  .mobile-drawer.open {
+    transform: translateY(0);
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, var(--space-4));
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Mobile grid improvements */
+  .grid-mobile-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Improve button groups on mobile */
+  .button-group {
+    flex-direction: column !important;
+    gap: var(--space-2) !important;
+  }
+
+  .button-group button,
+  .button-group a {
+    width: 100% !important;
+  }
+
+  /* Mobile sticky footer */
+  .mobile-sticky-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--color-bg-elevated);
+    padding: var(--space-3) var(--space-4);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+  }
+
+  /* Improve search on mobile */
+  .search-container {
+    margin-bottom: var(--space-4);
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  /* Mobile category pills */
+  .category-filter {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: var(--space-2);
+  }
+
+  .category-filter::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Better spacing for mobile lists */
+  .list-mobile li {
+    padding: var(--space-3) 0;
+  }
+
+  /* Mobile avatar sizing */
+  .avatar-mobile {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Improve stat cards on mobile */
+  .stat-card {
+    padding: var(--space-4);
+  }
+
+  .stat-value {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  /* Smaller padding on very small screens */
+  .page-container {
+    padding: var(--space-3) var(--space-2) !important;
+  }
+
+  /* Smaller titles */
+  h1 {
+    font-size: var(--font-size-xl) !important;
+  }
+
+  h2 {
+    font-size: var(--font-size-lg) !important;
+  }
+
+  /* Compact buttons */
+  button,
+  .btn {
+    padding: var(--space-2) var(--space-3) !important;
+    font-size: var(--font-size-sm) !important;
+  }
+
+  /* Smaller modals */
+  .modal-content {
+    max-width: 100%;
+    margin: 0;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Compact cards */
+  .card {
+    padding: var(--space-3) !important;
+  }
+
+  /* Smaller stat cards */
+  .stat-card {
+    padding: var(--space-3) !important;
+  }
+
+  .stat-value {
+    font-size: var(--font-size-xl) !important;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-menu {
+    top: 60px;
+  }
+
+  .modal-content {
+    max-height: 80vh;
+  }
+}
+
+/* Tablet portrait */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .page-container {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  /* Tablet grid */
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Show some desktop features on tablet */
+  .hide-tablet {
+    display: none !important;
+  }
+}

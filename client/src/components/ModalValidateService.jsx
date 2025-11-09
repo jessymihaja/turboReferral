@@ -5,7 +5,7 @@ import api from '../services/api';
 import { useTranslation } from 'react-i18next';
 
 export default function ModalValidateService({ service, onClose, onValidated }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [validationReason, setValidationReason] = useState("");
   const [toast, setToast] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(false);
@@ -66,10 +66,12 @@ export default function ModalValidateService({ service, onClose, onValidated }) 
         <div className="modal-body">
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <h3 style={{ fontSize: 'var(--font-size-lg)', marginBottom: 'var(--space-2)' }}>
-              {service.name}
+              {typeof service.name === 'object' ? service.name[i18n.language] || service.name.fr : service.name}
             </h3>
             <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-              {service.description || '—'}
+              {typeof service.description === 'object' 
+                ? service.description[i18n.language] || service.description.fr || '—'
+                : service.description || '—'}
             </p>
           </div>
 

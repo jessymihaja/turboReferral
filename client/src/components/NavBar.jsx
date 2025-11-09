@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   FaHome,
   FaChartBar,
@@ -8,17 +7,13 @@ import {
   FaTools,
   FaSignInAlt,
   FaUserPlus,
-  FaLightbulb,
-  FaExclamationTriangle,
-  FaChevronDown,
   FaBars,
   FaTimes,
-  FaUsers,
-  FaCog,
 } from 'react-icons/fa';
 import NotificationIcon from './NotificationIcon';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import './NavBar.css';
 
 
 const Navbar = ({ user, logout }) => {
@@ -35,31 +30,23 @@ const Navbar = ({ user, logout }) => {
   }, []);
 
   return (
-    <motion.nav
+    <nav
       style={{
-        ...styles.nav,
         boxShadow: scrolled ? '0 4px 20px rgba(214, 156, 90, 0.15)' : 'var(--shadow-md)',
         backdropFilter: scrolled ? 'blur(10px)' : 'none',
         backgroundColor: scrolled ? 'rgba(249, 246, 243, 0.9)' : 'var(--color-bg-elevated)',
       }}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       {/* Logo */}
-      <Link to="/" style={styles.logoLink}>
-        <motion.span
-          style={styles.logo}
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.2 }}
-        >
+      <Link to="/" className="nav-logo-link">
+        <span className="nav-logo">
           turbo<span style={{ fontWeight: 'normal' }}>Referral</span>
-        </motion.span>
+        </span>
       </Link>
 
       {/* Mobile menu toggle */}
       <button
-        style={styles.mobileToggle}
+        className="nav-mobile-toggle"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label={t('navigation.toggleMenu')}
       >
@@ -67,27 +54,24 @@ const Navbar = ({ user, logout }) => {
       </button>
 
       {/* Navigation Links */}
-      <div style={{
-        ...styles.navContent,
-        ...(mobileMenuOpen ? styles.navContentMobile : {})
-      }}>
-        <div style={styles.linksGroup}>
-          <Link to="/" style={styles.link} title={t('common.home')}>
+      <div className={`nav-content ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+        <div className="nav-links-group">
+          <Link to="/" className="nav-link" title={t('common.home')}>
             <FaHome />
-            <span style={styles.linkText}>{t('common.home')}</span>
+            <span>{t('common.home')}</span>
           </Link>
 
           {user && (
             <>
-              <Link to="/dashboard" style={styles.link} title={t('common.dashboard')}>
+              <Link to="/dashboard" className="nav-link" title={t('common.dashboard')}>
                 <FaChartBar />
-                <span style={styles.linkText}>{t('common.dashboard')}</span>
+                <span>{t('common.dashboard')}</span>
               </Link>
               
               {user.role === 'admin' && (
-                <Link to="/admin" style={styles.link} title={t('common.admin')}>
+                <Link to="/admin" className="nav-link" title={t('common.admin')}>
                   <FaTools />
-                  <span style={styles.linkText}>{t('common.admin')}</span>
+                  <span>{t('common.admin')}</span>
                 </Link>
               )}
             </>
@@ -95,20 +79,20 @@ const Navbar = ({ user, logout }) => {
         </div>
 
         {/* User Section */}
-        <div style={styles.userSection}>
+        <div className="nav-user-section">
           <LanguageSwitcher />
           {user ? (
             <>
               <NotificationIcon />
-              <Link to="/profile" style={styles.profileLink} title="Profil">
+              <Link to="/profile" className="nav-profile-link" title="Profil">
                 {user.profilePhoto ? (
                   <img
                     src={`${import.meta.env.VITE_API_URL}${user.profilePhoto}`}
                     alt={user.username}
-                    style={styles.profilePhoto}
+                    className="nav-profile-photo"
                   />
                 ) : (
-                  <div style={styles.profileInitial}>
+                  <div className="nav-profile-initial">
                     {user.username?.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -118,293 +102,29 @@ const Navbar = ({ user, logout }) => {
                   logout();
                   setMobileMenuOpen(false);
                 }}
-                style={styles.logoutButton}
+                className="nav-logout-button"
                 title={t('common.logout')}
               >
                 <FaSignOutAlt />
-                <span style={styles.linkText}>{t('common.logout')}</span>
+                <span>{t('common.logout')}</span>
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" style={styles.link} title={t('common.login')}>
+              <Link to="/login" className="nav-link" title={t('common.login')}>
                 <FaSignInAlt />
-                <span style={styles.linkText}>{t('common.login')}</span>
+                <span>{t('common.login')}</span>
               </Link>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link to="/register" style={styles.authButton} title={t('common.register')}>
-                  <FaUserPlus />
-                  <span style={styles.linkText}>{t('common.register')}</span>
-                </Link>
-              </motion.div>
+              <Link to="/register" className="nav-auth-button" title={t('common.register')}>
+                <FaUserPlus />
+                <span>{t('common.register')}</span>
+              </Link>
             </>
           )}
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 };
-
-const styles = {
-  nav: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'var(--color-bg-elevated)',
-    padding: '0 var(--space-xl)',
-    height: '70px',
-    boxShadow: 'var(--shadow-md)',
-    position: 'sticky',
-    top: 0,
-    zIndex: 1000,
-    borderBottom: '1px solid var(--color-border-light)',
-  },
-  logoLink: {
-    textDecoration: 'none',
-    zIndex: 1001,
-  },
-  logo: {
-    fontSize: 'var(--font-size-xl)',
-    background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    fontWeight: 'var(--font-weight-bold)',
-    letterSpacing: '-0.5px',
-  },
-  mobileToggle: {
-    display: 'none',
-    background: 'none',
-    border: 'none',
-    fontSize: 'var(--font-size-xl)',
-    color: 'var(--color-text-primary)',
-    cursor: 'pointer',
-    padding: 'var(--space-sm)',
-    zIndex: 1001,
-  },
-  navContent: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flex: 1,
-    marginLeft: 'var(--space-2xl)',
-  },
-  navContentMobile: {
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'fixed',
-    top: '70px',
-    left: 0,
-    right: 0,
-    backgroundColor: 'var(--color-bg-elevated)',
-    boxShadow: 'var(--shadow-lg)',
-    padding: 'var(--space-lg)',
-    gap: 'var(--space-lg)',
-    zIndex: 1000,
-  },
-  linksGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-md)',
-  },
-  link: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-sm)',
-    textDecoration: 'none',
-    color: 'var(--color-text-secondary)',
-    fontSize: 'var(--font-size-base)',
-    fontWeight: 'var(--font-weight-medium)',
-    padding: 'var(--space-sm) var(--space-md)',
-    borderRadius: 'var(--radius-md)',
-    transition: 'all var(--transition-base)',
-  },
-  linkText: {
-    display: 'inline',
-  },
-  userSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-md)',
-  },
-  iconButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    color: 'var(--color-text-secondary)',
-    textDecoration: 'none',
-    transition: 'all var(--transition-base)',
-    backgroundColor: 'transparent',
-  },
-  profileLink: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    textDecoration: 'none',
-    transition: 'all var(--transition-base)',
-    border: '2px solid var(--color-border-light)',
-    overflow: 'hidden',
-  },
-  profilePhoto: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    borderRadius: '50%',
-  },
-  profileInitial: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
-    color: 'white',
-    fontWeight: 'var(--font-weight-bold)',
-    fontSize: 'var(--font-size-base)',
-  },
-  logoutButton: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-sm)',
-    border: 'none',
-    backgroundColor: 'var(--color-secondary)',
-    color: 'var(--color-text-inverse)',
-    fontWeight: 'var(--font-weight-medium)',
-    padding: 'var(--space-sm) var(--space-lg)',
-    borderRadius: 'var(--radius-md)',
-    cursor: 'pointer',
-    fontSize: 'var(--font-size-sm)',
-    transition: 'all var(--transition-base)',
-  },
-  authButton: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-sm)',
-    textDecoration: 'none',
-    background: 'linear-gradient(135deg, var(--color-primary) 0%, #D4A574 100%)',
-    color: 'var(--color-text-inverse)',
-    fontWeight: 'var(--font-weight-medium)',
-    padding: 'var(--space-sm) var(--space-lg)',
-    borderRadius: 'var(--radius-md)',
-    fontSize: 'var(--font-size-sm)',
-    transition: 'all var(--transition-base)',
-    boxShadow: '0 2px 8px rgba(214, 156, 90, 0.2)',
-  },
-  dropdownContainer: {
-    position: 'relative',
-  },
-  dropdownMenu: {
-    position: 'absolute',
-    top: 'calc(100% + 8px)',
-    left: 0,
-    backgroundColor: 'var(--color-bg-elevated)',
-    boxShadow: 'var(--shadow-lg)',
-    borderRadius: 'var(--radius-md)',
-    padding: 'var(--space-sm)',
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: '200px',
-    zIndex: 999,
-    border: '1px solid var(--color-border-light)',
-  },
-  dropdownItem: {
-    padding: 'var(--space-sm) var(--space-md)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-sm)',
-    color: 'var(--color-text-secondary)',
-    textDecoration: 'none',
-    fontSize: 'var(--font-size-sm)',
-    fontWeight: 'var(--font-weight-medium)',
-    transition: 'all var(--transition-base)',
-    cursor: 'pointer',
-    borderRadius: 'var(--radius-sm)',
-  },
-  adminLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-sm)',
-    background: 'none',
-    border: 'none',
-    padding: 'var(--space-sm) var(--space-md)',
-    color: 'var(--color-text-secondary)',
-    textDecoration: 'none',
-    cursor: 'pointer',
-    fontSize: 'var(--font-size-base)',
-    fontWeight: 'var(--font-weight-medium)',
-    borderRadius: 'var(--radius-md)',
-    transition: 'all var(--transition-base)',
-  },
-  chevron: {
-    fontSize: 'var(--font-size-xs)',
-    marginLeft: 'var(--space-xs)',
-    transition: 'transform var(--transition-base)',
-  },
-};
-
-// Add media query styles
-if (typeof window !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = `
-    @media (max-width: 768px) {
-      nav > div:not(.mobile-toggle) {
-        display: none !important;
-      }
-      
-      nav button[aria-label="Toggle menu"] {
-        display: block !important;
-      }
-      
-      .navContentMobile {
-        display: flex !important;
-      }
-      
-      nav .linksGroup,
-      nav .userSection {
-        flex-direction: column;
-        align-items: stretch !important;
-        width: 100%;
-      }
-      
-      nav .email {
-        max-width: 100%;
-      }
-    }
-    
-    nav .link:hover,
-    nav .dropdownItem:hover,
-    nav .adminLink:hover {
-      background-color: var(--color-bg-hover);
-      color: var(--color-primary);
-    }
-
-    nav a[title="Profil"]:hover {
-      transform: scale(1.05);
-      border-color: var(--color-primary);
-    }
-
-    nav .logoutButton:hover {
-      background-color: var(--color-primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    nav .authButton:hover {
-      background-color: var(--color-primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
-  `;
-  if (!document.getElementById('navbar-styles')) {
-    styleSheet.id = 'navbar-styles';
-    document.head.appendChild(styleSheet);
-  }
-}
 
 export default Navbar;
