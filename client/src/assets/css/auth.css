@@ -376,7 +376,9 @@
 }
 
 /* Cloudflare Turnstile Widget Styles */
-.cf-turnstile {
+.cf-turnstile,
+#turnstile-container,
+.auth-form-group > div[data-sitekey] {
   display: flex;
   justify-content: center;
   align-items: center;

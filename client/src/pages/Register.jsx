@@ -1,7 +1,8 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaLock, FaCheck, FaArrowRight, FaExclamationCircle } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import Turnstile from 'react-turnstile';
 import { UserContext } from '../contexts/UserContext';
 import { authService } from '../services';
 import { TURNSTILE_SITE_KEY } from '../config/constants';
@@ -22,26 +23,14 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
       navigate('/dashboard', { replace: true });
     }
-
-    window.onTurnstileSuccess = (token) => {
-      setTurnstileToken(token);
-    };
-
-    window.onTurnstileError = () => {
-      setGeneralError(t('errors.captchaError') || 'Erreur lors du chargement du captcha');
-    };
-
-    return () => {
-      delete window.onTurnstileSuccess;
-      delete window.onTurnstileError;
-    };
-  }, [user, navigate, t]);
+  }, [user, navigate]);
 
   const calculatePasswordStrength = (password) => {
     if (!password) return 0;
@@ -189,8 +178,8 @@ export default function Register() {
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setGeneralError(err.message || t('errors.registrationFailed'));
-      if (window.turnstile) {
-        window.turnstile.reset();
+      if (turnstileRef.current) {
+        turnstileRef.current.reset();
         setTurnstileToken('');
       }
     } finally {
@@ -310,12 +299,12 @@ export default function Register() {
             </div>
 
             <div className="auth-form-group">
-              <div 
-                className="cf-turnstile" 
-                data-sitekey={TURNSTILE_SITE_KEY}
-                data-callback="onTurnstileSuccess"
-                data-error-callback="onTurnstileError"
-                data-theme="light"
+              <Turnstile
+                ref={turnstileRef}
+                sitekey={TURNSTILE_SITE_KEY}
+                onVerify={(token) => setTurnstileToken(token)}
+                onError={() => setGeneralError(t('errors.captchaError') || 'Erreur lors du chargement du captcha')}
+                theme="light"
               />
             </div>
 
