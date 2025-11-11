@@ -3,9 +3,10 @@ import { FaTimes, FaCrown, FaCalendar, FaCheck } from "react-icons/fa";
 import { useAuthFetch } from "../utils/authFetch";
 import CustomToast from "./CustomToast";
 import { useTranslation } from 'react-i18next';
+import { getLocalizedText } from '../utils/localization';
 
 export default function PromoteReferralModal({ referral, isOpen, onClose, onCreated }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const authFetch = useAuthFetch();
   const [dateDebut, setDateDebut] = useState("");
   const [dateFin, setDateFin] = useState("");
@@ -75,7 +76,7 @@ export default function PromoteReferralModal({ referral, isOpen, onClose, onCrea
             <div className="alert alert-info" style={{ marginBottom: 'var(--space-4)' }}>
               <strong>{referral.service?.name || t('common.services')}</strong>
               <p style={{ fontSize: 'var(--font-size-sm)', marginTop: 'var(--space-1)' }}>
-                {referral.description || referral._id}
+                {getLocalizedText(referral.description, i18n.language) || referral._id}
               </p>
             </div>
 

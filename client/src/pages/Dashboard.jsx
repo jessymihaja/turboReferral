@@ -7,6 +7,7 @@ import BadgeDisplay from '../components/BadgeDisplay';
 import MultilingualInput from '../components/MultilingualInput';
 import { referralService, categoryService, serviceService, badgeService } from '../services';
 import { compressServiceLogo } from '../utils/imageCompressor';
+import { getLocalizedText } from '../utils/localization';
 import api from '../services/api';
 import './Dashboard.css';
 
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const [toast, setToast] = useState({ message: '', type: '' });
+
   
   // Pagination state
   const [page, setPage] = useState(1);
@@ -526,7 +528,7 @@ export default function Dashboard() {
                                   ) : null;
                                 })()}
                               </div>
-                              {ref.description && <span className="desc">{ref.description}</span>}
+                              {ref.description && <span className="desc">{getLocalizedText(ref.description, i18n.language)}</span>}
                             </div>
                             <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                               <button
