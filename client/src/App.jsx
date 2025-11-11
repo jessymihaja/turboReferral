@@ -26,21 +26,15 @@ import Profile from './pages/Profile';
 import Maintenance from './pages/Maintenance';
 import NotFound from './pages/NotFound';
 import ErrorBoundary from './components/ErrorBoundary';
+import ConnectionStatus from './components/ConnectionStatus';
 import api from './services/api';
 import './App.css';
 import './assets/css/mobile.css';
 
-function NavbarComp() {
-  const { user, logout } = useContext(UserContext);
-
-  return (
-    <Navbar user={user} logout={logout} />
-  );
-}
-
 function AppContent() {
   const location = useLocation();
   const { isMaintenanceMode, enableMaintenanceMode } = useMaintenance();
+  const { user, logout } = useContext(UserContext);
 
   useEffect(() => {
     api.setServerUnavailableCallback(() => {
@@ -60,7 +54,8 @@ function AppContent() {
 
   return (
     <>
-      {!isAdminPath && <NavbarComp />}
+      <ConnectionStatus />
+      {!isAdminPath && <Navbar user={user} logout={logout} />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services/:id" element={<ServiceDetail />} />

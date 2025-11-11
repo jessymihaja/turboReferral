@@ -14,7 +14,7 @@ const referralScoringService = require('../services/referralScoringService');
 const expirationNotificationService = require('../services/expirationNotificationService');
 
 exports.getAllReferrals = asyncHandler(async (req, res) => {
-  const referrals = await Referral.find().populate('service user');
+  const referrals = await Referral.find({ isActive: true }).populate('service user');
   ResponseHandler.success(res, referrals);
 });
 
@@ -130,7 +130,7 @@ exports.getReferralsByServiceId = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, sortBy = 'pertinence' } = req.query;
   const skip = (page - 1) * limit;
 
-  const referrals = await Referral.find({ service: req.params.id })
+  const referrals = await Referral.find({ service: req.params.id, isActive: true })
     .populate('service user');
 
   const total = referrals.length;
@@ -213,7 +213,7 @@ exports.getReferralsByUserId = asyncHandler(async (req, res) => {
 });
 
 exports.getReferralsWithPromoStatus = asyncHandler(async (req, res) => {
-  const referrals = await Referral.find().populate('user service');
+  const referrals = await Referral.find({ isActive: true }).populate('user service');
 
   // Get ALL promotions (not just active ones) to show all promoted referrals
   const promos = await PromReferral.find();

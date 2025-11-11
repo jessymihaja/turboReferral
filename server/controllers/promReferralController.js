@@ -27,9 +27,15 @@ exports.getActivePromReferrals = asyncHandler(async (req, res) => {
   const activePromotions = await PromReferral.find({
     dateDebut: { $lte: today },
     dateFin: { $gte: today },
-  }).populate('referral');
+  }).populate({
+    path: 'referral',
+    match: { isActive: true }
+  });
 
-  ResponseHandler.success(res, activePromotions);
+  // Filter out promotions where referral is null (due to isActive: false)
+  const filteredPromotions = activePromotions.filter(promo => promo.referral);
+
+  ResponseHandler.success(res, filteredPromotions);
 });
 
 exports.getActivePromReferralsByServiceId = asyncHandler(async (req, res) => {
@@ -40,6 +46,7 @@ exports.getActivePromReferralsByServiceId = asyncHandler(async (req, res) => {
     dateFin: { $gte: today },
   }).populate({
     path: 'referral',
+    match: { isActive: true },
     populate: [
       {
         path: 'user',

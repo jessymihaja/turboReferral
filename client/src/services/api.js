@@ -1,4 +1,5 @@
 import { API_URL, STORAGE_KEYS } from '../config/constants';
+import { NetworkStatus } from '../utils/networkStatus';
 
 class ApiService {
   constructor(baseURL) {
@@ -13,6 +14,26 @@ class ApiService {
 
   setServerUnavailableCallback(callback) {
     this.onServerUnavailable = callback;
+  }
+
+  async retry(fn, maxRetries = 2, delay = 1000) {
+    for (let i = 0; i <= maxRetries; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (i === maxRetries || !this.shouldRetry(error)) {
+          throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      }
+    }
+  }
+
+  shouldRetry(error) {
+    return error.message.includes('connexion') || 
+           error.message.includes('réseau') || 
+           error.message.includes('timeout') ||
+           error.message.includes('ERR_CONNECTION');
   }
 
   getAuthHeaders() {
@@ -44,10 +65,15 @@ class ApiService {
   }
 
   async get(endpoint, options = {}) {
+    // Check network status first
+    if (!NetworkStatus.isOnline) {
+      throw new Error('Pas de connexion Internet');
+    }
+
     try {
       // Construction sécurisée de l'URL + support des query params (page, limit, sortBy, etc.)
       const url = new URL(`${this.baseURL}${endpoint}`);
-      const { params } = options || {};
+      const { params, timeout = 10000 } = options || {};
       if (params && typeof params === 'object') {
         Object.entries(params).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
@@ -56,17 +82,26 @@ class ApiService {
         });
       }
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: this.getAuthHeaders(),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       return this.handleResponse(response);
     } catch (error) {
-      if (error.message.includes('fetch') || error.message.includes('network')) {
+      if (error.name === 'AbortError') {
+        throw new Error('La requête a expiré');
+      }
+      if (error.message.includes('fetch') || error.message.includes('network') || error.message.includes('ERR_CONNECTION')) {
         if (this.onServerUnavailable) {
           this.onServerUnavailable();
         }
+        throw new Error('Problème de connexion réseau');
       }
       throw error;
     }

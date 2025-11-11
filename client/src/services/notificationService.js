@@ -8,8 +8,15 @@ export const notificationService = {
   },
 
   async getUnreadCount() {
-    const response = await api.get(API_ENDPOINTS.NOTIFICATIONS.UNREAD_COUNT);
-    return response.data;
+    try {
+      const response = await api.retry(async () => {
+        return await api.get(API_ENDPOINTS.NOTIFICATIONS.UNREAD_COUNT, { timeout: 5000 });
+      });
+      return response.data;
+    } catch (error) {
+      console.warn('Échec de récupération du nombre de notifications:', error.message);
+      return { count: 0 };
+    }
   },
 
   async markAsRead(id) {

@@ -58,6 +58,14 @@ app.get('/', (req, res) => {
   res.json({ message: 'API TurboReferral fonctionne', version: '1.0.0' });
 });
 
+app.head('/api/health', (req, res) => {
+  res.status(200).end();
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/referrals', referralRoutes);

@@ -11,6 +11,7 @@ const Notifications = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
   const observerTarget = useRef(null);
   const navigate = useNavigate();
 
@@ -39,6 +40,7 @@ const Notifications = () => {
     const fetchNotifications = async () => {
       try {
         setLoading(true);
+        setError(null);
         const data = await notificationService.getAll(1, 10);
 
         const initialNotifications = data.data?.notifications || data.notifications || [];
@@ -48,6 +50,7 @@ const Notifications = () => {
         setHasMore(pagination?.hasMore || false);
       } catch (err) {
         console.error('Erreur lors de la récupération des notifications :', err);
+        setError('Impossible de charger les notifications');
       } finally {
         setLoading(false);
       }
@@ -66,13 +69,14 @@ const Notifications = () => {
       { threshold: 0.1 }
     );
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
     }
 
     return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
       }
     };
   }, [hasMore, loadingMore, loadMoreNotifications]);
@@ -98,6 +102,25 @@ const Notifications = () => {
     return (
       <div className="notifications-container">
         <div className="spinner" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-wrapper">
+        <div className="notifications-container">
+          <h2 style={{color:'#5D4037'}}>{t('notifications.myNotifications')}</h2>
+          <div className="error-message" style={{ 
+            padding: '20px', 
+            backgroundColor: '#ffebee', 
+            border: '1px solid #ffcdd2', 
+            borderRadius: '4px',
+            color: '#c62828'
+          }}>
+            {error}
+          </div>
+        </div>
       </div>
     );
   }
