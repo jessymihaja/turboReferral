@@ -113,14 +113,15 @@ exports.setServiceValidation = asyncHandler(async (req, res) => {
 
   if (service.requestedBy) {
     const Notification = require('../models/Notification');
+    const serviceName = typeof service.name === 'string' ? service.name : (service.name?.toString() || '');
     await Notification.create({
       userId: service.requestedBy,
       title: isValidated ?
-        `Service "${service.name}" approuvé` :
-        `Service "${service.name}" rejeté`,
+        `Service "${serviceName}" approuvé` :
+        `Service "${serviceName}" rejeté`,
       content: isValidated ?
-        `Votre demande de service "${service.name}" a été approuvée et est maintenant disponible.` :
-        `Votre demande de service "${service.name}" a été rejetée${validationReason ? `: ${validationReason}` : '.'}`,
+        `Votre demande de service "${serviceName}" a été approuvée et est maintenant disponible.` :
+        `Votre demande de service "${serviceName}" a été rejetée${validationReason ? `: ${validationReason}` : '.'}`,
       link: `/services/${service._id}`,
     });
   }

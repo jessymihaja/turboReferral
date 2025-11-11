@@ -35,7 +35,7 @@ module.exports = {
 
   VALIDATION: {
     MAX_COMMENT_LENGTH: 300,
-    MAX_DESCRIPTION_LENGTH: 100,
+    MAX_DESCRIPTION_LENGTH: 500,
     MAX_CODE_LENGTH: 20,
     URL_REGEX: /^https?:\/\/.+$/,
   },
