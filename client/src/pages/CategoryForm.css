@@ -1,8 +1,12 @@
 .category-grid-layout {
   display: grid;
-  grid-template-columns: 400px 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: var(--space-6);
   align-items: start;
+}
+
+.category-grid-layout > .form-container:first-child {
+  min-width: 400px;
 }
 
 .category-table-container {

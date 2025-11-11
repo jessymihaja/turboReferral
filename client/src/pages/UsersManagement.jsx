@@ -179,6 +179,7 @@ export default function UsersManagement() {
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               className="input-with-icon"
+              style={{paddingLeft: "2.5rem"}}
             />
           </div>
         </div>

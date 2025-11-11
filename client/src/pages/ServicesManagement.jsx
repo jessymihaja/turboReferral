@@ -10,7 +10,7 @@ import api from '../services/api';
 import './ServicesManagement.css';
 
 export default function ServicesManagement() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -55,34 +55,62 @@ export default function ServicesManagement() {
       sortable: false,
       width: '80px',
       align: 'center',
-      render: (service) => (
-        service.logo ? (
+      render: (service) => {
+        const serviceName = service.name;
+        const displayName = !serviceName ? 'Service' :
+          (typeof serviceName === 'object' 
+            ? (serviceName[i18n.language] || serviceName.fr || 'Service')
+            : serviceName);
+        
+        return service.logo ? (
           <img
             src={`${import.meta.env.VITE_API_URL}${service.logo}`}
-            alt={service.name}
+            alt={displayName}
             className="table-img"
           />
         ) : (
           <div className="avatar">
             <FaBox />
           </div>
-        )
-      )
+        );
+      }
     },
     {
       key: 'name',
       header: t('table.name'),
-      accessor: (service) => service.name
+      accessor: (service) => {
+        const serviceName = service.name;
+        if (!serviceName) return '—';
+        if (typeof serviceName === 'object') {
+          return serviceName[i18n.language] || serviceName.fr || '—';
+        }
+        return serviceName;
+      }
     },
     {
       key: 'description',
       header: t('table.description'),
-      accessor: (service) => service.description || '—',
-      render: (service) => (
-        <div className="truncate" style={{ maxWidth: '300px' }} title={service.description}>
-          {service.description || '—'}
-        </div>
-      )
+      accessor: (service) => {
+        const desc = service.description;
+        if (!desc) return '—';
+        if (typeof desc === 'object') {
+          return desc[i18n.language] || desc.fr || '—';
+        }
+        return desc;
+      },
+      render: (service) => {
+        const desc = service.description;
+        const displayDesc = !desc ? '—' :
+          (typeof desc === 'object' 
+            ? (desc[i18n.language] || desc.fr || '—')
+            : desc);
+        
+        return (
+          <div className="truncate" style={{ maxWidth: '300px' }} title={displayDesc}>
+            {displayDesc}
+          </div>
+        );
+      }
     },
     {
       key: 'category',

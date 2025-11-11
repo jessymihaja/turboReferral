@@ -91,24 +91,39 @@ export default function AdminReferralsPage() {
     {
       key: 'service',
       header: t('table.service'),
-      accessor: (row) => row.service?.name || t('errors.unknown'),
-      render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          {row.service?.logo ? (
-            <img
-              src={`${import.meta.env.VITE_API_URL}${row.service.logo}`}
-              alt={row.service.name}
-              style={{ 
-                width: '24px', 
-                height: '24px', 
-                borderRadius: 'var(--radius-sm)',
-                objectFit: 'cover'
-              }}
-            />
-          ) : null}
-          <span>{row.service?.name || t('errors.unknown')}</span>
-        </div>
-      )
+      accessor: (row) => {
+        const serviceName = row.service?.name;
+        if (!serviceName) return t('errors.unknown');
+        if (typeof serviceName === 'object') {
+          return serviceName[i18n.language] || serviceName.fr || t('errors.unknown');
+        }
+        return serviceName;
+      },
+      render: (row) => {
+        const serviceName = row.service?.name;
+        const displayName = !serviceName ? t('errors.unknown') :
+          (typeof serviceName === 'object' 
+            ? (serviceName[i18n.language] || serviceName.fr || t('errors.unknown'))
+            : serviceName);
+        
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            {row.service?.logo ? (
+              <img
+                src={`${import.meta.env.VITE_API_URL}${row.service.logo}`}
+                alt={displayName}
+                style={{ 
+                  width: '24px', 
+                  height: '24px', 
+                  borderRadius: 'var(--radius-sm)',
+                  objectFit: 'cover'
+                }}
+              />
+            ) : null}
+            <span>{displayName}</span>
+          </div>
+        );
+      }
     },
     {
       key: 'referral',

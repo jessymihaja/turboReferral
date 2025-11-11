@@ -14,6 +14,8 @@ import {
 } from 'react-icons/fa';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
+import './AdminSidebar.css';
 
 const AdminSidebar = ({ isOpen, onToggle }) => {
   const location = useLocation();
@@ -109,24 +111,10 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
 
       {/* Sidebar */}
       <motion.aside
+        className="admin-sidebar"
         initial="closed"
         animate={isOpen ? "open" : "closed"}
         variants={sidebarVariants}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          height: '100vh',
-          width: '280px',
-          backgroundColor: 'var(--color-bg-elevated)',
-          borderRight: '1px solid var(--color-border-light)',
-          boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)',
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '0',
-          minHeight: '100vh'
-        }}
       >
         {/* Header */}
         <div style={{
@@ -301,6 +289,15 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
             );
           })}
         </nav>
+
+        {/* Language Switcher */}
+        <div style={{
+          padding: 'var(--space-lg)',
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
+          <LanguageSwitcher variant="navbar" />
+        </div>
 
         {/* Footer */}
         <div style={{

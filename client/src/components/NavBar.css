@@ -1,5 +1,5 @@
 /* NavBar Styles */
-nav {
+.main-navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -158,7 +158,7 @@ nav {
 
 /* Mobile Styles */
 @media (max-width: 768px) {
-  nav {
+  .main-navbar {
     padding: 0 var(--space-4);
   }
 

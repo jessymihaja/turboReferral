@@ -44,8 +44,8 @@
     font-size: 16px !important; /* Prevent zoom on iOS */
   }
 
-  /* Mobile navigation spacing */
-  nav {
+  /* Mobile navigation spacing - only for main navbar */
+  .main-navbar {
     padding: 0 var(--space-4) !important;
   }
 

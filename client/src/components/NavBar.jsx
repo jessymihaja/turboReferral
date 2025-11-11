@@ -31,6 +31,7 @@ const Navbar = ({ user, logout }) => {
 
   return (
     <nav
+      className="main-navbar"
       style={{
         boxShadow: scrolled ? '0 4px 20px rgba(214, 156, 90, 0.15)' : 'var(--shadow-md)',
         backdropFilter: scrolled ? 'blur(10px)' : 'none',
