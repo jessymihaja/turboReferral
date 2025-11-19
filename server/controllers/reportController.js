@@ -97,12 +97,12 @@ exports.deleteReferral = asyncHandler(async (req, res) => {
   }
 
   const userId = referral.user._id;
-  const lien = referral.link || referral.code || 'lien inconnu';
-  const serviceName = referral.service?.name || 'service inconnu';
-  const raison = report.reason || 'Aucune raison spécifiée';
+  const lien = referral.link || referral.code || t('common.unknownLink');
+  const serviceName = referral.service?.name || t('common.unknownService');
+  const raison = report.reason ? t(`reports.reportReasons.${report.reason}`) : t('common.noReasonSpecified');
 
-  const title = `Votre parrainage "${serviceName}" a été supprimé`;
-  const content = `Votre lien "${lien}" a été supprimé pour la raison suivante : "${raison}". Veuillez respecter les conditions d'utilisation lors de vos prochaines publications.`;
+  const title = t('notification.referralDeleted.title', { serviceName });
+  const content = t('notification.referralDeleted.content', { lien, raison });
 
   await Notification.create({ userId, title, content });
 

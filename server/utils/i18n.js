@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const translations = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../locales/fr.json'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../locales/en.json'), 'utf8')
 );
 
 function t(key, params = {}) {

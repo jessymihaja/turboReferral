@@ -48,7 +48,13 @@
     "codeMaxLength": "Code cannot exceed {{max}} characters",
     "typeRequired": "Type is required",
     "dateFinRequired": "End date is required for temporary referrals and must be after start date",
-    "oneActiveReferralPerService": "You can only have one active referral or code per service"
+    "oneActiveReferralPerService": "You can only have one active referral or code per service",
+    "reasonInvalid": "Invalid reason provided"
+  },
+  "common": {
+    "unknownLink": "unknown link",
+    "unknownService": "unknown service",
+    "noReasonSpecified": "No reason specified"
   },
   "auth": {
     "usernameOrEmailInUse": "Username or email already in use",
@@ -69,7 +75,11 @@
     "serviceDeleted": "Service deleted successfully",
     "serviceNotFound": "Service not found",
     "serviceValidated": "Service validated successfully",
-    "serviceAlreadyExists": "A service with this name already exists"
+    "serviceAlreadyExists": "A service with this name already exists",
+    "serviceApprovedTitle": "Service \"{{name}}\" approved",
+    "serviceApprovedContent": "Your service request \"{{name}}\" has been approved and is now available.",
+    "serviceRejectedTitle": "Service \"{{name}}\" rejected",
+    "serviceRejectedContent": "Your service request \"{{name}}\" has been rejected{{reason}}."
   },
   "referral": {
     "referralCreated": "Referral created successfully",
@@ -99,14 +109,24 @@
     "reportNotFound": "Report not found",
     "alreadyReported": "You have already reported this referral",
     "warningNotificationSent": "Warning sent to user successfully",
-    "referralDeletedAndNotificationSent": "Referral deleted and notification sent successfully"
+    "referralDeletedAndNotificationSent": "Referral deleted and notification sent successfully",
+    "reportReasons": {
+      "broken": "Broken",
+      "misleading": "Misleading",
+      "abusive": "Abusive",
+      "other": "Other"
+    }
   },
   "notification": {
     "notificationCreated": "Notification created successfully",
     "notificationMarkedRead": "Notification marked as read",
     "allNotificationsMarkedRead": "All notifications have been marked as read",
     "notificationDeleted": "Notification deleted successfully",
-    "notificationNotFound": "Notification not found"
+    "notificationNotFound": "Notification not found",
+    "referralDeleted": {
+      "title": "Your referral \"{{serviceName}}\" has been deleted",
+      "content": "Your link \"{{lien}}\" has been deleted for the following reason: \"{{raison}}\". Please respect the terms of use in your future posts."
+    }
   },
   "promReferral": {
     "promReferralCreated": "Referral promoted successfully",

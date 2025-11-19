@@ -14,10 +14,10 @@ const ReportReferral = ({ referralId, iconOnly = false }) => {
   const { token} = useContext(UserContext);
 
   const reasons = [
-    t('reports.reportReasons.broken'),
-    t('reports.reportReasons.misleading'),
-    t('reports.reportReasons.abusive'),
-    t('reports.reportReasons.other')
+    'broken',
+    'misleading',
+    'abusive',
+    'other'
   ];
 
   const handleReport = async (reason) => {
@@ -136,7 +136,7 @@ const ReportReferral = ({ referralId, iconOnly = false }) => {
                 e.currentTarget.style.color = 'var(--color-text-primary)';
               }}
             >
-              {reason}
+              {t(`reports.reportReasons.${reason}`)}
             </div>
           ))}
         </div>

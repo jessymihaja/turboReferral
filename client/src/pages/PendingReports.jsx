@@ -185,10 +185,10 @@ export default function PendingReports() {
     {
       key: 'reason',
       header: t('reports.reason'),
-      accessor: (report) => report.reason,
+      accessor: (report) => t(`reports.reportReasons.${report.reason}`),
       render: (report) => (
         <span className="badge badge-warning">
-          <FaFlag size={10} /> {report.reason}
+          <FaFlag size={10} /> {t(`reports.reportReasons.${report.reason}`)}
         </span>
       )
     },

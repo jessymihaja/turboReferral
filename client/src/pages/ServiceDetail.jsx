@@ -170,7 +170,7 @@ export default function ServiceDetail() {
     e.preventDefault();
 
     if (!turnstileToken) {
-      setToast({ message: t('errors.captchaRequired') || 'Veuillez compléter le captcha', type: 'error' });
+      setToast({ message: t('errors.captchaRequired'), type: 'error' });
       return;
     }
 
@@ -180,17 +180,17 @@ export default function ServiceDetail() {
     }
 
     if (newReferral.code && newReferral.code.length > 20) {
-      setToast({ message: 'Le code ne peut pas dépasser 20 caractères', type: 'error' });
+      setToast({ message: t('toast.codeTooLong', { maxLength: 20 }), type: 'error' });
       return;
     }
 
     if (newReferral.type === 'temporary' && !newReferral.dateFin) {
-      setToast({ message: 'La date de fin est requise pour les parrainages temporaires', type: 'error' });
+      setToast({ message: t('toast.endDateRequired'), type: 'error' });
       return;
     }
 
     if (newReferral.type === 'temporary' && new Date(newReferral.dateFin) <= new Date(newReferral.dateDebut)) {
-      setToast({ message: 'La date de fin doit être après la date de début', type: 'error' });
+      setToast({ message: t('toast.endDateInvalid'), type: 'error' });
       return;
     }
 
@@ -372,16 +372,16 @@ export default function ServiceDetail() {
       ));
 
       setToast({
-        message: updatedReferral.isActive ? 'Parrainage activé' : 'Parrainage désactivé',
+        message: updatedReferral.isActive ? t('toast.referralActivated') : t('toast.referralDeactivated'),
         type: 'success'
       });
     } catch (err) {
-      setToast({ message: err.message || 'Erreur lors de la mise à jour du statut', type: 'error' });
+      setToast({ message: err.message || t('toast.statusUpdateError'), type: 'error' });
     }
   }
 
   async function renewReferral(referralId) {
-    if (!window.confirm('Voulez-vous renouveler ce parrainage pour 3 mois supplémentaires ?')) {
+    if (!window.confirm(t('toast.confirmRenew'))) {
       return;
     }
 
@@ -393,9 +393,9 @@ export default function ServiceDetail() {
         ref._id === referralId ? { ...ref, ...updatedReferral } : ref
       ));
 
-      setToast({ message: 'Parrainage renouvelé avec succès pour 3 mois', type: 'success' });
+      setToast({ message: t('toast.renewSuccess'), type: 'success' });
     } catch (err) {
-      setToast({ message: err.message || 'Erreur lors du renouvellement', type: 'error' });
+      setToast({ message: err.message || t('toast.renewError'), type: 'error' });
     }
   }
 
@@ -669,7 +669,7 @@ export default function ServiceDetail() {
                           }}
                           onMouseEnter={e => e.currentTarget.style.color = ref.isActive ? 'var(--color-error)' : 'var(--color-success)'}
                           onMouseLeave={e => e.currentTarget.style.color = ref.isActive ? 'var(--color-success)' : 'var(--color-text-tertiary)'}
-                          title={ref.isActive ? 'Désactiver' : 'Activer'}
+                          title={ref.isActive ? t('referralCard.deactivate') : t('referralCard.activate')}
                         >
                           <FaPowerOff size={16} />
                         </button>
@@ -690,7 +690,7 @@ export default function ServiceDetail() {
                             }}
                             onMouseEnter={e => e.currentTarget.style.color = 'var(--color-primary)'}
                             onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
-                            title="Renouveler pour 3 mois"
+                            title={t('referralCard.renewTitle')}
                           >
                             <FaSyncAlt size={16} />
                           </button>
@@ -790,7 +790,7 @@ export default function ServiceDetail() {
                         fontWeight: '600'
                       }}>
                         <FaClock size={14} />
-                        <span>Expire dans {daysLeft} jours</span>
+                        <span>{t('referralCard.expiresInDays', { count: daysLeft })}</span>
                       </div>
                     );
                   }
@@ -812,7 +812,7 @@ export default function ServiceDetail() {
                         animation: 'pulse 2s ease-in-out infinite'
                       }}>
                         <FaBell size={14} />
-                        <span>⚠️ Expire dans {daysLeft} jour{daysLeft > 1 ? 's' : ''} ! Pensez à renouveler</span>
+                        <span>{t('referralCard.expiringSoon', { count: daysLeft })}</span>
                       </div>
                     );
                   }
@@ -927,17 +927,17 @@ export default function ServiceDetail() {
                     <FaPlus />
                   </div>
                   <h3 style={{ marginBottom: 'var(--space-2)', color: 'var(--color-text-primary)' }}>
-                    Parrainage actif
+                    {t('rightSidebar.activeReferral.title')}
                   </h3>
                   <p style={{ fontSize: 'var(--font-size-sm)', lineHeight: '1.6' }}>
-                    Vous avez déjà un parrainage actif pour ce service. Désactivez-le depuis votre tableau de bord pour en ajouter un nouveau.
+                    {t('rightSidebar.activeReferral.message')}
                   </p>
                 </div>
               </div>
             ) : (
               <div className={styles.formCard}>
                 <h3 style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-lg)' }}>
-                  <FaPlus /> {t('service.addNewReferral')}
+                  <FaPlus /> {t('rightSidebar.addReferral.title')}
                 </h3>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
@@ -966,7 +966,7 @@ export default function ServiceDetail() {
 
                 <div className="form-group">
                   <label className="form-label">
-                    <FaCode /> {t('service.referralCode')} <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--font-size-xs)' }}>(max 20 caractères)</span>
+                    <FaCode /> {t('service.referralCode')} <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--font-size-xs)' }}>({t('toast.codeTooLong', { maxLength: 20 })})</span>
                   </label>
                   <input
                     type="text"
@@ -991,15 +991,15 @@ export default function ServiceDetail() {
 
                 <div className="form-group">
                   <label className="form-label">
-                    <FaClock /> Type de parrainage
+                    <FaClock /> {t('rightSidebar.addReferral.type.label')}
                   </label>
                   <select
                     className="form-input"
                     value={newReferral.type}
                     onChange={(e) => setNewReferral({ ...newReferral, type: e.target.value })}
                   >
-                    <option value="permanent">Permanent (renouvelable tous les 3 mois)</option>
-                    <option value="temporary">Temporaire (avec date de fin)</option>
+                    <option value="permanent">{t('rightSidebar.addReferral.type.permanent')}</option>
+                    <option value="temporary">{t('rightSidebar.addReferral.type.temporary')}</option>
                   </select>
                 </div>
 
@@ -1007,7 +1007,7 @@ export default function ServiceDetail() {
                   <>
                     <div className="form-group">
                       <label className="form-label">
-                        <FaCalendarAlt /> Date de début
+                        <FaCalendarAlt /> {t('rightSidebar.addReferral.startDate.label')}
                       </label>
                       <input
                         type="date"
@@ -1020,7 +1020,7 @@ export default function ServiceDetail() {
 
                     <div className="form-group">
                       <label className="form-label">
-                        <FaCalendarAlt /> Date de fin
+                        <FaCalendarAlt /> {t('rightSidebar.addReferral.endDate.label')}
                       </label>
                       <input
                         type="date"
@@ -1039,7 +1039,7 @@ export default function ServiceDetail() {
                     ref={turnstileRef}
                     sitekey={TURNSTILE_SITE_KEY}
                     onVerify={(token) => setTurnstileToken(token)}
-                    onError={() => setToast({ message: t('errors.captchaError') || 'Erreur lors du chargement du captcha', type: 'error' })}
+                    onError={() => setToast({ message: t('errors.captchaError'), type: 'error' })}
                     theme="light"
                   />
                 </div>

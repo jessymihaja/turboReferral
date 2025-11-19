@@ -69,7 +69,11 @@
     "serviceDeleted": "Service supprimé avec succès",
     "serviceNotFound": "Service introuvable",
     "serviceValidated": "Service validé avec succès",
-    "serviceAlreadyExists": "Un service avec ce nom existe déjà"
+    "serviceAlreadyExists": "Un service avec ce nom existe déjà",
+    "serviceApprovedTitle": "Service \"{{name}}\" approuvé",
+    "serviceApprovedContent": "Votre demande de service \"{{name}}\" a été approuvée et est maintenant disponible.",
+    "serviceRejectedTitle": "Service \"{{name}}\" rejeté",
+    "serviceRejectedContent": "Votre demande de service \"{{name}}\" a été rejetée{{reason}}."
   },
   "referral": {
     "referralCreated": "Parrainage créé avec succès",

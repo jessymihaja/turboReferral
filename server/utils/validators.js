@@ -125,7 +125,7 @@ const reportValidators = {
   create: [
     body('referralId').isMongoId().withMessage(t('validation.referralRequired')),
     body('reason')
-      .isIn(['Brisé', 'Trompeur', 'Abusif', 'Autre'])
+      .isIn(['broken', 'misleading', 'abusive', 'other'])
       .withMessage(t('validation.reasonRequired')),
     validate,
   ],

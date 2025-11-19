@@ -333,7 +333,44 @@
     "copiedToClipboard": "Copié dans le presse-papiers !",
     "copyFailed": "Échec de la copie",
     "confirmDeleteReferral": "Êtes-vous sûr de vouloir supprimer ce parrainage ?",
-    "errorDeletingReferral": "Erreur lors de la suppression du parrainage"
+    "errorDeletingReferral": "Erreur lors de la suppression du parrainage",
+    "codeTooLong": "Le code ne peut pas dépasser {{maxLength}} caractères",
+    "endDateRequired": "La date de fin est requise pour les parrainages temporaires",
+    "endDateInvalid": "La date de fin doit être après la date de début",
+    "referralActivated": "Parrainage activé",
+    "referralDeactivated": "Parrainage désactivé",
+    "statusUpdateError": "Erreur lors de la mise à jour du statut",
+    "confirmRenew": "Voulez-vous renouveler ce parrainage pour 3 mois supplémentaires ?",
+    "renewSuccess": "Parrainage renouvelé avec succès pour 3 mois",
+    "renewError": "Erreur lors du renouvellement"
+  },
+  "rightSidebar": {
+    "activeReferral": {
+      "title": "Parrainage actif",
+      "message": "Vous avez déjà un parrainage actif pour ce service. Désactivez-le depuis votre tableau de bord pour en ajouter un nouveau."
+    },
+    "addReferral": {
+      "title": "Ajouter un nouveau parrainage",
+      "type": {
+        "label": "Type de parrainage",
+        "permanent": "Permanent (renouvelable tous les 3 mois)",
+        "temporary": "Temporaire (avec date de fin)"
+      },
+      "startDate": {
+        "label": "Date de début"
+      },
+      "endDate": {
+        "label": "Date de fin"
+      }
+    }
+  },
+  "referralCard": {
+    "expiresInDays": "Expire dans {{count}} jours",
+    "expiringSoon": "⚠️ Expire dans {{count}} jour(s) ! Pensez à renouveler",
+    "activate": "Activer",
+    "deactivate": "Désactiver",
+    "renew": "Renouveler",
+    "renewTitle": "Renouveler pour 3 mois"
   },
   "validation": {
     "required": "Requis",
@@ -349,7 +386,16 @@
     "passwordWeak": "Faible - Ajoutez des chiffres et caractères spéciaux",
     "passwordMedium": "Moyen - Ajoutez des caractères spéciaux",
     "passwordStrong": "Fort - Bon mot de passe !",
-    "confirmPasswordRequired": "Veuillez confirmer votre mot de passe"
+    "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+    "reasonInvalid": "Raison fournie invalide",
+    "referralRequired": "Parrainage requis",
+    "serviceRequired": "Service requis",
+    "linkInvalid": "Format d'URL invalide",
+    "linkOrCodeRequired": "Un lien ou un code est requis",
+    "descriptionMaxLength": "La description ne peut pas dépasser {{max}} caractères",
+    "categoryRequired": "Catégorie requise",
+    "voteTypeInvalid": "Type de vote invalide",
+    "commentMaxLength": "Le commentaire ne peut pas dépasser {{max}} caractères"
   },
   "errors": {
     "loginFailed": "Échec de la connexion",

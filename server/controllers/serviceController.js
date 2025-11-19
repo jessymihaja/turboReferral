@@ -113,15 +113,15 @@ exports.setServiceValidation = asyncHandler(async (req, res) => {
 
   if (service.requestedBy) {
     const Notification = require('../models/Notification');
-    const serviceName = typeof service.name === 'string' ? service.name : (service.name?.toString() || '');
+    const serviceName = typeof service.name === 'string' ? service.name : (service.name?.fr || service.name?.en || '');
     await Notification.create({
       userId: service.requestedBy,
       title: isValidated ?
-        `Service "${serviceName}" approuvé` :
-        `Service "${serviceName}" rejeté`,
+        t('service.serviceApprovedTitle', { name: serviceName }) :
+        t('service.serviceRejectedTitle', { name: serviceName }),
       content: isValidated ?
-        `Votre demande de service "${serviceName}" a été approuvée et est maintenant disponible.` :
-        `Votre demande de service "${serviceName}" a été rejetée${validationReason ? `: ${validationReason}` : '.'}`,
+        t('service.serviceApprovedContent', { name: serviceName }) :
+        t('service.serviceRejectedContent', { name: serviceName, reason: validationReason ? `: ${validationReason}` : '.' }),
       link: `/services/${service._id}`,
     });
   }
@@ -147,6 +147,21 @@ exports.updateService = asyncHandler(async (req, res) => {
     }
     const optimizedImages = await optimizeServiceLogo(req.file.path, req.file.filename);
     updates.logo = optimizedImages.original;
+  }
+
+  if (updates.name && typeof updates.name === 'string') {
+    try {
+      updates.name = JSON.parse(updates.name);
+    } catch (e) {
+      // Not a JSON string, treat as a simple string
+    }
+  }
+
+  if (updates.description && typeof updates.description === 'string') {
+    try {
+      updates.description = JSON.parse(updates.description);
+    } catch (e) {
+    }
   }
 
   // Handle multilingual names
@@ -175,6 +190,7 @@ exports.updateService = asyncHandler(async (req, res) => {
 
   Object.assign(service, updates);
   await service.save();
+  await service.populate('category');
 
   ResponseHandler.success(res, service, t('service.serviceUpdated'));
 });

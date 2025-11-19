@@ -10,10 +10,10 @@ module.exports = {
   },
 
   REPORT_REASONS: {
-    BROKEN: 'Brisé',
-    MISLEADING: 'Trompeur',
-    ABUSIVE: 'Abusif',
-    OTHER: 'Autre',
+    BROKEN: 'broken',
+    MISLEADING: 'misleading',
+    ABUSIVE: 'abusive',
+    OTHER: 'other',
   },
 
   REPORT_STATUS: {

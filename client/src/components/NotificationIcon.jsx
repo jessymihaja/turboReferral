@@ -43,7 +43,15 @@ const NotificationIcon = () => {
   }, [user, errorCount]);
 
   return (
-    <Link to="/notifications" style={{ position: 'relative', display: 'inline-block' }}>
+    <Link to="/notifications" style={{ 
+      position: 'relative', 
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '8px',
+      borderRadius: '6px',
+      transition: 'background-color 0.2s ease'
+    }}>
       <FaBell style={{ 
         fontSize: '18px', 
         color: errorCount > 2 ? '#999' : '#333' // Dim icon if many errors
@@ -51,15 +59,21 @@ const NotificationIcon = () => {
       {unreadCount > 0 && (
         <span style={{
           position: 'absolute',
-          top: '-5px',
-          right: '-10px',
-          backgroundColor: 'red',
+          top: '2px',
+          right: '2px',
+          backgroundColor: '#e74c3c',
           color: 'white',
           borderRadius: '50%',
           padding: '2px 6px',
-          fontSize: '10px'
+          fontSize: '10px',
+          fontWeight: 'bold',
+          minWidth: '16px',
+          textAlign: 'center',
+          lineHeight: '1.2',
+          border: '2px solid white',
+          boxSizing: 'border-box'
         }}>
-          {unreadCount}
+          {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
     </Link>
