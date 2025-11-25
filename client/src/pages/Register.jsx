@@ -15,7 +15,8 @@ export default function Register() {
     username: '',
     email: '',
     password: '',
-    confirm: ''
+    confirm: '',
+    acceptCGU: false
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
@@ -99,14 +100,20 @@ export default function Register() {
           return t('validation.passwordsDoNotMatch');
         }
         return '';
+      case 'acceptCGU':
+        if (!value) {
+          return t('validation.acceptCGURequired') || 'Vous devez accepter les conditions générales';
+        }
+        return '';
       default:
         return '';
     }
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+    setFormData(prev => ({ ...prev, [name]: fieldValue }));
     
     if (name === 'password') {
       const strength = calculatePasswordStrength(value);
@@ -136,8 +143,9 @@ export default function Register() {
   };
 
   const handleBlur = (e) => {
-    const { name, value } = e.target;
-    const error = validateField(name, value);
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+    const error = validateField(name, fieldValue);
     setFieldErrors(prev => ({ ...prev, [name]: error }));
   };
 
@@ -294,6 +302,26 @@ export default function Register() {
               {fieldErrors.confirm && (
                 <div className="auth-field-error">
                   <FaExclamationCircle /> {fieldErrors.confirm}
+                </div>
+              )}
+            </div>
+
+            <div className="auth-form-group">
+              <label className="auth-checkbox-label">
+                <input
+                  type="checkbox"
+                  name="acceptCGU"
+                  checked={formData.acceptCGU}
+                  onChange={handleChange}
+                  className={`auth-checkbox ${fieldErrors.acceptCGU ? 'error' : ''}`}
+                />
+                <span>
+                  {t('auth.acceptCGU') || 'J\'accepte les'} <Link to="/conditions-generales" target="_blank" className="auth-link">{t('auth.cgu') || 'Conditions Générales d\'Utilisation'}</Link>
+                </span>
+              </label>
+              {fieldErrors.acceptCGU && (
+                <div className="auth-field-error">
+                  <FaExclamationCircle /> {fieldErrors.acceptCGU}
                 </div>
               )}
             </div>

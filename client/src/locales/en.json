@@ -57,7 +57,9 @@
     "createPassword": "Create a password",
     "creating": "Creating...",
     "loginRequired": "Login required",
-    "pleaseSignIn": "Please sign in"
+    "pleaseSignIn": "Please sign in",
+    "acceptCGU": "I accept the",
+    "cgu": "Terms of Service"
   },
   "home": {
     "discoverTrusted": "Discover trusted",
@@ -395,7 +397,8 @@
     "descriptionMaxLength": "Description cannot exceed {{max}} characters",
     "categoryRequired": "Category is required",
     "voteTypeInvalid": "Invalid vote type",
-    "commentMaxLength": "Comment cannot exceed {{max}} characters"
+    "commentMaxLength": "Comment cannot exceed {{max}} characters",
+    "acceptCGURequired": "You must accept the Terms of Service"
   },
   "errors": {
     "loginFailed": "Login failed",

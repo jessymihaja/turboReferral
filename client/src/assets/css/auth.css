@@ -402,3 +402,44 @@
     padding: var(--space-2xl);
   }
 }
+
+.auth-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+.auth-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  transition: all var(--transition-fast);
+}
+
+.auth-checkbox:hover {
+  border-color: var(--color-primary);
+}
+
+.auth-checkbox.error {
+  border-color: var(--color-error-500);
+  outline: 2px solid var(--color-error-light);
+}
+
+.auth-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+}
+
+.auth-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}

@@ -57,7 +57,9 @@
     "createPassword": "Créer un mot de passe",
     "creating": "Création...",
     "loginRequired": "Connexion requise",
-    "pleaseSignIn": "Veuillez vous connecter"
+    "pleaseSignIn": "Veuillez vous connecter",
+    "acceptCGU": "J'accepte les",
+    "cgu": "Conditions Générales d'Utilisation"
   },
   "home": {
     "discoverTrusted": "Découvrez des parrainages",
@@ -395,7 +397,8 @@
     "descriptionMaxLength": "La description ne peut pas dépasser {{max}} caractères",
     "categoryRequired": "Catégorie requise",
     "voteTypeInvalid": "Type de vote invalide",
-    "commentMaxLength": "Le commentaire ne peut pas dépasser {{max}} caractères"
+    "commentMaxLength": "Le commentaire ne peut pas dépasser {{max}} caractères",
+    "acceptCGURequired": "Vous devez accepter les Conditions Générales d'Utilisation"
   },
   "errors": {
     "loginFailed": "Échec de la connexion",
