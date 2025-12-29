@@ -1,5 +1,5 @@
 ## 🎯 Objectif du projet
-TurboReferral est une application web centrée sur l’utilisateur, conçue pour partager des liens ou codes de parrainage de services, tout en garantissant transparence, sécurité et engagement communautaire.
+RefPush est une application web centrée sur l'utilisateur, conçue pour partager des liens ou codes de parrainage de services, tout en garantissant transparence, sécurité et engagement communautaire.
 La plateforme inclut :
 Un système de validation des services par les administrateurs
 
@@ -266,7 +266,7 @@ Passport.js
 
 
 💡 10. Fonctionnalités supplémentaires recommandées
-Voici des idées de fonctionnalités additionnelles pour enrichir TurboReferral :
+Voici des idées de fonctionnalités additionnelles pour enrichir RefPush :
 ✅ Favoris / Bookmark
 Les utilisateurs peuvent sauvegarder des liens qu’ils souhaitent utiliser plus tard.
 

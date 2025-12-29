@@ -33,14 +33,14 @@ const seedProduction = async () => {
     console.log('👤 Creating admin user...');
     await User.create({
       username: 'admin',
-      email: 'admin@turboreferral.com',
+      email: 'admin@refpush.com',
       password: 'admin123', // Change this in production!
       role: 'admin',
     });
     console.log('✅ Admin user created');
     console.log('');
     console.log('🎉 Production environment ready!');
-    console.log('👋 Login with: admin@turboreferral.com / admin123');
+    console.log('👋 Login with: admin@refpush.com / admin123');
     console.log('⚠️  Please change the admin password after first login!');
 
     await mongoose.disconnect();

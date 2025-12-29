@@ -1,4 +1,4 @@
-# Copilot Instructions for TurboReferral
+# Copilot Instructions for RefPush
 
 Monorepo overview
 - client: React + Vite (ESM)

@@ -109,6 +109,65 @@ export default function ServiceDetail() {
     }
   }
 
+  // Update meta tags for SEO when service loads
+  useEffect(() => {
+    if (service) {
+      const serviceName = service.name || 'Service';
+      const serviceDesc = service.description || 'Découvrez les meilleures offres de parrainage';
+      const pageTitle = `${serviceName} - Codes et Liens de Parrainage | RefPush`;
+      
+      // Update page title
+      document.title = pageTitle;
+      
+      // Update meta description
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.content = `${serviceName}: ${serviceDesc.substring(0, 120)}... Partagez et validez les codes de parrainage sur RefPush.`;
+      
+      // Update og:title
+      let ogTitle = document.querySelector('meta[property="og:title"]');
+      if (!ogTitle) {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        document.head.appendChild(ogTitle);
+      }
+      ogTitle.content = pageTitle;
+      
+      // Update og:description
+      let ogDesc = document.querySelector('meta[property="og:description"]');
+      if (!ogDesc) {
+        ogDesc = document.createElement('meta');
+        ogDesc.setAttribute('property', 'og:description');
+        document.head.appendChild(ogDesc);
+      }
+      ogDesc.content = metaDesc.content;
+      
+      // Update og:url
+      let ogUrl = document.querySelector('meta[property="og:url"]');
+      if (!ogUrl) {
+        ogUrl = document.createElement('meta');
+        ogUrl.setAttribute('property', 'og:url');
+        document.head.appendChild(ogUrl);
+      }
+      ogUrl.content = `https://refpush.com/services/${id}`;
+      
+      // Update og:image if service has logo
+      if (service.logo) {
+        let ogImage = document.querySelector('meta[property="og:image"]');
+        if (!ogImage) {
+          ogImage = document.createElement('meta');
+          ogImage.setAttribute('property', 'og:image');
+          document.head.appendChild(ogImage);
+        }
+        ogImage.content = `https://refpush.com${service.logo}`;
+      }
+    }
+  }, [service, id]);
+
   useEffect(() => {
     function handleScroll() {
       const scrollTop = window.scrollY;
