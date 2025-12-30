@@ -3,12 +3,5 @@ Allow: /
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /api/
-Allow: /api/health
 
-Sitemap: https://refpush.com/sitemap.xml
-
-# Crawl delay (in seconds)
-Crawl-delay: 1
-
-# Request rate (pages per second)
-Request-rate: 10/1s
+Sitemap: https://web.refpush.com/sitemap.xml
