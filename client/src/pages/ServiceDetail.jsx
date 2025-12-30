@@ -18,7 +18,8 @@ import MultilingualDescriptionInput from '../components/MultilingualDescriptionI
 import { serviceService, referralService, voteService, badgeService } from '../services';
 import api from '../services/api';
 import { useTranslation } from 'react-i18next';
-import { TURNSTILE_SITE_KEY } from '../config/constants';
+import { TURNSTILE_SITE_KEY, BASE_URL } from '../config/constants';
+import { generateServiceUrl, slugify } from '../utils/slugify';
 import styles from './ServiceDetail.module.css';
 
 export default function ServiceDetail() {
@@ -153,7 +154,8 @@ export default function ServiceDetail() {
         ogUrl.setAttribute('property', 'og:url');
         document.head.appendChild(ogUrl);
       }
-      ogUrl.content = `https://refpush.com/services/${id}`;
+      const serviceSlug = slugify(serviceName);
+      ogUrl.content = `${BASE_URL}/services/${id}${serviceSlug ? `/${serviceSlug}` : ''}`;
       
       // Update og:image if service has logo
       if (service.logo) {
@@ -163,7 +165,7 @@ export default function ServiceDetail() {
           ogImage.setAttribute('property', 'og:image');
           document.head.appendChild(ogImage);
         }
-        ogImage.content = `https://refpush.com${service.logo}`;
+        ogImage.content = `${BASE_URL}${service.logo}`;
       }
     }
   }, [service, id]);

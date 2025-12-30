@@ -8,6 +8,7 @@ import MultilingualInput from '../components/MultilingualInput';
 import { referralService, categoryService, serviceService, badgeService } from '../services';
 import { compressServiceLogo } from '../utils/imageCompressor';
 import { getLocalizedText } from '../utils/localization';
+import { generateServiceUrl } from '../utils/slugify';
 import api from '../services/api';
 import './Dashboard.css';
 
@@ -438,7 +439,7 @@ export default function Dashboard() {
                         <div className="service-title-left">
                           {serviceId && (
                             <a 
-                              href={`/services/${serviceId}`} 
+                              href={generateServiceUrl(serviceId, serviceName)} 
                               onClick={(e) => e.stopPropagation()}
                               className="service-link"
                             >

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaBox, FaArrowRight } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { generateServiceUrl } from '../utils/slugify';
 
 export default function ServiceCard({ service }) {
   const { t, i18n } = useTranslation();
@@ -22,7 +23,7 @@ export default function ServiceCard({ service }) {
   };
   return (
     <Link
-      to={`/services/${service._id}`}
+      to={generateServiceUrl(service._id, getLocalizedName())}
       style={{ textDecoration: 'none', display: 'block' }}
     >
       <motion.div
