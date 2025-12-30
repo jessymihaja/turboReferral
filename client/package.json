@@ -4,7 +4,14 @@
   "author": "RefPush Team",
   "homepage": "https://refpush.com",
   "repository": "https://github.com/yourusername/refpush",
-  "keywords": ["parrainage", "referral", "codes", "partage", "validation", "communauté"],
+  "keywords": [
+    "parrainage",
+    "referral",
+    "codes",
+    "partage",
+    "validation",
+    "communauté"
+  ],
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -37,6 +44,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "terser": "^5.44.1",
     "vite": "^6.3.5"
   }
 }
