@@ -2,7 +2,7 @@
   "name": "refpush-client",
   "description": "RefPush - Plateforme de partage de codes et liens de parrainage avec validation communautaire",
   "author": "RefPush Team",
-  "homepage": "https://web.refpush.com",
+  "homepage": "https://refpush.com",
   "repository": "https://github.com/yourusername/refpush",
   "keywords": [
     "parrainage",

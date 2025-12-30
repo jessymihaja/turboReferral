@@ -4,7 +4,7 @@
   "description": "RefPush API - Plateforme de partage de codes et liens de parrainage",
   "main": "index.js",
   "author": "RefPush Team",
-  "homepage": "https://web.refpush.com",
+  "homepage": "https://refpush.com",
   "repository": "https://github.com/yourusername/refpush",
   "keywords": ["parrainage", "referral", "api", "express", "mongodb"],
   "license": "ISC",
