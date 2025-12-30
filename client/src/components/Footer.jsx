@@ -66,7 +66,7 @@ export default function Footer() {
             fontSize: "var(--font-size-xl)",
             fontWeight: "var(--font-weight-bold)",
             textShadow: "0 1px 2px rgba(0,0,0,0.45)"
-          }}>turboReferral</h2>
+          }}>refPush</h2>
           <p style={{
             fontSize: "var(--font-size-base)",
             color: "var(--color-text-inverse)",
@@ -293,7 +293,7 @@ export default function Footer() {
           textShadow: "0 1px 2px rgba(0,0,0,0.35)"
         }}
       >
-        © {new Date().getFullYear()} TurboReferral • {t('footer.copyright', 'Tous droits réservés')}
+        © {new Date().getFullYear()} RefPush • {t('footer.copyright', 'Tous droits réservés')}
       </div>
     </footer>
   );

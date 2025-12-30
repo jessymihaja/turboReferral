@@ -11,7 +11,7 @@ const { mongoUri } = require('../config/env');
 
 const initializeProduction = async () => {
   try {
-    console.log('🚀 Initializing TurboReferral for production...\n');
+    console.log('🚀 Initializing RefPush for production...\n');
 
     // 1. Check environment
     console.log('🔍 Checking environment configuration...');
@@ -52,7 +52,7 @@ const initializeProduction = async () => {
 
     // 4. Create admin user
     console.log('\n👤 Setting up admin user...');
-    const existingAdmin = await User.findOne({ email: 'admin@turboreferral.com' });
+    const existingAdmin = await User.findOne({ email: 'admin@refpush.com' });
     
     if (existingAdmin) {
       console.log('⚠️  Admin user already exists');
@@ -61,7 +61,7 @@ const initializeProduction = async () => {
     } else {
       const admin = await User.create({
         username: 'admin',
-        email: 'admin@turboreferral.com',
+        email: 'admin@refpush.com',
         password: 'Admin2024!TurboRef',
         role: 'admin',
       });
@@ -143,7 +143,7 @@ const initializeProduction = async () => {
 if (require.main === module) {
   initializeProduction()
     .then(() => {
-      console.log('\n✨ Ready to launch TurboReferral!');
+      console.log('\n✨ Ready to launch RefPush!');
       process.exit(0);
     })
     .catch((error) => {

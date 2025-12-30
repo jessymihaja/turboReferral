@@ -49,7 +49,7 @@ export default function ConditionsGenerales() {
                   1. Objet
                 </h2>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
-                  Les présentes conditions générales d'utilisation (CGU) ont pour objet de définir les modalités et conditions d'utilisation du site TurboReferral, ainsi que les droits et obligations des parties dans ce cadre.
+                  Les présentes conditions générales d'utilisation (CGU) ont pour objet de définir les modalités et conditions d'utilisation du site RefPush, ainsi que les droits et obligations des parties dans ce cadre.
                 </p>
               </section>
 
@@ -99,7 +99,7 @@ export default function ConditionsGenerales() {
                   4. Parrainage et commissions
                 </h2>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
-                  Les utilisateurs peuvent partager des liens de parrainage sur la plateforme. TurboReferral n'est pas responsable des conditions de parrainage proposées par les services tiers. Les utilisateurs sont invités à vérifier les conditions de chaque service avant de s'inscrire.
+                  Les utilisateurs peuvent partager des liens de parrainage sur la plateforme. RefPush n'est pas responsable des conditions de parrainage proposées par les services tiers. Les utilisateurs sont invités à vérifier les conditions de chaque service avant de s'inscrire.
                 </p>
               </section>
 
@@ -127,7 +127,7 @@ export default function ConditionsGenerales() {
                   6. Responsabilité
                 </h2>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
-                  TurboReferral ne saurait être tenu responsable des dommages directs ou indirects causés au matériel de l'utilisateur lors de l'accès au site, ou résultant de l'utilisation du service.
+                  RefPush ne saurait être tenu responsable des dommages directs ou indirects causés au matériel de l'utilisateur lors de l'accès au site, ou résultant de l'utilisation du service.
                 </p>
               </section>
 
@@ -141,7 +141,7 @@ export default function ConditionsGenerales() {
                   7. Modification des CGU
                 </h2>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
-                  TurboReferral se réserve le droit de modifier les présentes CGU à tout moment. Les modifications prendront effet dès leur publication sur le site.
+                  RefPush se réserve le droit de modifier les présentes CGU à tout moment. Les modifications prendront effet dès leur publication sur le site.
                 </p>
               </section>
 

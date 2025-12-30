@@ -16,7 +16,7 @@ export default function PolitiqueConfidentialité() {
             Nous utilisons vos informations pour fournir et améliorer nos services, personnaliser votre expérience, communiquer avec vous, et pour des raisons de sécurité. Nous ne vendons ni ne louons vos informations personnelles à des tiers.
         </p>
             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-                Merci de faire confiance à Turbo Referral !
+                Merci de faire confiance à RefPush !
             </span>
         <h2 style={{ marginBottom: "1rem", marginTop: "2rem" }}>3. Protection des Informations</h2>
         <p style={{ marginBottom: "1rem" }}>

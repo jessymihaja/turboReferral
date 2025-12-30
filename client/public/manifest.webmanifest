@@ -1,0 +1,48 @@
+{
+  "name": "RefPush",
+  "short_name": "RefPush",
+  "description": "La plateforme de partage de codes et liens de parrainage avec validation communautaire",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#C9A885",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/vite.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/vite.svg",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Accédez à votre tableau de bord RefPush",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/vite.svg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

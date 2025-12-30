@@ -310,7 +310,7 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
             color: 'var(--color-text-muted)',
             textAlign: 'center'
           }}>
-            TurboReferral Admin
+            RefPush Admin
           </div>
         </div>
       </motion.aside>

@@ -49,7 +49,7 @@ export default function MentionsLegales() {
                   1. Informations légales
                 </h2>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
-                  <strong>Nom du site :</strong> TurboReferral
+                  <strong>Nom du site :</strong> RefPush
                 </p>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
                   <strong>Adresse :</strong> [Adresse à compléter]
@@ -58,7 +58,7 @@ export default function MentionsLegales() {
                   <strong>Téléphone :</strong> [Numéro à compléter]
                 </p>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
-                  <strong>Email :</strong> contact@turboreferral.com
+                  <strong>Email :</strong> contact@refpush.com
                 </p>
               </section>
 
@@ -86,7 +86,7 @@ export default function MentionsLegales() {
                   3. Hébergement
                 </h2>
                 <p style={{ marginBottom: 'var(--space-md)' }}>
-                  Le site TurboReferral est hébergé par [Nom de l'hébergeur], situé [Adresse de l'hébergeur].
+                  Le site RefPush est hébergé par [Nom de l'hébergeur], situé [Adresse de l'hébergeur].
                 </p>
               </section>
 
@@ -128,7 +128,7 @@ export default function MentionsLegales() {
                   6. Contact
                 </h2>
                 <p>
-                  Pour toute question relative aux présentes mentions légales, vous pouvez nous contacter à l'adresse suivante : contact@turboreferral.com
+                  Pour toute question relative aux présentes mentions légales, vous pouvez nous contacter à l'adresse suivante : contact@refpush.com
                 </p>
               </section>
             </div>

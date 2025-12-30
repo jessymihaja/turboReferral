@@ -37,7 +37,7 @@ const seedData = async () => {
     // Don't hash password here - the User model's pre-save hook will do it
     await User.create({
       username: 'admin',
-      email: 'admin@turboreferral.com',
+      email: 'admin@refpush.com',
       password: 'password123',
       role: 'admin',
     });
@@ -604,7 +604,7 @@ const seedData = async () => {
 
     console.log('\n✨ Seed data created successfully!\n');
     console.log('📋 Summary:');
-    console.log(`   - Users: ${users.length + 1} (admin: admin@turboreferral.com, password: password123)`);
+    console.log(`   - Users: ${users.length + 1} (admin: admin@refpush.com, password: password123)`);
     console.log(`   - Categories: ${categories.length}`);
     console.log(`   - Services: ${services.length} (${services.filter(s => s.isValidated).length} validated)`);
     console.log(`   - Referrals: ${referrals.length}`);
@@ -613,7 +613,7 @@ const seedData = async () => {
     console.log(`   - Promotions: ${promotedReferrals.length}`);
     console.log(`   - Notifications: ${notifications.length}`);
     console.log('\n🔑 Login credentials:');
-    console.log('   Admin: admin@turboreferral.com / password123');
+    console.log('   Admin: admin@refpush.com / password123');
     console.log('   User 1 (5 referrals, risky): john@example.com / password123');
     console.log('   User 2 (15 referrals, badge 10+): jane@example.com / password123');
     console.log('   User 3 (52 referrals, badge 50+): bob@example.com / password123');

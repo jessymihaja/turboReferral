@@ -56,6 +56,7 @@ function AppContent() {
     <>
       <ConnectionStatus />
       {!isAdminPath && <Navbar user={user} logout={logout} />}
+      <main>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
@@ -118,6 +119,7 @@ function AppContent() {
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </main>
       {!isAdminPath && <Footer />}
     </>
   );

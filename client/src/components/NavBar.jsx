@@ -41,7 +41,7 @@ const Navbar = ({ user, logout }) => {
       {/* Logo */}
       <Link to="/" className="nav-logo-link">
         <span className="nav-logo">
-          turbo<span style={{ fontWeight: 'normal' }}>Referral</span>
+          refPush
         </span>
       </Link>
 
