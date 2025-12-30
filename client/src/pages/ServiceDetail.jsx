@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Turnstile from 'react-turnstile';
 import { UserContext } from '../contexts/UserContext';
 import ReferralVoteForm from '../components/ReferralVoteForm';
@@ -24,7 +24,8 @@ import styles from './ServiceDetail.module.css';
 
 export default function ServiceDetail() {
   const { t, i18n } = useTranslation();
-  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get('id');
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const [service, setService] = useState(null);
@@ -113,8 +114,14 @@ export default function ServiceDetail() {
   // Update meta tags for SEO when service loads
   useEffect(() => {
     if (service) {
-      const serviceName = service.name || 'Service';
-      const serviceDesc = service.description || 'Découvrez les meilleures offres de parrainage';
+      const serviceName = typeof service.name === 'object' 
+        ? (service.name[i18n.language] || service.name.fr || service.name.en || 'Service')
+        : (service.name || 'Service');
+      
+      const serviceDesc = typeof service.description === 'object'
+        ? (service.description[i18n.language] || service.description.fr || service.description.en || 'Découvrez les meilleures offres de parrainage')
+        : (service.description || 'Découvrez les meilleures offres de parrainage');
+      
       const pageTitle = `${serviceName} - Codes et Liens de Parrainage | RefPush`;
       
       // Update page title

@@ -17,5 +17,5 @@ export function slugify(text) {
 
 export function generateServiceUrl(serviceId, serviceName) {
   const slug = slugify(serviceName);
-  return `/services/${serviceId}${slug ? `/${slug}` : ''}`;
+  return `/services/${slug || 'service'}?id=${serviceId}`;
 }

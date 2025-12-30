@@ -59,7 +59,7 @@ function AppContent() {
       <main>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/services/:id/:slug?" element={<ServiceDetail />} />
+        <Route path="/services/:slug" element={<ServiceDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/notifications" element={<Notifications />} />
