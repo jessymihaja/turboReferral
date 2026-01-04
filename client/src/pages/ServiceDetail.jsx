@@ -702,17 +702,20 @@ export default function ServiceDetail() {
                         }}
                       />
                     ) : (
-                      <div className="avatar" style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        backgroundColor: ref.source ? 'var(--color-success)' : 'var(--color-primary)',
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {ref.source ? <FaGlobe size={18} /> : (ref.user?.username?.charAt(0).toUpperCase() || "?")}
+                      <div 
+                        className="avatar" 
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          backgroundColor: 'var(--color-primary)',
+                          color: 'white !important',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {ref.source ? <FaGlobe size={18} color="white" /> : (ref.user?.username?.charAt(0).toUpperCase() || "?")}
                       </div>
                     )}
                     <div>

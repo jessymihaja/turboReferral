@@ -236,7 +236,7 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
           ) : (
             <span
               style={{
-                backgroundColor: ref.source ? "var(--color-success)" : "#3498db",
+                backgroundColor: "#3498db",
                 color: "white",
                 borderRadius: "50%",
                 width: "36px",
@@ -247,7 +247,7 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
                 fontWeight: "bold",
               }}
             >
-              {ref.source ? <FaGlobe size={18} /> : (ref.user?.username?.charAt(0).toUpperCase() || "?")}
+              {ref.source ? <FaGlobe size={18} color="white" /> : (ref.user?.username?.charAt(0).toUpperCase() || "?")}
             </span>
           )}
           <div>
