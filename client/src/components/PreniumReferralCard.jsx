@@ -1,4 +1,4 @@
-import { FaComment, FaThumbsUp, FaThumbsDown, FaCrown, FaCopy, FaCheck, FaExternalLinkAlt } from "react-icons/fa";
+import { FaComment, FaThumbsUp, FaThumbsDown, FaCrown, FaCopy, FaCheck, FaExternalLinkAlt, FaGlobe } from "react-icons/fa";
 import TimeAgo from "./TimeAgo";
 import ReferralVoteForm from "./ReferralVoteForm";
 import ReportReferral from "./ReportReferral";
@@ -222,31 +222,63 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
       {/* Header : avatar + user + couronne */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.8rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* Avatar rond */}
-          <span
-            style={{
-              backgroundColor: "#3498db",
-              color: "white",
-              borderRadius: "50%",
-              width: "36px",
-              height: "36px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold",
-            }}
-          >
-            {(ref.user?.username?.charAt(0).toUpperCase() || "?")}
-          </span>
+          {ref.user?.profilePhoto ? (
+            <img
+              src={`${import.meta.env.VITE_API_URL}${ref.user.profilePhoto}`}
+              alt={ref.user.username}
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                objectFit: 'cover'
+              }}
+            />
+          ) : (
+            <span
+              style={{
+                backgroundColor: ref.source ? "var(--color-success)" : "#3498db",
+                color: "white",
+                borderRadius: "50%",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+              }}
+            >
+              {ref.source ? <FaGlobe size={18} /> : (ref.user?.username?.charAt(0).toUpperCase() || "?")}
+            </span>
+          )}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-              <span style={{ fontWeight: "600", color: "#2c3e50" }}>
-                {ref.user?.username
-                  ? ref.user.username.charAt(0).toUpperCase() +
-                    ref.user.username.slice(1).toLowerCase()
-                  : ref.user}
-              </span>
+              {ref.source ? (
+                <a
+                  href={ref.source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontWeight: "600",
+                    color: "var(--color-primary)",
+                    textDecoration: "none"
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.textDecoration = "underline"}
+                  onMouseLeave={(e) => e.currentTarget.style.textDecoration = "none"}
+                >
+                  De {new URL(ref.source).hostname.replace('www.', '')}
+                </a>
+              ) : (
+                <span style={{ fontWeight: "600", color: "#2c3e50" }}>
+                  {ref.user?.username
+                    ? ref.user.username.charAt(0).toUpperCase() +
+                      ref.user.username.slice(1).toLowerCase()
+                    : ref.user}
+                </span>
+              )}
               <BadgeDisplay badges={badges} size="small" />
+              {ref.source && (
+                <BadgeDisplay badges={[{ type: 'external' }]} size="small" />
+              )}
             </div>
             <small style={{ color: "#7f8c8d" }}>
               <TimeAgo isoDateString={ref.createdAt} />
