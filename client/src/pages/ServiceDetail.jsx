@@ -20,6 +20,7 @@ import api from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { TURNSTILE_SITE_KEY, BASE_URL } from '../config/constants';
 import { generateServiceUrl, slugify } from '../utils/slugify';
+import { getDescriptionInLanguage } from '../utils/languages';
 import styles from './ServiceDetail.module.css';
 
 export default function ServiceDetail() {
@@ -36,7 +37,7 @@ export default function ServiceDetail() {
   const [newReferral, setNewReferral] = useState({
     link: undefined,
     code: undefined,
-    description: { fr: '', en: '' },
+    description: {},
     type: 'permanent',
     dateDebut: new Date().toISOString().split('T')[0],
     dateFin: '',
@@ -289,7 +290,7 @@ export default function ServiceDetail() {
       setNewReferral({
         link: '',
         code: '',
-        description: { fr: '', en: '' },
+        description: {},
         type: 'permanent',
         dateDebut: new Date().toISOString().split('T')[0],
         dateFin: '',
@@ -571,7 +572,7 @@ export default function ServiceDetail() {
                 paddingBottom: 'var(--space-4)',
                 borderBottom: '1px solid var(--color-border-light)'
               }}>
-                {typeof service.description === 'object' ? service.description[i18n.language] || service.description.fr : service.description}
+                {getDescriptionInLanguage(service.description, i18n.language)}
               </p>
             )}
 
@@ -931,10 +932,7 @@ export default function ServiceDetail() {
                     lineHeight: '1.6',
                     fontSize: 'var(--font-size-sm)'
                   }}>
-                    {typeof ref.description === 'string' 
-                      ? ref.description 
-                      : (ref.description[i18n.language] || ref.description.fr || ref.description.en || '')
-                    }
+                    {getDescriptionInLanguage(ref.description, i18n.language)}
                   </p>
                 )}
 

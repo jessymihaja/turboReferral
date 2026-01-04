@@ -6,6 +6,7 @@ import ModalEditReferral from "./ModalEditReferral";
 import api from '../services/api';
 import { referralService } from '../services';
 import { useTranslation } from 'react-i18next';
+import { getDescriptionInLanguage, getDescriptionAvailableLanguages, AVAILABLE_LANGUAGES } from '../utils/languages';
 import './AdminReferrals.css';
 import AdminLayout from './AdminLayout';
 
@@ -29,7 +30,7 @@ export default function AdminReferralsPage() {
               try {
                 const promoData = await api.get(`/api/promotions/by-referral/${ref._id}`);
                 return { ...ref, promotion: promoData.data || promoData };
-              } catch (err) {
+              } catch {
                 return ref;
               }
             }
@@ -39,7 +40,7 @@ export default function AdminReferralsPage() {
         
         setReferrals(referralsWithPromo);
         setLoading(false);
-      } catch (err) {
+      } catch {
         setLoading(false);
       }
     };
@@ -51,7 +52,7 @@ export default function AdminReferralsPage() {
     try {
       await referralService.delete(id);
       setReferrals(referrals.filter((r) => r._id !== id));
-    } catch (err) {
+    } catch {
       // Error handled
     }
   }
@@ -182,16 +183,33 @@ export default function AdminReferralsPage() {
       key: 'description',
       header: t('table.description'),
       accessor: (row) => {
-        if (typeof row.description === 'string') return row.description || '—';
-        return row.description?.[i18n.language] || row.description?.fr || row.description?.en || '—';
+        return getDescriptionInLanguage(row.description, i18n.language) || '—';
       },
       render: (row) => {
-        const desc = typeof row.description === 'string' 
-          ? row.description 
-          : (row.description?.[i18n.language] || row.description?.fr || row.description?.en || '');
+        const desc = getDescriptionInLanguage(row.description, i18n.language);
+        const availableLangs = getDescriptionAvailableLanguages(row.description);
+        
         return (
-          <div className="truncate" style={{ maxWidth: '200px' }} title={desc}>
-            {desc || '—'}
+          <div className="space-y-1">
+            <div className="truncate" style={{ maxWidth: '200px' }} title={desc}>
+              {desc || '—'}
+            </div>
+            {availableLangs.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {availableLangs.map(langCode => {
+                  const lang = AVAILABLE_LANGUAGES.find(l => l.code === langCode);
+                  return (
+                    <span
+                      key={langCode}
+                      className="text-xs bg-gray-100 px-2 py-0.5 rounded"
+                      title={`${lang?.name || langCode}`}
+                    >
+                      {lang?.flag || langCode}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         );
       }
@@ -419,7 +437,7 @@ export default function AdminReferralsPage() {
           referral={selectedReferral}
           isOpen={!!selectedReferral}
           onClose={() => setSelectedReferral(null)}
-          onCreated={async (newPromo) => {
+          onCreated={async () => {
             try {
               const promoData = await api.get(`/api/promotions/by-referral/${selectedReferral._id}`);
               const promotion = promoData.data || promoData;
@@ -428,7 +446,7 @@ export default function AdminReferralsPage() {
                 r._id === selectedReferral._id ? { ...r, isPromoted: true, promotion } : r
               );
               setReferrals(updatedReferrals);
-            } catch (err) {
+            } catch {
               const updatedReferrals = referrals.map(r =>
                 r._id === selectedReferral._id ? { ...r, isPromoted: true } : r
               );

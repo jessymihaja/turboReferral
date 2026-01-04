@@ -31,7 +31,10 @@
     "showing": "Affichage de",
     "to": "à",
     "entries": "entrées",
-    "current": "Actuel"
+    "current": "Actuel",
+    "add": "Ajouter",
+    "remove": "Supprimer",
+    "noTranslations": "Aucune traduction"
   },
   "navigation": {
     "toggleMenu": "Basculer le menu",

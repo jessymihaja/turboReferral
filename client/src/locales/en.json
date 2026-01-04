@@ -31,7 +31,10 @@
     "showing": "Showing",
     "to": "to",
     "entries": "entries",
-    "current": "Current"
+    "current": "Current",
+    "add": "Add",
+    "remove": "Remove",
+    "noTranslations": "No translations"
   },
   "navigation": {
     "toggleMenu": "Toggle menu",

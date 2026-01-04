@@ -6,6 +6,7 @@ import BadgeDisplay from "./BadgeDisplay";
 import { useEffect, useState } from "react";
 import { voteService, badgeService } from '../services';
 import { useTranslation } from 'react-i18next';
+import { getDescriptionInLanguage } from '../utils/languages';
 
 export default function PremiumReferralCard({ ref, onComment, user }) {
   const { t, i18n } = useTranslation();
@@ -354,10 +355,7 @@ export default function PremiumReferralCard({ ref, onComment, user }) {
 
       {/* Description */}
       <p style={{ marginBottom: "0.8rem", color: "#2c3e50" }}>
-        {typeof ref.description === 'string' 
-          ? ref.description 
-          : (ref.description?.[i18n.language] || ref.description?.fr || ref.description?.en || '')
-        }
+        {getDescriptionInLanguage(ref.description, i18n.language)}
       </p>
 
       {/* Votes + Commentaires */}

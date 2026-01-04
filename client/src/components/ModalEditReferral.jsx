@@ -5,27 +5,32 @@ import MultilingualDescriptionInput from './MultilingualDescriptionInput';
 import api from '../services/api';
 
 const ModalEditReferral = ({ referral, isOpen, onClose, onUpdated }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     link: '',
     code: '',
-    description: { fr: '', en: '' }
+    description: {}
   });
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (referral && isOpen) {
+      let description = {};
+      if (typeof referral.description === 'string') {
+        description = { [i18n.language]: referral.description };
+      } else if (typeof referral.description === 'object' && referral.description) {
+        description = { ...referral.description };
+      }
+      
       setFormData({
         link: referral.link || '',
         code: referral.code || '',
-        description: typeof referral.description === 'string' 
-          ? { fr: referral.description, en: '' }
-          : { fr: referral.description?.fr || '', en: referral.description?.en || '' }
+        description
       });
       setError('');
     }
-  }, [referral, isOpen]);
+  }, [referral, isOpen, i18n.language]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,52 +56,47 @@ const ModalEditReferral = ({ referral, isOpen, onClose, onUpdated }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-title flex items-center gap-2">
             <FaEdit className="text-blue-600" />
             {t('modal.editReferral', 'Modifier le parrainage')}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <FaTimes size={20} />
-          </button>
+          <button onClick={onClose} className="modal-close">×</button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="modal-body space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800 text-sm">{error}</p>
+            <div className="alert alert-error">
+              <p>{error}</p>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-group">
+              <label className="form-label">
                 {t('service.referralLink')}
               </label>
               <input
                 type="url"
                 value={formData.link}
                 onChange={(e) => setFormData({ ...formData, link: e.target.value, code: e.target.value ? '' : formData.code })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="form-input"
                 placeholder="https://exemple.com/ref/..."
                 disabled={!!formData.code}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-group">
+              <label className="form-label">
                 {t('service.referralCode')}
               </label>
               <input
                 type="text"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value, link: e.target.value ? '' : formData.link })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="form-input"
                 placeholder={t('service.enterCode')}
                 disabled={!!formData.link}
                 maxLength={20}
@@ -108,8 +108,8 @@ const ModalEditReferral = ({ referral, isOpen, onClose, onUpdated }) => {
             {t('service.or')}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="form-group">
+            <label className="form-label">
               {t('dashboard.description')}
             </label>
             <MultilingualDescriptionInput
@@ -120,11 +120,11 @@ const ModalEditReferral = ({ referral, isOpen, onClose, onUpdated }) => {
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="btn-secondary"
               disabled={loading}
             >
               {t('common.cancel')}
@@ -132,14 +132,19 @@ const ModalEditReferral = ({ referral, isOpen, onClose, onUpdated }) => {
             <button
               type="submit"
               disabled={loading || (!formData.link && !formData.code)}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="btn-primary"
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {t('modal.saving')}
+                </>
               ) : (
-                <FaSave />
+                <>
+                  <FaSave />
+                  {t('modal.saveChanges')}
+                </>
               )}
-              {loading ? t('modal.saving') : t('modal.saveChanges')}
             </button>
           </div>
         </form>

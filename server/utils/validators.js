@@ -62,6 +62,12 @@ const referralValidators = {
             throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
           }
         } else if (typeof value === 'object' && value !== null) {
+          const hasAtLeastOne = Object.values(value).some(
+            v => typeof v === 'string' && v.trim().length > 0
+          );
+          if (!hasAtLeastOne) {
+            throw new Error(t('validation.descriptionRequired'));
+          }
           for (const lang in value) {
             if (typeof value[lang] === 'string' && value[lang].length > VALIDATION.MAX_DESCRIPTION_LENGTH) {
               throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
@@ -92,6 +98,12 @@ const referralValidators = {
             throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
           }
         } else if (typeof value === 'object' && value !== null) {
+          const hasAtLeastOne = Object.values(value).some(
+            v => typeof v === 'string' && v.trim().length > 0
+          );
+          if (!hasAtLeastOne) {
+            throw new Error(t('validation.descriptionRequired'));
+          }
           for (const lang in value) {
             if (typeof value[lang] === 'string' && value[lang].length > VALIDATION.MAX_DESCRIPTION_LENGTH) {
               throw new Error(t('validation.descriptionMaxLength', { max: VALIDATION.MAX_DESCRIPTION_LENGTH }));
