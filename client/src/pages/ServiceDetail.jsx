@@ -502,7 +502,7 @@ export default function ServiceDetail() {
       )}
 
       <div className="page-header">
-        <button className="btn-ghost" onClick={() => navigate(-1)}>
+        <button className="btn-ghost" onClick={() => globalThis.history.length > 1 ? navigate(-1) : navigate('/')}>
           <FaArrowLeft /> {t('common.back')}
         </button>
       </div>
