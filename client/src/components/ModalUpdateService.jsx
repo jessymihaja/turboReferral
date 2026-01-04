@@ -26,6 +26,7 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
 
   const [names, setNames] = useState(initializeNames());
   const [descriptions, setDescriptions] = useState(initializeDescriptions());
+  const [website, setWebsite] = useState(service.website || "");
   const [category, setCategory] = useState(service.category?._id || "");
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
@@ -64,6 +65,7 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
       const formData = new FormData();
       formData.append("name", JSON.stringify(names));
       formData.append("description", JSON.stringify(descriptions));
+      formData.append("website", website.trim());
       formData.append("category", category);
       if (logo) formData.append("logo", logo, logo.name || 'logo.webp');
 
@@ -139,6 +141,17 @@ export default function ModalUpdateService({ service, onClose, onUpdated }) {
                 type="textarea"
                 minRows={4}
                 maxLength={500}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">{t('dashboard.website')}</label>
+              <input
+                type="url"
+                className="form-input"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                placeholder={t('dashboard.enterWebsite')}
               />
             </div>
 

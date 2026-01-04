@@ -20,6 +20,7 @@ router.get('/stats', getStats);
 router.get('/analytics', getAnalytics);
 router.get('/services', listServices);
 router.put('/services/:id/validate', idValidator, validateService);
+router.delete('/services/:id', idValidator, require('../controllers/serviceController').deleteService);
 router.get('/users', listUsers);
 router.get('/users/:id', idValidator, getUserDetails);
 router.put('/users/:id/block', idValidator, blockUser);

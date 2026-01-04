@@ -118,6 +118,8 @@
     "needsReview": "Needs Review",
     "validateService": "Validate Service",
     "editService": "Edit Service",
+    "deleteService": "Delete Service",
+    "confirmDeleteService": "Are you sure you want to delete this service? This action cannot be undone.",
     "addService": "Add Service",
     "deleteReferral": "Delete Referral",
     "promoteReferral": "Promote Referral",

@@ -12,6 +12,7 @@ const {
   setServiceValidation,
   updateService,
   getUserServices,
+  deleteService,
 } = require('../controllers/serviceController');
 
 router.get('/', getAllServices);
@@ -36,6 +37,12 @@ router.put(
   upload.single('logo'),
   idValidator,
   updateService
+);
+router.delete(
+  '/:id',
+  adminAuthMiddleware,
+  idValidator,
+  deleteService
 );
 
 module.exports = router;

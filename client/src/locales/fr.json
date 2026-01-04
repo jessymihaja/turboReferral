@@ -118,6 +118,8 @@
     "needsReview": "À vérifier",
     "validateService": "Valider le service",
     "editService": "Modifier le service",
+    "deleteService": "Supprimer le service",
+    "confirmDeleteService": "Êtes-vous sûr de vouloir supprimer ce service ? Cette action ne peut pas être annulée.",
     "addService": "Ajouter un service",
     "deleteReferral": "Supprimer le parrainage",
     "promoteReferral": "Promouvoir le parrainage",

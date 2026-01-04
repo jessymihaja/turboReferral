@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaCheck, FaEdit, FaBox, FaExclamationCircle, FaPlus } from 'react-icons/fa';
+import { FaCheck, FaEdit, FaBox, FaExclamationCircle, FaPlus, FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import AdminLayout from "../components/AdminLayout";
 import Table from "../components/Table";
@@ -46,6 +46,19 @@ export default function ServicesManagement() {
   function handleServiceAdded(newService) {
     setServices([newService, ...services]);
     setShowAddModal(false);
+  }
+
+  async function handleDeleteService(service) {
+    if (!window.confirm(t('admin.confirmDeleteService'))) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/admin/services/${service._id}`);
+      setServices(services.filter((s) => s._id !== service._id));
+    } catch (err) {
+      setError(err.message || t('errors.errorDeletingService'));
+    }
   }
 
   const serviceColumns = [
@@ -159,6 +172,13 @@ export default function ServicesManagement() {
             title={t('admin.editService')}
           >
             <FaEdit size={12} />
+          </button>
+          <button
+            onClick={() => handleDeleteService(service)}
+            className="btn-sm btn-danger"
+            title={t('admin.deleteService')}
+          >
+            <FaTrash size={12} />
           </button>
         </div>
       )

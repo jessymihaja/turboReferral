@@ -194,3 +194,18 @@ exports.updateService = asyncHandler(async (req, res) => {
 
   ResponseHandler.success(res, service, t('service.serviceUpdated'));
 });
+
+exports.deleteService = asyncHandler(async (req, res) => {
+  const service = await Service.findById(req.params.id);
+  if (!service) {
+    throw new AppError(t('service.serviceNotFound'), 404);
+  }
+
+  // Delete associated logo files
+  if (service.logo) {
+    await deleteImageVariants(service.logo);
+  }
+
+  await Service.findByIdAndDelete(req.params.id);
+  ResponseHandler.success(res, null, t('service.serviceDeleted'));
+});
