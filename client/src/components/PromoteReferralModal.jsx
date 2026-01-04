@@ -74,7 +74,13 @@ export default function PromoteReferralModal({ referral, isOpen, onClose, onCrea
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             <div className="alert alert-info" style={{ marginBottom: 'var(--space-4)' }}>
-              <strong>{referral.service?.name || t('common.services')}</strong>
+              <strong>
+                {(() => {
+                  const name = referral.service?.name;
+                  if (!name) return t('common.services');
+                  return typeof name === 'object' ? (name.fr || name.en || t('common.services')) : name;
+                })()}
+              </strong>
               <p style={{ fontSize: 'var(--font-size-sm)', marginTop: 'var(--space-1)' }}>
                 {getLocalizedText(referral.description, i18n.language) || referral._id}
               </p>

@@ -701,8 +701,17 @@ export default function ServiceDetail() {
                         }}
                       />
                     ) : (
-                      <div className="avatar">
-                        {(ref.user?.username?.charAt(0).toUpperCase() || "?")}
+                      <div className="avatar" style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: ref.source ? 'var(--color-success)' : 'var(--color-primary)',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {ref.source ? <FaGlobe size={18} /> : (ref.user?.username?.charAt(0).toUpperCase() || "?")}
                       </div>
                     )}
                     <div>
@@ -736,7 +745,7 @@ export default function ServiceDetail() {
                           <BadgeDisplay badges={userBadges[ref.user._id]} size="small" />
                         )}
                         {ref.source && (
-                          <BadgeDisplay badges={[{ type: 'promoted' }]} size="small" />
+                          <BadgeDisplay badges={[{ type: 'external' }]} size="small" />
                         )}
                       </div>
                       <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-tertiary)' }}>

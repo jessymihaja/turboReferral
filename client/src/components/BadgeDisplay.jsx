@@ -1,4 +1,4 @@
-import { FaMedal, FaAward, FaTrophy, FaCheckCircle, FaExclamationTriangle, FaCrown, FaStar } from "react-icons/fa";
+import { FaMedal, FaAward, FaTrophy, FaCheckCircle, FaExclamationTriangle, FaCrown, FaExternalLinkAlt } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
 
 export default function BadgeDisplay({ badges = [], size = "small" }) {
@@ -47,12 +47,12 @@ export default function BadgeDisplay({ badges = [], size = "small" }) {
       label: "Promoteur",
       title: "Promoteur officiel"
     },
-    promoted: {
-      icon: FaStar,
-      color: "#f39c12",
-      bgColor: "rgba(243, 156, 18, 0.15)",
-      label: "Promu",
-      title: "Référencement promu"
+    external: {
+      icon: FaExternalLinkAlt,
+      color: "#3498db",
+      bgColor: "rgba(52, 152, 219, 0.15)",
+      label: "Autre site",
+      title: "Provenant d'autres sites"
     }
   };
 
