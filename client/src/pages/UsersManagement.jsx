@@ -96,11 +96,15 @@ export default function UsersManagement() {
       key: 'role',
       header: 'Rôle',
       align: 'center',
-      render: (user) => (
-        <span className={`badge ${user.role === 'admin' ? 'badge-primary' : 'badge-secondary'}`}>
-          {user.role === 'admin' ? 'Admin' : 'Utilisateur'}
-        </span>
-      )
+      render: (user) => {
+        const roleConfig = {
+          admin: { label: 'Admin', class: 'badge-primary' },
+          promoter: { label: 'Promoteur', class: 'badge-warning' },
+          user: { label: 'Utilisateur', class: 'badge-secondary' }
+        };
+        const config = roleConfig[user.role] || roleConfig.user;
+        return <span className={`badge ${config.class}`}>{config.label}</span>;
+      }
     },
     {
       key: 'isBlocked',

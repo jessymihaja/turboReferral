@@ -424,8 +424,8 @@ exports.updateUserRole = asyncHandler(async (req, res) => {
   const userId = req.params.id;
   const { role } = req.body;
 
-  if (!role || !['user', 'admin'].includes(role)) {
-    throw new AppError('Rôle invalide. Doit être "user" ou "admin"', 400);
+  if (!role || !['user', 'admin', 'promoter'].includes(role)) {
+    throw new AppError('Rôle invalide. Doit être "user", "admin" ou "promoter"', 400);
   }
 
   const user = await User.findById(userId);
@@ -438,12 +438,46 @@ exports.updateUserRole = asyncHandler(async (req, res) => {
     throw new AppError('Vous ne pouvez pas modifier votre propre rôle', 403);
   }
 
+  const Badge = require('../models/Badge');
+  const Notification = require('../models/Notification');
+  const previousRole = user.role;
+  
   user.role = role;
   await user.save();
 
-  const message = role === 'admin'
-    ? 'Utilisateur promu administrateur avec succès'
-    : 'Utilisateur rétrogradé en utilisateur standard';
+  // Gérer le badge promoter
+  if (role === 'promoter' && previousRole !== 'promoter') {
+    // Ajouter le badge promoter
+    await Badge.findOneAndUpdate(
+      { user: userId, type: 'promoter' },
+      { user: userId, type: 'promoter', earnedAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    // Créer une notification
+    await Notification.create({
+      userId: userId,
+      title: 'Vous êtes maintenant Promoteur',
+      content: 'Félicitations ! Vous êtes maintenant un Promoteur. Vous pouvez ajouter plusieurs référencements par service avec une source. N\'oubliez pas d\'indiquer la source de vos référencements.',
+      isRead: false
+    });
+  } else if (role !== 'promoter' && previousRole === 'promoter') {
+    // Retirer le badge promoter
+    await Badge.deleteOne({ user: userId, type: 'promoter' });
+
+    // Créer une notification
+    await Notification.create({
+      userId: userId,
+      title: 'Statut Promoteur révoqué',
+      content: 'Votre statut de Promoteur a été révoqué. Vous ne pouvez désormais ajouter qu\'un seul référencement actif par service.',
+      isRead: false
+    });
+  }
+
+  const message = 
+    role === 'admin' ? 'Utilisateur promu administrateur avec succès' :
+    role === 'promoter' ? 'Utilisateur promu promoteur avec succès' :
+    'Utilisateur rétrogradé en utilisateur standard';
 
   ResponseHandler.success(res, { _id: user._id, username: user.username, email: user.email, role: user.role }, message);
 });

@@ -9,7 +9,7 @@ const badgeSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['referral_10', 'referral_50', 'referral_100', 'trusted', 'risky'],
+    enum: ['referral_10', 'referral_50', 'referral_100', 'trusted', 'risky', 'promoter', 'promoted'],
     required: [true, t('validation.badgeTypeRequired')],
   },
   earnedAt: {

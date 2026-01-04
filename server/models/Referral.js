@@ -33,6 +33,17 @@ const referralSchema = new mongoose.Schema({
     trim: true,
     maxlength: [VALIDATION.MAX_CODE_LENGTH, t('validation.codeMaxLength', { max: VALIDATION.MAX_CODE_LENGTH })],
   },
+  source: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        if (!v) return true;
+        return VALIDATION.SOURCE_URL_REGEX.test(v);
+      },
+      message: t('validation.sourceInvalid'),
+    },
+  },
   description: {
     type: mongoose.Schema.Types.Mixed, // Allows both String and Object
     validate: {
@@ -95,17 +106,22 @@ referralSchema.pre('validate', async function(next) {
     }
 
     if (this.isActive) {
-      const Referral = mongoose.model('Referral');
-      const query = {
-        service: this.service,
-        user: this.user,
-        isActive: true,
-        _id: { $ne: this._id }
-      };
+      const User = mongoose.model('User');
+      const userDoc = await User.findById(this.user);
+      
+      if (!userDoc || userDoc.role !== 'promoter') {
+        const Referral = mongoose.model('Referral');
+        const query = {
+          service: this.service,
+          user: this.user,
+          isActive: true,
+          _id: { $ne: this._id }
+        };
 
-      const existingActiveReferral = await Referral.findOne(query);
-      if (existingActiveReferral) {
-        return next(new Error(t('validation.oneActiveReferralPerService')));
+        const existingActiveReferral = await Referral.findOne(query);
+        if (existingActiveReferral) {
+          return next(new Error(t('validation.oneActiveReferralPerService')));
+        }
       }
     }
 

@@ -39,7 +39,8 @@ export default function ServiceDetail() {
     description: { fr: '', en: '' },
     type: 'permanent',
     dateDebut: new Date().toISOString().split('T')[0],
-    dateFin: ''
+    dateFin: '',
+    source: undefined
   });
   const [selectedReferral, setSelectedReferral] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -227,7 +228,7 @@ export default function ServiceDetail() {
     });
   }, [referrals]);
 
-  const hasActiveReferralForUser = user
+  const hasActiveReferralForUser = user && user.role !== 'promoter'
     ? referrals.some(ref =>
         (ref.user?.username === user.username || ref.user === user.username) &&
         ref.isActive
@@ -273,6 +274,7 @@ export default function ServiceDetail() {
         dateDebut: newReferral.dateDebut,
         dateFin: newReferral.type === 'temporary' ? newReferral.dateFin : undefined,
         turnstileToken,
+        source: newReferral.source || undefined,
       });
 
       const newRef = data.data || data;
@@ -290,7 +292,8 @@ export default function ServiceDetail() {
         description: { fr: '', en: '' },
         type: 'permanent',
         dateDebut: new Date().toISOString().split('T')[0],
-        dateFin: ''
+        dateFin: '',
+        source: undefined
       });
       setToast({ message: t('toast.referralAdded'), type: 'success' });
       
@@ -704,13 +707,36 @@ export default function ServiceDetail() {
                     )}
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
-                          {ref.user?.username
-                            ? ref.user.username.charAt(0).toUpperCase() + ref.user.username.slice(1).toLowerCase()
-                            : ref.user}
-                        </span>
+                        {ref.source ? (
+                          <a 
+                            href={ref.source}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ 
+                              fontWeight: '600', 
+                              color: 'var(--color-primary)',
+                              textDecoration: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 'var(--space-1)'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                            onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                          >
+                            De {new URL(ref.source).hostname.replace('www.', '')}
+                          </a>
+                        ) : (
+                          <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>
+                            {ref.user?.username
+                              ? ref.user.username.charAt(0).toUpperCase() + ref.user.username.slice(1).toLowerCase()
+                              : ref.user}
+                          </span>
+                        )}
                         {ref.user?._id && userBadges[ref.user._id] && (
                           <BadgeDisplay badges={userBadges[ref.user._id]} size="small" />
+                        )}
+                        {ref.source && (
+                          <BadgeDisplay badges={[{ type: 'promoted' }]} size="small" />
                         )}
                       </div>
                       <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-tertiary)' }}>
@@ -1046,6 +1072,28 @@ export default function ServiceDetail() {
                     maxLength={20}
                   />
                 </div>
+
+                {user.role === 'promoter' && (
+                  <div className="form-group">
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                      <FaLink /> Source <span style={{ color: 'var(--color-error)' }}>*</span>
+                    </label>
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="https://example.com"
+                      value={newReferral.source || ''}
+                      onChange={(e) => setNewReferral({ ...newReferral, source: e.target.value })}
+                      required
+                      style={{
+                        borderColor: newReferral.source ? 'var(--color-success)' : 'var(--color-border)'
+                      }}
+                    />
+                    <small style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--font-size-xs)', marginTop: 'var(--space-1)' }}>
+                      Indiquez la source d'où provient ce référencement
+                    </small>
+                  </div>
+                )}
 
                 <div className="form-group">
                   <label className="form-label">{t('dashboard.description')}</label>

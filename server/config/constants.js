@@ -2,6 +2,7 @@ module.exports = {
   ROLES: {
     USER: 'user',
     ADMIN: 'admin',
+    PROMOTER: 'promoter',
   },
 
   VOTE_TYPES: {
@@ -38,6 +39,7 @@ module.exports = {
     MAX_DESCRIPTION_LENGTH: 500,
     MAX_CODE_LENGTH: 20,
     URL_REGEX: /^https?:\/\/.+$/,
+    SOURCE_URL_REGEX: /^https?:\/\/([\w\-]+\.)+[\w\-]+/,
   },
 
   REFERRAL_TYPES: {

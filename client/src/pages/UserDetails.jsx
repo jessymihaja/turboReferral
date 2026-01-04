@@ -12,8 +12,7 @@ import {
   FaArrowLeft,
   FaTrash,
   FaShieldAlt,
-  FaCopy,
-  FaUserShield
+  FaCopy
 } from 'react-icons/fa';
 import Table from '../components/Table';
 import TimeAgo from '../components/TimeAgo';
@@ -30,10 +29,11 @@ export default function UserDetails() {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockReason, setBlockReason] = useState('');
   const [isBlocking, setIsBlocking] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: '' });
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    CustomToast.success('Copié dans le presse-papier');
+    setToast({ message: 'Copié dans le presse-papier', type: 'success' });
   };
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function UserDetails() {
       setUserDetails(data);
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement des détails');
-      CustomToast.error(err.message || 'Erreur lors du chargement des détails');
+      setToast({ message: err.message || 'Erreur lors du chargement des détails', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -66,9 +66,10 @@ export default function UserDetails() {
         reason: blockReason
       });
 
-      CustomToast.success(
-        isBlocked ? 'Utilisateur bloqué avec succès' : 'Utilisateur débloqué avec succès'
-      );
+      setToast({
+        message: isBlocked ? 'Utilisateur bloqué avec succès' : 'Utilisateur débloqué avec succès',
+        type: 'success'
+      });
 
       setUserDetails({
         ...userDetails,
@@ -78,7 +79,7 @@ export default function UserDetails() {
       setShowBlockModal(false);
       setBlockReason('');
     } catch (err) {
-      CustomToast.error(err.message || 'Erreur lors du blocage');
+      setToast({ message: err.message || 'Erreur lors du blocage', type: 'error' });
     } finally {
       setIsBlocking(false);
     }
@@ -91,40 +92,38 @@ export default function UserDetails() {
 
     try {
       await api.delete(`/api/admin/users/${id}`);
-      CustomToast.success('Utilisateur supprimé avec succès');
+      setToast({ message: 'Utilisateur supprimé avec succès', type: 'success' });
       navigate('/admin/users');
     } catch (err) {
-      CustomToast.error(err.message || 'Erreur lors de la suppression');
+      setToast({ message: err.message || 'Erreur lors de la suppression', type: 'error' });
     }
   }
 
-  async function handleToggleRole() {
+  async function handleToggleRole(newRole) {
     if (!userDetails) return;
 
-    const newRole = userDetails.user.role === 'admin' ? 'user' : 'admin';
-    const confirmMessage = newRole === 'admin'
-      ? 'Êtes-vous sûr de vouloir promouvoir cet utilisateur en administrateur ?'
-      : 'Êtes-vous sûr de vouloir rétrograder cet administrateur en utilisateur standard ?';
+    const roleMessages = {
+      admin: { confirm: 'Êtes-vous sûr de vouloir promouvoir cet utilisateur en administrateur ?', success: 'Utilisateur promu administrateur avec succès' },
+      promoter: { confirm: 'Êtes-vous sûr de vouloir promouvoir cet utilisateur en promoteur ?', success: 'Utilisateur promu promoteur avec succès' },
+      user: { confirm: 'Êtes-vous sûr de vouloir rétrograder cet utilisateur en utilisateur standard ?', success: 'Utilisateur rétrogradé en utilisateur standard' }
+    };
 
-    if (!confirm(confirmMessage)) {
+    const message = roleMessages[newRole];
+    if (!message || !confirm(message.confirm)) {
       return;
     }
 
     try {
       await api.put(`/api/admin/users/${id}/role`, { role: newRole });
 
-      CustomToast.success(
-        newRole === 'admin'
-          ? 'Utilisateur promu administrateur avec succès'
-          : 'Utilisateur rétrogradé en utilisateur standard'
-      );
+      setToast({ message: message.success, type: 'success' });
 
       setUserDetails({
         ...userDetails,
         user: { ...userDetails.user, role: newRole }
       });
     } catch (err) {
-      CustomToast.error(err.message || 'Erreur lors du changement de rôle');
+      setToast({ message: err.message || 'Erreur lors du changement de rôle', type: 'error' });
     }
   }
 
@@ -157,7 +156,11 @@ export default function UserDetails() {
     {
       key: 'service',
       header: 'Service',
-      render: (ref) => ref?.service?.name || '—'
+      render: (ref) => {
+        const name = ref?.service?.name;
+        if (!name) return '—';
+        return typeof name === 'object' ? (name.fr || name.en || '—') : name;
+      }
     },
     {
       key: 'linkOrCode',
@@ -185,7 +188,11 @@ export default function UserDetails() {
     {
       key: 'description',
       header: 'Description',
-      render: (ref) => ref?.description || '—'
+      render: (ref) => {
+        const desc = ref?.description;
+        if (!desc) return '—';
+        return typeof desc === 'object' ? (desc.fr || desc.en || '—') : desc;
+      }
     },
     {
       key: 'createdAt',
@@ -198,7 +205,11 @@ export default function UserDetails() {
     {
       key: 'service',
       header: 'Service',
-      render: (report) => report?.referralId?.service?.name || '—'
+      render: (report) => {
+        const name = report?.referralId?.service?.name;
+        if (!name) return '—';
+        return typeof name === 'object' ? (name.fr || name.en || '—') : name;
+      }
     },
     {
       key: 'referralOwner',
@@ -293,26 +304,39 @@ export default function UserDetails() {
 
   return (
     <div className="page-container user-details">
+      {toast.message && (
+        <CustomToast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ message: '', type: '' })}
+        />
+      )}
       <div className="user-details-header">
         <button onClick={() => navigate('/admin/users')} className="btn-secondary btn-back">
           <FaArrowLeft /> Retour
         </button>
         <div className="user-details-actions">
-          <button
-            onClick={handleToggleRole}
-            className={user.role === 'admin' ? 'btn-secondary' : 'btn-primary'}
-            title={user.role === 'admin' ? 'Rétrograder en utilisateur' : 'Promouvoir administrateur'}
-          >
-            {user.role === 'admin' ? (
-              <>
-                <FaUser /> Rétrograder
-              </>
-            ) : (
-              <>
-                <FaUserShield /> Promouvoir Admin
-              </>
-            )}
-          </button>
+          <div style={{ position: 'relative' }}>
+            <select
+              value={user.role}
+              onChange={(e) => handleToggleRole(e.target.value)}
+              className="btn-primary"
+              style={{ 
+                padding: '10px 15px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-bg-elevated)',
+                color: 'var(--color-text-primary)',
+                cursor: 'pointer',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: '500'
+              }}
+            >
+              <option value="user">👤 Utilisateur</option>
+              <option value="promoter">👑 Promoteur</option>
+              <option value="admin">🛡️ Administrateur</option>
+            </select>
+          </div>
           <button
             onClick={() => setShowBlockModal(true)}
             className={user.isBlocked ? 'btn-success' : 'btn-warning'}
@@ -351,8 +375,16 @@ export default function UserDetails() {
               <div className="user-profile-info">
                 <h1 className="user-profile-name">{user.username}</h1>
                 <div className="user-profile-meta">
-                  <span className={`badge ${user.role === 'admin' ? 'badge-primary' : 'badge-secondary'}`}>
-                    <FaShieldAlt size={10} /> {user.role === 'admin' ? 'Admin' : 'Utilisateur'}
+                  <span className={`badge ${
+                    user.role === 'admin' ? 'badge-primary' : 
+                    user.role === 'promoter' ? 'badge-warning' : 
+                    'badge-secondary'
+                  }`}>
+                    <FaShieldAlt size={10} /> {
+                      user.role === 'admin' ? 'Admin' : 
+                      user.role === 'promoter' ? 'Promoteur' : 
+                      'Utilisateur'
+                    }
                   </span>
                   <span className={`badge ${user.isBlocked ? 'badge-error' : 'badge-success'}`}>
                     {user.isBlocked ? (

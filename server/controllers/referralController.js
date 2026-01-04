@@ -19,8 +19,22 @@ exports.getAllReferrals = asyncHandler(async (req, res) => {
 });
 
 exports.createReferral = asyncHandler(async (req, res) => {
-  const { service, link, code, description, type, dateDebut, dateFin, turnstileToken } = req.body;
+  const { service, link, code, description, type, dateDebut, dateFin, turnstileToken, source } = req.body;
   const user = req.user._id;
+  const User = require('../models/User');
+  const userDoc = await User.findById(user);
+
+  if (!userDoc) {
+    throw new AppError(t('user.userNotFound'), 404);
+  }
+
+  if (userDoc.role === 'promoter' && !source) {
+    throw new AppError('Les promoteurs doivent fournir une source pour leurs référencements', 400);
+  }
+
+  if (userDoc.role !== 'promoter' && source) {
+    throw new AppError('Seuls les promoteurs peuvent ajouter une source', 403);
+  }
 
   if (!turnstileToken) {
     throw new AppError('Le captcha est requis', 400);
@@ -88,7 +102,8 @@ exports.createReferral = asyncHandler(async (req, res) => {
     description: descriptionObj,
     type,
     dateDebut,
-    dateFin
+    dateFin,
+    source: source || undefined
   };
 
   const referral = new Referral(referralData);

@@ -49,7 +49,8 @@
     "typeRequired": "Type is required",
     "dateFinRequired": "End date is required for temporary referrals and must be after start date",
     "oneActiveReferralPerService": "You can only have one active referral or code per service",
-    "reasonInvalid": "Invalid reason provided"
+    "reasonInvalid": "Invalid reason provided",
+    "sourceInvalid": "Invalid source format. Must be a valid URL"
   },
   "common": {
     "unknownLink": "unknown link",

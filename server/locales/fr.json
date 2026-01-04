@@ -48,7 +48,8 @@
     "codeMaxLength": "Le code ne peut pas dépasser {{max}} caractères",
     "typeRequired": "Le type est requis",
     "dateFinRequired": "La date de fin est requise pour les parrainages temporaires et doit être après la date de début",
-    "oneActiveReferralPerService": "Vous ne pouvez avoir qu'un seul parrainage ou code actif par service"
+    "oneActiveReferralPerService": "Vous ne pouvez avoir qu'un seul parrainage ou code actif par service",
+    "sourceInvalid": "Format de source invalide. Doit être une URL valide"
   },
   "auth": {
     "usernameOrEmailInUse": "Nom d'utilisateur ou email déjà utilisé",

@@ -49,6 +49,12 @@ export const STORAGE_KEYS = {
   TOKEN: 'token',
 };
 
+export const ROLES = {
+  USER: 'user',
+  ADMIN: 'admin',
+  PROMOTER: 'promoter',
+};
+
 export const VOTE_TYPES = {
   GOOD: 'good',
   BAD: 'bad',

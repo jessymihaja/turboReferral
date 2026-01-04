@@ -49,6 +49,11 @@ const referralValidators = {
       .matches(VALIDATION.URL_REGEX)
       .withMessage(t('validation.linkInvalid')),
     body('code').optional().trim().notEmpty().withMessage(t('validation.linkOrCodeRequired')),
+    body('source')
+      .optional()
+      .trim()
+      .matches(VALIDATION.SOURCE_URL_REGEX)
+      .withMessage(t('validation.sourceInvalid')),
     body('description')
       .optional()
       .custom((value) => {
@@ -74,6 +79,11 @@ const referralValidators = {
       .matches(VALIDATION.URL_REGEX)
       .withMessage(t('validation.linkInvalid')),
     body('code').optional().trim(),
+    body('source')
+      .optional()
+      .trim()
+      .matches(VALIDATION.SOURCE_URL_REGEX)
+      .withMessage(t('validation.sourceInvalid')),
     body('description')
       .optional()
       .custom((value) => {
